@@ -1,0 +1,7 @@
+name: mlp_projection
+type: mlp_projection
+input_dim: 512
+hidden_dims: [256]
+output_dim: 128
+dropout: 0.1
+use_batch_norm: true 

@@ -1,31 +1,46 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, Any
+from typing import Dict, Any, List, Optional
+from pydantic import Field
 from .base import (
     EventEncoder,
     SequenceEncoder,
     EmbeddingLayer,
     ProjectionHead,
     PredictionHead,
+    ComponentConfig,
+    ComponentRegistry,
 )
 
+class MLPConfig(ComponentConfig):
+    """Configuration for MLP-based components."""
+    
+    input_dim: int = Field(..., description="Input dimension")
+    hidden_dims: List[int] = Field(..., description="List of hidden dimensions")
+    output_dim: int = Field(..., description="Output dimension")
+    dropout: float = Field(0.1, description="Dropout rate")
+    use_batch_norm: bool = Field(True, description="Whether to use batch normalization")
 
+@ComponentRegistry.register("mlp_event_encoder")
 class MLPEventEncoder(EventEncoder):
     """A simple MLP-based event encoder."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: MLPConfig):
         super().__init__(config)
-        self.input_dim = config["input_dim"]
-        self.hidden_dims = config["hidden_dims"]
-        self.output_dim = config["output_dim"]
+        self.input_dim = config.input_dim
+        self.hidden_dims = config.hidden_dims
+        self.output_dim = config.output_dim
 
         layers = []
         prev_dim = self.input_dim
         for hidden_dim in self.hidden_dims:
-            layers.extend(
-                [nn.Linear(prev_dim, hidden_dim), nn.ReLU(), nn.BatchNorm1d(hidden_dim)]
-            )
+            layers.extend([
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
+                nn.Dropout(config.dropout)
+            ])
             prev_dim = hidden_dim
 
         layers.append(nn.Linear(prev_dim, self.output_dim))
@@ -34,105 +49,102 @@ class MLPEventEncoder(EventEncoder):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.mlp(x)
 
+class SequenceModelConfig(ComponentConfig):
+    """Base configuration for sequence models."""
+    
+    input_dim: int = Field(..., description="Input dimension")
+    hidden_dim: int = Field(..., description="Hidden dimension")
+    num_layers: int = Field(1, description="Number of layers")
+    dropout: float = Field(0.1, description="Dropout rate")
+    bidirectional: bool = Field(False, description="Whether to use bidirectional processing")
 
-class BaseSequenceModel(nn.Module):
-    """Base class for sequence models."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.input_dim = config["input_dim"]
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.dropout = config.get("dropout", 0.1)
-        self.bidirectional = config.get("bidirectional", False)
-
-        # Input projection if needed
-        if self.input_dim != self.hidden_dim:
-            self.input_projection = nn.Linear(self.input_dim, self.hidden_dim)
-        else:
-            self.input_projection = nn.Identity()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError
-
-
-class RNNSequenceModel(nn.Module):
+@ComponentRegistry.register("rnn")
+class RNNSequenceModel(SequenceEncoder):
     """Basic RNN sequence model."""
     
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.dropout = config.get("dropout", 0.0)
+    def __init__(self, config: SequenceModelConfig):
+        super().__init__(config)
+        self.hidden_dim = config.hidden_dim
+        self.num_layers = config.num_layers
+        self.dropout = config.dropout
         
         self.rnn = nn.RNN(
-            input_size=config["input_dim"],
+            input_size=config.input_dim,
             hidden_size=self.hidden_dim,
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
-            batch_first=True
+            batch_first=True,
+            bidirectional=config.bidirectional
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.rnn(x)[0]
 
-
-class LSTMSequenceModel(nn.Module):
+@ComponentRegistry.register("lstm")
+class LSTMSequenceModel(SequenceEncoder):
     """LSTM sequence model."""
     
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.dropout = config.get("dropout", 0.0)
+    def __init__(self, config: SequenceModelConfig):
+        super().__init__(config)
+        self.hidden_dim = config.hidden_dim
+        self.num_layers = config.num_layers
+        self.dropout = config.dropout
         
         self.lstm = nn.LSTM(
-            input_size=config["input_dim"],
+            input_size=config.input_dim,
             hidden_size=self.hidden_dim,
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
-            batch_first=True
+            batch_first=True,
+            bidirectional=config.bidirectional
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.lstm(x)[0]
 
-
-class GRUSequenceModel(nn.Module):
+@ComponentRegistry.register("gru")
+class GRUSequenceModel(SequenceEncoder):
     """GRU sequence model."""
     
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.dropout = config.get("dropout", 0.0)
+    def __init__(self, config: SequenceModelConfig):
+        super().__init__(config)
+        self.hidden_dim = config.hidden_dim
+        self.num_layers = config.num_layers
+        self.dropout = config.dropout
         
         self.gru = nn.GRU(
-            input_size=config["input_dim"],
+            input_size=config.input_dim,
             hidden_size=self.hidden_dim,
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
-            batch_first=True
+            batch_first=True,
+            bidirectional=config.bidirectional
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.gru(x)[0]
 
+class TransformerConfig(SequenceModelConfig):
+    """Configuration for Transformer models."""
+    
+    num_heads: int = Field(4, description="Number of attention heads")
+    dim_feedforward: int = Field(..., description="Dimension of feedforward network")
 
-class TransformerSequenceModel(nn.Module):
+@ComponentRegistry.register("transformer")
+class TransformerSequenceModel(SequenceEncoder):
     """Transformer sequence model."""
     
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.num_heads = config.get("num_heads", 4)
-        self.dropout = config.get("dropout", 0.0)
+    def __init__(self, config: TransformerConfig):
+        super().__init__(config)
+        self.hidden_dim = config.hidden_dim
+        self.num_layers = config.num_layers
+        self.num_heads = config.num_heads
+        self.dropout = config.dropout
         
         encoder_layer = nn.TransformerEncoderLayer(
-            d_model=config["input_dim"],
+            d_model=config.input_dim,
             nhead=self.num_heads,
-            dim_feedforward=self.hidden_dim,
+            dim_feedforward=config.dim_feedforward,
             dropout=self.dropout,
             batch_first=True
         )
@@ -144,436 +156,292 @@ class TransformerSequenceModel(nn.Module):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.transformer(x)
 
-
-class SSMSequenceModel(nn.Module):
-    """State Space Model sequence model."""
+class EmbeddingConfig(ComponentConfig):
+    """Configuration for embedding layers."""
     
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.dropout = config.get("dropout", 0.0)
-        
-        # Simple implementation using linear layers
-        self.layers = nn.ModuleList([
-            nn.Sequential(
-                nn.Linear(config["input_dim"] if i == 0 else self.hidden_dim, self.hidden_dim),
-                nn.ReLU(),
-                nn.Dropout(self.dropout)
-            ) for i in range(self.num_layers)
-        ])
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        for layer in self.layers:
-            x = layer(x)
-        return x
+    embedding_dims: List[tuple[int, int]] = Field(..., description="List of (num_categories, embedding_dim) tuples")
+    dropout: float = Field(0.1, description="Dropout rate")
 
-
-class S4Model(nn.Module):
-    """S4 sequence model."""
-    
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__()
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 1)
-        self.dropout = config.get("dropout", 0.0)
-        
-        # Simple implementation using linear layers
-        self.layers = nn.ModuleList([
-            nn.Sequential(
-                nn.Linear(config["input_dim"] if i == 0 else self.hidden_dim, self.hidden_dim),
-                nn.ReLU(),
-                nn.Dropout(self.dropout)
-            ) for i in range(self.num_layers)
-        ])
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        for layer in self.layers:
-            x = layer(x)
-        return x
-
-
-class FlexibleSequenceEncoder(SequenceEncoder):
-    """A flexible sequence encoder that can use any sequence model."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.model_type = config["model_type"]
-        self.output_dim = config.get("output_dim", config["hidden_dim"])
-
-        # Initialize the appropriate sequence model
-        if self.model_type == "rnn":
-            self.model = RNNSequenceModel(config)
-        elif self.model_type == "lstm":
-            self.model = LSTMSequenceModel(config)
-        elif self.model_type == "gru":
-            self.model = GRUSequenceModel(config)
-        elif self.model_type == "transformer":
-            self.model = TransformerSequenceModel(config)
-        elif self.model_type == "ssm":
-            self.model = SSMSequenceModel(config)
-        elif self.model_type == "s4":
-            self.model = S4Model(config)
-        else:
-            raise ValueError(f"Unknown model type: {self.model_type}")
-
-        # Optional output projection
-        if self.output_dim != config["hidden_dim"]:
-            self.output_projection = nn.Linear(config["hidden_dim"], self.output_dim)
-        else:
-            self.output_projection = nn.Identity()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.model(x)
-        return self.output_projection(x)
-
-
+@ComponentRegistry.register("categorical_embedding")
 class CategoricalEmbedding(EmbeddingLayer):
     """Embedding layer for categorical variables."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: EmbeddingConfig):
         super().__init__(config)
-        self.embedding_dims = config[
-            "embedding_dims"
-        ]  # List of (num_categories, embedding_dim)
-        self.embeddings = nn.ModuleList(
-            [
-                nn.Embedding(num_categories, embedding_dim)
-                for num_categories, embedding_dim in self.embedding_dims
-            ]
-        )
+        self.embedding_dims = config.embedding_dims
+        self.embeddings = nn.ModuleList([
+            nn.Embedding(num_categories, embedding_dim)
+            for num_categories, embedding_dim in self.embedding_dims
+        ])
+        self.dropout = nn.Dropout(config.dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         # x shape: (batch_size, num_categorical_features)
         embedded = []
         for i, embedding in enumerate(self.embeddings):
             embedded.append(embedding(x[:, i]))
-        return torch.cat(embedded, dim=1)
+        return self.dropout(torch.cat(embedded, dim=1))
 
+class ProjectionHeadConfig(ComponentConfig):
+    """Configuration for projection heads."""
+    
+    input_dim: int = Field(..., description="Input dimension")
+    hidden_dims: List[int] = Field(..., description="List of hidden dimensions")
+    output_dim: int = Field(..., description="Output dimension")
+    dropout: float = Field(0.1, description="Dropout rate")
+    use_batch_norm: bool = Field(True, description="Whether to use batch normalization")
 
+@ComponentRegistry.register("mlp_projection")
 class MLPProjectionHead(ProjectionHead):
-    """A simple MLP projection head."""
+    """MLP-based projection head."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: ProjectionHeadConfig):
         super().__init__(config)
-        self.input_dim = config["input_dim"]
-        self.hidden_dim = config["hidden_dim"]
-        self.output_dim = config["output_dim"]
+        self.input_dim = config.input_dim
+        self.hidden_dims = config.hidden_dims
+        self.output_dim = config.output_dim
 
-        self.projection = nn.Sequential(
-            nn.Linear(self.input_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.output_dim),
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.projection(x)
-
-
-class ClassificationHead(PredictionHead):
-    """A classification head."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.input_dim = config["input_dim"]
-        self.num_classes = config["num_classes"]
-        self.dropout = config.get("dropout", 0.1)
-
-        self.classifier = nn.Sequential(
-            nn.Dropout(self.dropout), nn.Linear(self.input_dim, self.num_classes)
-        )
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        return self.classifier(x)
-
-
-class AutoEncoderEventEncoder(EventEncoder):
-    """An autoencoder-based event encoder that learns through reconstruction."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.input_dim = config["input_dim"]
-        self.hidden_dims = config["hidden_dims"]
-        self.output_dim = config["output_dim"]
-        self.dropout = config.get("dropout", 0.1)
-
-        # Encoder layers
-        encoder_layers = []
-        prev_dim = self.input_dim
-        for hidden_dim in self.hidden_dims:
-            encoder_layers.extend([
-                nn.Linear(prev_dim, hidden_dim),
-                nn.ReLU(),
-                nn.BatchNorm1d(hidden_dim),
-                nn.Dropout(self.dropout)
-            ])
-            prev_dim = hidden_dim
-        
-        # Final encoder layer
-        encoder_layers.append(nn.Linear(prev_dim, self.output_dim))
-        self.encoder = nn.Sequential(*encoder_layers)
-
-        # Decoder layers (mirror of encoder)
-        decoder_layers = []
-        prev_dim = self.output_dim
-        for hidden_dim in reversed(self.hidden_dims):
-            decoder_layers.extend([
-                nn.Linear(prev_dim, hidden_dim),
-                nn.ReLU(),
-                nn.BatchNorm1d(hidden_dim),
-                nn.Dropout(self.dropout)
-            ])
-            prev_dim = hidden_dim
-        
-        # Final decoder layer
-        decoder_layers.append(nn.Linear(prev_dim, self.input_dim))
-        self.decoder = nn.Sequential(*decoder_layers)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through the encoder."""
-        return self.encoder(x)
-
-    def decode(self, z: torch.Tensor) -> torch.Tensor:
-        """Decode the latent representation."""
-        return self.decoder(z)
-
-    def reconstruction_loss(self, x: torch.Tensor) -> torch.Tensor:
-        """Compute reconstruction loss."""
-        z = self.encoder(x)
-        x_recon = self.decoder(z)
-        return F.mse_loss(x_recon, x)
-
-
-class ContrastiveEventEncoder(EventEncoder):
-    """An event encoder designed for contrastive learning."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.input_dim = config["input_dim"]
-        self.hidden_dims = config["hidden_dims"]
-        self.output_dim = config["output_dim"]
-        self.dropout = config.get("dropout", 0.1)
-        self.temperature = config.get("temperature", 0.07)
-
-        # Encoder layers
         layers = []
         prev_dim = self.input_dim
         for hidden_dim in self.hidden_dims:
             layers.extend([
                 nn.Linear(prev_dim, hidden_dim),
                 nn.ReLU(),
-                nn.BatchNorm1d(hidden_dim),
-                nn.Dropout(self.dropout)
+                nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
+                nn.Dropout(config.dropout)
             ])
             prev_dim = hidden_dim
-        
-        # Final encoder layer
-        layers.append(nn.Linear(prev_dim, self.output_dim))
-        self.encoder = nn.Sequential(*layers)
 
-        # Projection head for contrastive learning
-        self.projection = nn.Sequential(
-            nn.Linear(self.output_dim, self.output_dim),
-            nn.ReLU(),
-            nn.Linear(self.output_dim, self.output_dim)
-        )
+        layers.append(nn.Linear(prev_dim, self.output_dim))
+        self.mlp = nn.Sequential(*layers)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through the encoder."""
-        h = self.encoder(x)
-        z = self.projection(h)
-        return F.normalize(z, dim=1)  # L2 normalize for contrastive learning
+        return self.mlp(x)
+
+class PredictionHeadConfig(ComponentConfig):
+    """Configuration for prediction heads."""
+    
+    input_dim: int = Field(..., description="Input dimension")
+    num_classes: int = Field(..., description="Number of output classes")
+    hidden_dims: Optional[List[int]] = Field(None, description="Optional list of hidden dimensions")
+    dropout: float = Field(0.1, description="Dropout rate")
+    use_batch_norm: bool = Field(True, description="Whether to use batch normalization")
+
+@ComponentRegistry.register("classification")
+class ClassificationHead(PredictionHead):
+    """Classification head."""
+
+    def __init__(self, config: PredictionHeadConfig):
+        super().__init__(config)
+        self.input_dim = config.input_dim
+        self.num_classes = config.num_classes
+
+        if config.hidden_dims:
+            layers = []
+            prev_dim = self.input_dim
+            for hidden_dim in config.hidden_dims:
+                layers.extend([
+                    nn.Linear(prev_dim, hidden_dim),
+                    nn.ReLU(),
+                    nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
+                    nn.Dropout(config.dropout)
+                ])
+                prev_dim = hidden_dim
+            layers.append(nn.Linear(prev_dim, self.num_classes))
+            self.mlp = nn.Sequential(*layers)
+        else:
+            self.mlp = nn.Linear(self.input_dim, self.num_classes)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.mlp(x)
+
+class AutoEncoderConfig(MLPConfig):
+    """Configuration for autoencoder."""
+    
+    use_reconstruction_loss: bool = Field(True, description="Whether to use reconstruction loss")
+
+@ComponentRegistry.register("autoencoder")
+class AutoEncoderEventEncoder(EventEncoder):
+    """Autoencoder-based event encoder."""
+
+    def __init__(self, config: AutoEncoderConfig):
+        super().__init__(config)
+        self.input_dim = config.input_dim
+        self.hidden_dims = config.hidden_dims
+        self.output_dim = config.output_dim
+        self.use_reconstruction_loss = config.use_reconstruction_loss
+
+        # Encoder
+        encoder_layers = []
+        prev_dim = self.input_dim
+        for hidden_dim in self.hidden_dims:
+            encoder_layers.extend([
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
+                nn.Dropout(config.dropout)
+            ])
+            prev_dim = hidden_dim
+        encoder_layers.append(nn.Linear(prev_dim, self.output_dim))
+        self.encoder = nn.Sequential(*encoder_layers)
+
+        # Decoder
+        decoder_layers = []
+        prev_dim = self.output_dim
+        for hidden_dim in reversed(self.hidden_dims):
+            decoder_layers.extend([
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
+                nn.Dropout(config.dropout)
+            ])
+            prev_dim = hidden_dim
+        decoder_layers.append(nn.Linear(prev_dim, self.input_dim))
+        self.decoder = nn.Sequential(*decoder_layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.encoder(x)
+
+    def decode(self, z: torch.Tensor) -> torch.Tensor:
+        return self.decoder(z)
+
+    def reconstruction_loss(self, x: torch.Tensor) -> torch.Tensor:
+        z = self.encoder(x)
+        x_recon = self.decoder(z)
+        return F.mse_loss(x_recon, x)
+
+class ContrastiveConfig(MLPConfig):
+    """Configuration for contrastive learning."""
+    
+    temperature: float = Field(0.07, description="Temperature for contrastive loss")
+
+@ComponentRegistry.register("contrastive")
+class ContrastiveEventEncoder(EventEncoder):
+    """Contrastive learning-based event encoder."""
+
+    def __init__(self, config: ContrastiveConfig):
+        super().__init__(config)
+        self.input_dim = config.input_dim
+        self.hidden_dims = config.hidden_dims
+        self.output_dim = config.output_dim
+        self.temperature = config.temperature
+
+        # Encoder
+        encoder_layers = []
+        prev_dim = self.input_dim
+        for hidden_dim in self.hidden_dims:
+            encoder_layers.extend([
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
+                nn.Dropout(config.dropout)
+            ])
+            prev_dim = hidden_dim
+        encoder_layers.append(nn.Linear(prev_dim, self.output_dim))
+        self.encoder = nn.Sequential(*encoder_layers)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        return self.encoder(x)
 
     def contrastive_loss(self, z1: torch.Tensor, z2: torch.Tensor) -> torch.Tensor:
-        """Compute contrastive loss between two views of the same input."""
+        # Normalize embeddings
+        z1 = F.normalize(z1, dim=1)
+        z2 = F.normalize(z2, dim=1)
+
         # Compute similarity matrix
         similarity = torch.matmul(z1, z2.t()) / self.temperature
-        
-        # Labels are the diagonal elements (positive pairs)
-        labels = torch.arange(z1.size(0), device=z1.device)
-        
-        # Compute loss for both directions
-        loss_1 = F.cross_entropy(similarity, labels)
-        loss_2 = F.cross_entropy(similarity.t(), labels)
-        
-        return (loss_1 + loss_2) / 2
 
+        # Labels are on the diagonal
+        labels = torch.arange(similarity.size(0), device=similarity.device)
 
-class InputCorruption(nn.Module):
-    """Base class for input corruption strategies."""
+        # Compute loss
+        loss = F.cross_entropy(similarity, labels)
+        return loss
 
-    def __init__(self, config: Dict[str, Any]):
+class CorruptionConfig(ComponentConfig):
+    """Base configuration for corruption strategies."""
+    
+    corruption_rate: float = Field(0.15, description="Rate of corruption")
+
+@ComponentRegistry.register("random_masking")
+class RandomMasking(nn.Module):
+    """Random masking corruption strategy."""
+
+    def __init__(self, config: CorruptionConfig):
         super().__init__()
-        self.corruption_rate = config.get("corruption_rate", 0.15)
-        self.mask_value = config.get("mask_value", 0.0)
+        self.corruption_rate = config.corruption_rate
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        raise NotImplementedError
+        mask = torch.rand_like(x) > self.corruption_rate
+        return x * mask
 
+@ComponentRegistry.register("gaussian_noise")
+class GaussianNoise(nn.Module):
+    """Gaussian noise corruption strategy."""
 
-class RandomMasking(InputCorruption):
-    """Random feature masking (inspired by SCARF)."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.mask_distribution = config.get("mask_distribution", "uniform")
-        self.feature_importance = config.get("feature_importance", None)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        batch_size, n_features = x.shape
-        device = x.device
-
-        if self.mask_distribution == "uniform":
-            mask = torch.rand(batch_size, n_features, device=device) > self.corruption_rate
-        elif self.mask_distribution == "importance":
-            if self.feature_importance is None:
-                raise ValueError("Feature importance must be provided for importance-based masking")
-            probs = torch.tensor(self.feature_importance, device=device)
-            probs = probs / probs.sum()
-            mask = torch.rand(batch_size, n_features, device=device) > (probs * self.corruption_rate)
-        else:
-            raise ValueError(f"Unknown mask distribution: {self.mask_distribution}")
-
-        return x * mask + self.mask_value * (~mask)
-
-
-class GaussianNoise(InputCorruption):
-    """Additive Gaussian noise corruption."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.noise_scale = config.get("noise_scale", 0.1)
-        self.feature_wise = config.get("feature_wise", True)
+    def __init__(self, config: CorruptionConfig):
+        super().__init__()
+        self.corruption_rate = config.corruption_rate
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        if self.feature_wise:
-            # Different noise scale per feature
-            noise = torch.randn_like(x) * self.noise_scale
-        else:
-            # Same noise scale for all features
-            noise = torch.randn_like(x) * self.noise_scale
+        noise = torch.randn_like(x) * self.corruption_rate
         return x + noise
 
+@ComponentRegistry.register("swapping")
+class SwappingCorruption(nn.Module):
+    """Feature swapping corruption strategy."""
 
-class SwappingCorruption(InputCorruption):
-    """Feature swapping corruption (inspired by ReConTab)."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.swap_prob = config.get("swap_prob", 0.1)
-        self.feature_groups = config.get("feature_groups", None)
+    def __init__(self, config: CorruptionConfig):
+        super().__init__()
+        self.corruption_rate = config.corruption_rate
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        batch_size, n_features = x.shape
-        device = x.device
+        # Randomly select features to swap
+        mask = torch.rand_like(x) < self.corruption_rate
+        # Create a copy of x with shuffled features
+        x_shuffled = x[torch.randperm(x.size(0))]
+        # Apply mask
+        return torch.where(mask, x_shuffled, x)
 
-        if self.feature_groups is None:
-            # Random swapping between any features
-            swap_mask = torch.rand(batch_size, n_features, device=device) < self.swap_prob
-            for i in range(batch_size):
-                if swap_mask[i].any():
-                    swap_indices = torch.randperm(n_features, device=device)
-                    x[i, swap_mask[i]] = x[i, swap_indices[swap_mask[i]]]
-        else:
-            # Swapping within feature groups
-            for group in self.feature_groups:
-                group_mask = torch.zeros(n_features, dtype=torch.bool, device=device)
-                group_mask[group] = True
-                swap_mask = (torch.rand(batch_size, device=device) < self.swap_prob).unsqueeze(1)
-                for i in range(batch_size):
-                    if swap_mask[i].any():
-                        group_indices = torch.nonzero(group_mask).squeeze()
-                        swap_indices = group_indices[torch.randperm(len(group_indices), device=device)]
-                        x[i, group_mask] = x[i, swap_indices]
+@ComponentRegistry.register("vime")
+class VIMECorruption(nn.Module):
+    """VIME-style corruption strategy."""
 
+    def __init__(self, config: CorruptionConfig):
+        super().__init__()
+        self.corruption_rate = config.corruption_rate
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        # Random masking
+        mask = torch.rand_like(x) > self.corruption_rate
+        x_masked = x * mask
+
+        # Add Gaussian noise
+        noise = torch.randn_like(x) * self.corruption_rate
+        x_noisy = x + noise
+
+        # Combine strategies
+        return torch.where(mask, x_masked, x_noisy)
+
+class CorruptionPipelineConfig(ComponentConfig):
+    """Configuration for corruption pipeline."""
+    
+    strategies: List[str] = Field(..., description="List of corruption strategies to apply")
+    corruption_rates: List[float] = Field(..., description="Corruption rates for each strategy")
+
+@ComponentRegistry.register("corruption_pipeline")
+class CorruptionPipeline(nn.Module):
+    """Pipeline of corruption strategies."""
+
+    def __init__(self, config: CorruptionPipelineConfig):
+        super().__init__()
+        self.strategies = []
+        for strategy_name, rate in zip(config.strategies, config.corruption_rates):
+            strategy_config = CorruptionConfig(corruption_rate=rate)
+            strategy = ComponentRegistry.get(strategy_name)(strategy_config)
+            self.strategies.append(strategy)
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        for strategy in self.strategies:
+            x = strategy(x)
         return x
-
-
-class VIMECorruption(InputCorruption):
-    """VIME-style corruption with both masking and swapping."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.mask_prob = config.get("mask_prob", 0.15)
-        self.swap_prob = config.get("swap_prob", 0.1)
-        self.noise_scale = config.get("noise_scale", 0.1)
-        self.feature_importance = config.get("feature_importance", None)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        batch_size, n_features = x.shape
-        device = x.device
-
-        # 1. Random masking
-        if self.feature_importance is not None:
-            probs = torch.tensor(self.feature_importance, device=device)
-            probs = probs / probs.sum()
-            mask = torch.rand(batch_size, n_features, device=device) > (probs * self.mask_prob)
-        else:
-            mask = torch.rand(batch_size, n_features, device=device) > self.mask_prob
-
-        # 2. Feature swapping
-        swap_mask = torch.rand(batch_size, n_features, device=device) < self.swap_prob
-        for i in range(batch_size):
-            if swap_mask[i].any():
-                swap_indices = torch.randperm(n_features, device=device)
-                x[i, swap_mask[i]] = x[i, swap_indices[swap_mask[i]]]
-
-        # 3. Add noise to masked values
-        noise = torch.randn_like(x) * self.noise_scale
-        x = x * mask + (self.mask_value + noise) * (~mask)
-
-        return x
-
-
-class CorruptionPipeline(InputCorruption):
-    """Pipeline of multiple corruption strategies."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.corruptions = {
-            "masking": RandomMasking(config) if config.get("use_masking", True) else None,
-            "noise": GaussianNoise(config) if config.get("use_noise", True) else None,
-            "swapping": SwappingCorruption(config) if config.get("use_swapping", True) else None,
-            "vime": VIMECorruption(config) if config.get("use_vime", False) else None,
-        }
-        # Remove None values
-        self.corruptions = {k: v for k, v in self.corruptions.items() if v is not None}
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        for key in ["masking", "noise", "swapping", "vime"]:
-            if key in self.corruptions:
-                x = self.corruptions[key](x)
-        return x
-
-
-class TransformerSequenceEncoder(SequenceEncoder):
-    """Transformer-based sequence encoder."""
-
-    def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.input_dim = config["input_dim"]
-        self.hidden_dim = config["hidden_dim"]
-        self.num_layers = config.get("num_layers", 2)
-        self.num_heads = config.get("num_heads", 4)
-        self.dropout = config.get("dropout", 0.1)
-
-        encoder_layer = nn.TransformerEncoderLayer(
-            d_model=self.hidden_dim,
-            nhead=self.num_heads,
-            dim_feedforward=self.hidden_dim * 4,
-            dropout=self.dropout,
-            batch_first=True,
-        )
-        self.transformer = nn.TransformerEncoder(
-            encoder_layer, num_layers=self.num_layers
-        )
-
-        # Input projection if needed
-        if self.input_dim != self.hidden_dim:
-            self.input_projection = nn.Linear(self.input_dim, self.hidden_dim)
-        else:
-            self.input_projection = nn.Identity()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.input_projection(x)
-        return self.transformer(x)

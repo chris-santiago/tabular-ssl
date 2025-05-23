@@ -1,145 +1,98 @@
-import hydra
-import pytorch_lightning as lit
-from omegaconf import DictConfig, OmegaConf
-from tabular_ssl.utils.utils import get_logger, extras
-import torch
-import warnings
-from typing import Optional, Any
+#!/usr/bin/env python
+
 import os
+import dotenv
+import hydra
+from omegaconf import DictConfig, OmegaConf
+import pytorch_lightning as pl
+from pytorch_lightning import LightningModule, LightningDataModule, Callback, Trainer
+from pytorch_lightning.loggers import Logger
 
-log = get_logger(__name__)
+# Load environment variables from `.env` file if it exists
+# Recursively searches for `.env` in all folders starting from work dir
+dotenv.load_dotenv(override=True)
 
+from tabular_ssl import utils
 
-def setup_environment(config: DictConfig) -> None:
-    """Setup environment variables and configurations."""
-    # Set PyTorch to use deterministic algorithms if specified
-    if config.get("deterministic", False):
-        torch.backends.cudnn.deterministic = True
-        torch.backends.cudnn.benchmark = False
-        torch.use_deterministic_algorithms(True)
-    
-    # Set number of threads for PyTorch
-    if config.get("num_workers", None) is not None:
-        torch.set_num_threads(config.num_workers)
-    
-    # Set memory growth for GPU if available
-    if torch.cuda.is_available() and config.get("gpu_memory_fraction", None) is not None:
-        torch.cuda.set_per_process_memory_fraction(config.gpu_memory_fraction)
-    
-    # Set environment variables for better performance
-    os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:512"
-    os.environ["OMP_NUM_THREADS"] = str(config.get("num_workers", 1))
-
-
-def instantiate_model(config: DictConfig) -> lit.LightningModule:
-    """Instantiate the model with error handling."""
-    try:
-        log.info(f"Instantiating model <{config.model._target_}>")
-        model = hydra.utils.instantiate(config.model)
-        return model
-    except Exception as e:
-        log.error(f"Error instantiating model: {str(e)}")
-        raise
-
-
-def instantiate_datamodule(config: DictConfig) -> lit.LightningDataModule:
-    """Instantiate the datamodule with error handling."""
-    try:
-        log.info(f"Instantiating datamodule <{config.data._target_}>")
-        datamodule = hydra.utils.instantiate(config.data)
-        return datamodule
-    except Exception as e:
-        log.error(f"Error instantiating datamodule: {str(e)}")
-        raise
-
-
-def instantiate_trainer(config: DictConfig, callbacks: list, logger: list) -> lit.Trainer:
-    """Instantiate the trainer with error handling."""
-    try:
-        log.info(f"Instantiating trainer <{config.trainer._target_}>")
-        trainer = hydra.utils.instantiate(
-            config.trainer, callbacks=callbacks, logger=logger
-        )
-        return trainer
-    except Exception as e:
-        log.error(f"Error instantiating trainer: {str(e)}")
-        raise
+log = utils.get_logger(__name__)
 
 
 @hydra.main(version_base=None, config_path="../configs", config_name="config")
-def main(config: DictConfig) -> Optional[float]:
-    """Main training pipeline with improved error handling and performance optimizations."""
-    # Imports should be nested inside @hydra.main to optimize tab completion
-    from tabular_ssl.utils.utils import instantiate_callbacks, instantiate_loggers
-    from tabular_ssl.utils.utils import log_hyperparameters, get_metric_value
-    from tabular_ssl.utils.utils import close_loggers
+def main(config: DictConfig) -> None:
+    """Main training pipeline with error handling and performance optimizations."""
+    
+    # Set up environment variables and configurations
+    utils.extras(config)
+    
+    # Set seed for random number generators in pytorch, numpy and python.random
+    if config.get("seed"):
+        pl.seed_everything(config.seed, workers=True)
 
-    try:
-        # Setup environment
-        setup_environment(config)
+    # Initialize the datamodule
+    log.info(f"Instantiating datamodule <{config.data._target_}>")
+    datamodule: LightningDataModule = hydra.utils.instantiate(config.data)
 
-        # Apply optional utilities
-        extras(config)
+    # Initialize the model
+    log.info(f"Instantiating model <{config.model._target_}>")
+    model: LightningModule = hydra.utils.instantiate(config.model)
 
-        # Pretty print config using Rich library
-        if config.get("print_config"):
-            log.info("Printing config with Rich! <cfg>")
-            log.info(OmegaConf.to_yaml(config))
+    # Initialize callbacks
+    callbacks: list[Callback] = []
+    if "callbacks" in config:
+        for _, cb_conf in config.callbacks.items():
+            if "_target_" in cb_conf:
+                log.info(f"Instantiating callback <{cb_conf._target_}>")
+                callbacks.append(hydra.utils.instantiate(cb_conf))
 
-        # Set seed for random number generators
-        if config.get("seed"):
-            lit.seed_everything(config.seed, workers=True)
+    # Initialize loggers
+    logger: list[Logger] = []
+    if "logger" in config:
+        for lg_conf in config.logger.values():
+            if "_target_" in lg_conf:
+                log.info(f"Instantiating logger <{lg_conf._target_}>")
+                logger.append(hydra.utils.instantiate(lg_conf))
 
-        # Initialize components with error handling
-        model = instantiate_model(config)
-        datamodule = instantiate_datamodule(config)
-        callbacks = instantiate_callbacks(config.get("callbacks"))
-        logger = instantiate_loggers(config.get("logger"))
-        trainer = instantiate_trainer(config, callbacks, logger)
+    # Initialize the trainer
+    log.info(f"Instantiating trainer")
+    trainer: Trainer = hydra.utils.instantiate(
+        config.trainer, callbacks=callbacks, logger=logger
+    )
 
-        # Log hyperparameters
-        log.info("Logging hyperparameters!")
-        log_hyperparameters(config=config, model=model, trainer=trainer)
+    # Send some parameters from config to all lightning loggers
+    log.info("Logging hyperparameters!")
+    utils.log_hyperparameters(
+        config=config,
+        model=model,
+        datamodule=datamodule,
+        trainer=trainer,
+        callbacks=callbacks,
+        logger=logger,
+    )
 
-        # Train the model
-        if config.get("train"):
-            log.info("Starting training!")
-            trainer.fit(model=model, datamodule=datamodule)
+    # Train the model
+    if config.get("train"):
+        log.info("Starting training!")
+        trainer.fit(model=model, datamodule=datamodule)
 
-        # Get metric value for hyperparameter optimization
-        optimized_metric = config.get("optimized_metric", "val/loss")
-        metric_value = get_metric_value(
-            metric_dict=trainer.callback_metrics, metric_name=optimized_metric
-        )
+    # Evaluate model on test set
+    if config.get("test"):
+        log.info("Starting testing!")
+        if not config.get("train"):
+            log.warning(
+                "No checkpoints found. Using model weights from the end of training."
+            )
+        trainer.test(model=model, datamodule=datamodule)
 
-        # Test the model
-        if config.get("test"):
-            log.info("Starting testing!")
-            trainer.test(model=model, datamodule=datamodule)
-
-        # Make sure everything closed properly
-        log.info("Finalizing!")
-        close_loggers(logger)
-
-        # Print path to best checkpoint
-        if not config.trainer.get("fast_dev_run"):
-            log.info(f"Best model ckpt at {trainer.checkpoint_callback.best_model_path}")
-
-        return metric_value
-
-    except Exception as e:
-        log.error(f"An error occurred during training: {str(e)}")
-        raise
-
-    finally:
-        # Cleanup
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
+    # Make sure everything closed properly
+    log.info("Finalizing!")
+    
+    # Print path to best checkpoint
+    if trainer.checkpoint_callback:
+        log.info(f"Best checkpoint path: {trainer.checkpoint_callback.best_model_path}")
+    
+    # Return for possible use in optimizations like Optuna
+    return trainer.callback_metrics.get("test/acc_best", None)
 
 
 if __name__ == "__main__":
-    # Suppress specific warnings
-    warnings.filterwarnings("ignore", category=UserWarning, module="pytorch_lightning")
-    warnings.filterwarnings("ignore", category=DeprecationWarning)
-    
     main()

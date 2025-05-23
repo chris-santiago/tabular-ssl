@@ -1,6 +1,7 @@
 import logging
 import os
-from typing import List, Dict, Any, Tuple, Optional
+import warnings
+from typing import List, Dict, Any, Tuple, Optional, Sequence
 import numpy as np
 import torch
 import matplotlib.pyplot as plt
@@ -9,39 +10,95 @@ import shap
 
 import hydra
 import pytorch_lightning as lit
-from omegaconf import DictConfig
+from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning.callbacks import Callback
 from pytorch_lightning.loggers import Logger
+from pytorch_lightning.utilities import rank_zero_only
+
+import rich.syntax
+import rich.tree
 
 log = logging.getLogger(__name__)
 
 
 def get_logger(name: str = __name__) -> logging.Logger:
-    """Get logger with specified name."""
-    return logging.getLogger(name)
+    """Initializes multi-GPU-friendly python command line logger."""
+
+    logger = logging.getLogger(name)
+
+    # this ensures all logging levels get marked with the rank zero decorator
+    # otherwise logs would get multiplied for each GPU process in multi-GPU setup
+    for level in (
+        "debug",
+        "info",
+        "warning",
+        "error",
+        "exception",
+        "fatal",
+        "critical",
+    ):
+        setattr(logger, level, rank_zero_only(getattr(logger, level)))
+
+    return logger
 
 
 def extras(config: DictConfig) -> None:
-    """Applies optional utilities, controlled by config flags."""
-    if config.get("ignore_warnings"):
-        import warnings
+    """Applies optional utilities before the task is run.
 
+    Utilities:
+    - Ignoring python warnings
+    - Setting tags from command line
+    - Rich config printing
+    """
+
+    # return if no config
+    if config is None:
+        return
+
+    # disable python warnings
+    if config.get("ignore_warnings"):
         warnings.filterwarnings("ignore")
 
-    if config.get("enable_color_logging"):
-        import coloredlogs
+    # pretty print config tree using Rich library
+    if config.get("print_config"):
+        print_config(config, resolve=True)
 
-        coloredlogs.install(level="INFO", logger=log)
 
-    if config.get("debug"):
-        log.info("Running in debug mode")
-        os.environ["PYTHONPATH"] = os.getcwd()
-        config.trainer.fast_dev_run = True
-        config.trainer.limit_train_batches = 2
-        config.trainer.limit_val_batches = 2
-        config.trainer.limit_test_batches = 2
-        config.trainer.limit_predict_batches = 2
-        config.trainer.log_every_n_steps = 1
+@rank_zero_only
+def print_config(
+    config: DictConfig,
+    fields: Sequence[str] = (
+        "trainer",
+        "model",
+        "data",
+        "callbacks",
+        "logger",
+        "seed",
+    ),
+    resolve: bool = True,
+) -> None:
+    """Prints content of DictConfig using Rich library and its tree structure.
+
+    Args:
+        config (DictConfig): Configuration.
+        fields (Sequence[str], optional): Determines which main fields from config to print.
+        resolve (bool, optional): Whether to resolve reference fields. Defaults to True.
+    """
+
+    style = "dim"
+    tree = rich.tree.Tree("CONFIG", style=style, guide_style=style)
+
+    for field in fields:
+        branch = tree.add(field, style=style, guide_style=style)
+
+        config_section = config.get(field)
+        branch_content = str(config_section)
+        if isinstance(config_section, DictConfig):
+            branch_content = OmegaConf.to_yaml(config_section, resolve=resolve)
+
+        branch.add(rich.syntax.Syntax(branch_content, "yaml"))
+
+    rich.print(tree)
 
 
 def instantiate_callbacks(callbacks_cfg: DictConfig) -> List[Callback]:
@@ -82,32 +139,48 @@ def instantiate_loggers(logger_cfg: DictConfig) -> List[Logger]:
     return logger
 
 
+@rank_zero_only
 def log_hyperparameters(
     config: DictConfig,
     model: lit.LightningModule,
+    datamodule: lit.LightningDataModule,
     trainer: lit.Trainer,
+    callbacks: List[Callback],
+    logger: List[Logger],
 ) -> None:
-    """This method controls which parameters from Hydra config are saved by Lightning loggers."""
+    """Controls which config parts are saved by Lightning loggers.
+
+    Saves:
+        - Parameters passed to model
+        - Parameters passed to datamodule
+        - Trainer parameters
+        - Callback parameters
+        - Environment variables with prefix MYPROJECT_
+    """
+
     hparams = {}
 
-    # choose which parts of hydra config are saved by loggers
-    hparams["model"] = config["model"]
-    hparams["data"] = config["data"]
-    hparams["trainer"] = config["trainer"]
-    hparams["callbacks"] = config["callbacks"]
-    hparams["logger"] = config["logger"]
+    # get config as flat dictionary
+    cfg_dict = OmegaConf.to_container(config, resolve=True)
+    if isinstance(cfg_dict, dict):
+        hparams = flatten(cfg_dict)
 
-    # save number of model parameters
-    hparams["model/params/total"] = sum(p.numel() for p in model.parameters())
-    hparams["model/params/trainable"] = sum(
-        p.numel() for p in model.parameters() if p.requires_grad
-    )
-    hparams["model/params/non_trainable"] = sum(
-        p.numel() for p in model.parameters() if not p.requires_grad
-    )
+    # if loggers exist, log hyperparameters
+    if logger:
+        for lg in logger:
+            lg.log_hyperparams(hparams)
 
-    # send hparams to all loggers
-    trainer.logger.log_hyperparams(hparams)
+
+def flatten(d: Dict[str, Any], parent_key: str = "", sep: str = ".") -> Dict[str, Any]:
+    """Flattens a nested dictionary, joining keys with separator."""
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + sep + k if parent_key else k
+        if isinstance(v, dict):
+            items.extend(flatten(v, new_key, sep=sep).items())
+        else:
+            items.append((new_key, v))
+    return dict(items)
 
 
 def get_metric_value(metric_dict: dict, metric_name: str) -> float:

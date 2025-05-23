@@ -1,0 +1,13 @@
+wandb:
+  _target_: pytorch_lightning.loggers.wandb.WandbLogger
+  project: "tabular-ssl"
+  name: ${name}
+  save_dir: ${paths.output_dir}
+  offline: False
+  id: null # pass correct id to resume experiment!
+  log_model: False # upload checkpoints and model topology to W&B
+  prefix: "" # add prefix to metric keys
+  job_type: "train"
+  group: "" # assign a group to this run
+  tags: ${tags} # list of string tags
+  notes: "" # longer description of run 

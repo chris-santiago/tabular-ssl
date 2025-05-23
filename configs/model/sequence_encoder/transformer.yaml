@@ -1,0 +1,9 @@
+name: transformer_encoder
+type: transformer
+input_dim: 512
+hidden_dim: 512
+num_layers: 4
+num_heads: 8
+dim_feedforward: 2048
+dropout: 0.1
+bidirectional: true 

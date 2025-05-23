@@ -1,10 +1,35 @@
 _target_: pytorch_lightning.Trainer
 
-# training parameters
+accelerator: auto
+devices: auto
+strategy: auto
+
+min_epochs: 1
 max_epochs: 100
-accelerator: "auto"  # "cpu", "gpu", "tpu", "ipu", "auto"
-devices: 1
-precision: 32  # 16, 32, 64, "bf16", "16-mixed", "32-mixed", "64-mixed", "bf16-mixed"
+
+# mixed precision for improved performance
+precision: 16-mixed
+
+# perform a validation loop every N training epochs
+check_val_every_n_epoch: 1
+
+# set True to to ensure deterministic results
+# makes training slower but gives more reproducibility than just setting seed
+deterministic: False
+
+# limit batches for fast iteration during development
+# limit_train_batches: 0.1
+# limit_val_batches: 0.1
+# limit_test_batches: 0.1
+
+# other settings
+gradient_clip_val: 1.0
+accumulate_grad_batches: 1
+log_every_n_steps: 50
+val_check_interval: 1.0
+enable_progress_bar: true
+enable_model_summary: true
+enable_checkpointing: true
 
 # logging
 log_every_n_steps: 50

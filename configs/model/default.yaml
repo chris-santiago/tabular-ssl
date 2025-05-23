@@ -1,50 +1,32 @@
-_target_: tabular_ssl.models.example_model.ExampleModel
+defaults:
+  - _self_
+  - event_encoder: mlp.yaml
+  - sequence_encoder: transformer.yaml
+  - embedding: categorical.yaml
+  - projection_head: mlp.yaml
+  - prediction_head: classification.yaml
 
-# model architecture
-event_encoder:
-  input_dim: 10
-  hidden_dims: [64, 32]
-  output_dim: 16
+_target_: tabular_ssl.models.base.BaseModel
 
-sequence_encoder:
-  _target_: tabular_ssl.models.encoders.TransformerEncoder  # Can be changed to any encoder class
-  input_dim: 16
-  hidden_dim: 32
-  num_layers: 2
-  dropout: 0.1
-  bidirectional: true
-  # Transformer-specific
-  num_heads: 4
-  # SSM-specific
-  state_dim: 32
-  use_gate: true
-  # S4-specific
-  max_sequence_length: 1024
-  use_learnable_dt: true
-  use_initial_state: true
+model:
+  name: tabular_ssl_model
+  type: base
+  event_encoder: ${event_encoder}
+  sequence_encoder: ${sequence_encoder}
+  embedding: ${embedding}
+  projection_head: ${projection_head}
+  prediction_head: ${prediction_head}
 
-embedding:
-  embedding_dims:
-    - [5, 8]  # 5 categories, 8-dimensional embedding
-    - [3, 4]  # 3 categories, 4-dimensional embedding
-
-projection_head:
-  input_dim: 32
-  hidden_dim: 16
-  output_dim: 8
-
-prediction_head:
-  input_dim: 8
-  num_classes: 2
-  dropout: 0.1
-
-# optimizer
+# optimizer configuration
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 0.001
-  weight_decay: 0.0001
+  lr: 1.0e-4
+  weight_decay: 0.01
+  betas: [0.9, 0.999]
+  eps: 1.0e-8
 
-# scheduler
+# learning rate scheduler
 scheduler:
   _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  T_max: 1000 
+  T_max: ${trainer.max_epochs}
+  eta_min: 1.0e-6 
