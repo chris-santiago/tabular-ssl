@@ -116,4 +116,7 @@ build/
 # Misc
 *.swp
 *.swo
-*~ 
+*~
+
+# Chat archive
+chat_archive/ 
