@@ -10,6 +10,8 @@ from .base import (
 
 from .components import (
     MLPEventEncoder,
+    AutoEncoderEventEncoder,
+    ContrastiveEventEncoder,
     TransformerSequenceEncoder,
     CategoricalEmbedding,
     MLPProjectionHead,
@@ -27,6 +29,8 @@ __all__ = [
     "ProjectionHead",
     "PredictionHead",
     "MLPEventEncoder",
+    "AutoEncoderEventEncoder",
+    "ContrastiveEventEncoder",
     "TransformerSequenceEncoder",
     "CategoricalEmbedding",
     "MLPProjectionHead",

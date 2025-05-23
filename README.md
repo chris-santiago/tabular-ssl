@@ -168,7 +168,110 @@ default:
 
 ## Components
 
-### 1. Feature Processing
+### 1. Event Encoders
+
+The framework provides several event encoder options:
+
+#### MLP Event Encoder
+```python
+from tabular_ssl.models import MLPEventEncoder
+
+encoder = MLPEventEncoder({
+    "input_dim": 10,
+    "hidden_dims": [64, 32],
+    "output_dim": 16
+})
+```
+
+#### AutoEncoder Event Encoder
+A reconstruction-based encoder that learns through self-supervised reconstruction:
+```python
+from tabular_ssl.models import AutoEncoderEventEncoder
+
+encoder = AutoEncoderEventEncoder({
+    "input_dim": 10,
+    "hidden_dims": [64, 32],
+    "output_dim": 16,
+    "dropout": 0.1
+})
+
+# Get encoded representation
+z = encoder(x)
+# Get reconstruction
+x_recon = encoder.decode(z)
+# Get reconstruction loss
+loss = encoder.reconstruction_loss(x)
+```
+
+Configuration:
+```yaml
+model:
+  event_encoder:
+    _target_: tabular_ssl.models.components.AutoEncoderEventEncoder
+    input_dim: 10
+    hidden_dims: [64, 32]
+    output_dim: 16
+    dropout: 0.1
+```
+
+#### Contrastive Event Encoder
+A contrastive learning encoder that learns through comparing different views of the same input:
+```python
+from tabular_ssl.models import ContrastiveEventEncoder
+
+encoder = ContrastiveEventEncoder({
+    "input_dim": 10,
+    "hidden_dims": [64, 32],
+    "output_dim": 16,
+    "dropout": 0.1,
+    "temperature": 0.07
+})
+
+# Get contrastive representations
+z1 = encoder(x1)  # First view
+z2 = encoder(x2)  # Second view
+# Get contrastive loss
+loss = encoder.contrastive_loss(z1, z2)
+```
+
+Configuration:
+```yaml
+model:
+  event_encoder:
+    _target_: tabular_ssl.models.components.ContrastiveEventEncoder
+    input_dim: 10
+    hidden_dims: [64, 32]
+    output_dim: 16
+    dropout: 0.1
+    temperature: 0.07
+```
+
+For contrastive learning, you'll need to create two views of your input data. Common augmentation strategies include:
+- Random masking of features
+- Adding Gaussian noise
+- Feature dropout
+- Time-based augmentations for sequential data
+
+Example augmentation:
+```python
+def create_views(x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    # First view: Add Gaussian noise
+    x1 = x + torch.randn_like(x) * 0.1
+    
+    # Second view: Random feature masking
+    mask = torch.rand_like(x) > 0.2
+    x2 = x * mask
+    
+    return x1, x2
+
+# Usage in training
+x1, x2 = create_views(x)
+z1 = encoder(x1)
+z2 = encoder(x2)
+loss = encoder.contrastive_loss(z1, z2)
+```
+
+### 2. Feature Processing
 
 The framework provides a flexible feature processing system:
 
@@ -781,4 +884,224 @@ python src/train.py print_config=true
 
 # Ignore warnings
 python src/train.py ignore_warnings=true
+```
+
+### Input Corruption Strategies
+
+The framework provides several input corruption strategies for self-supervised learning tasks, inspired by ReConTab, SCARF, and VIME:
+
+#### 1. Random Masking (SCARF-style)
+```python
+from tabular_ssl.models import RandomMasking
+
+# Basic masking
+corruption = RandomMasking({
+    "corruption_rate": 0.15,
+    "mask_value": 0.0
+})
+
+# Importance-based masking
+corruption = RandomMasking({
+    "corruption_rate": 0.15,
+    "mask_distribution": "importance",
+    "feature_importance": [0.1, 0.2, 0.3, 0.4]  # Relative importance of features
+})
+
+# Apply corruption
+x_corrupted = corruption(x)
+```
+
+#### 2. Gaussian Noise
+```python
+from tabular_ssl.models import GaussianNoise
+
+# Feature-wise noise
+corruption = GaussianNoise({
+    "noise_scale": 0.1,
+    "feature_wise": True
+})
+
+# Global noise
+corruption = GaussianNoise({
+    "noise_scale": 0.1,
+    "feature_wise": False
+})
+
+# Apply corruption
+x_corrupted = corruption(x)
+```
+
+#### 3. Feature Swapping (ReConTab-style)
+```python
+from tabular_ssl.models import SwappingCorruption
+
+# Random swapping
+corruption = SwappingCorruption({
+    "swap_prob": 0.1
+})
+
+# Group-based swapping
+corruption = SwappingCorruption({
+    "swap_prob": 0.1,
+    "feature_groups": [
+        [0, 1, 2],  # First group of features
+        [3, 4, 5]   # Second group of features
+    ]
+})
+
+# Apply corruption
+x_corrupted = corruption(x)
+```
+
+#### 4. VIME-style Corruption
+```python
+from tabular_ssl.models import VIMECorruption
+
+corruption = VIMECorruption({
+    "mask_prob": 0.15,
+    "swap_prob": 0.1,
+    "noise_scale": 0.1,
+    "feature_importance": [0.1, 0.2, 0.3, 0.4]  # Optional
+})
+
+# Apply corruption
+x_corrupted = corruption(x)
+```
+
+#### 5. Corruption Pipeline
+Combine multiple corruption strategies:
+```python
+from tabular_ssl.models import CorruptionPipeline
+
+# Create a pipeline with multiple corruptions
+corruption = CorruptionPipeline({
+    "use_masking": True,
+    "use_noise": True,
+    "use_swapping": True,
+    "use_vime": False,
+    "corruption_rate": 0.15,
+    "noise_scale": 0.1,
+    "swap_prob": 0.1
+})
+
+# Apply corruption pipeline
+x_corrupted = corruption(x)
+```
+
+### Using Corruption with AutoEncoder
+
+```python
+from tabular_ssl.models import AutoEncoderEventEncoder, CorruptionPipeline
+
+# Create corruption pipeline
+corruption = CorruptionPipeline({
+    "use_masking": True,
+    "use_noise": True,
+    "corruption_rate": 0.15,
+    "noise_scale": 0.1
+})
+
+# Create autoencoder
+encoder = AutoEncoderEventEncoder({
+    "input_dim": 10,
+    "hidden_dims": [64, 32],
+    "output_dim": 16,
+    "dropout": 0.1
+})
+
+# Training step
+def training_step(x):
+    # Corrupt input
+    x_corrupted = corruption(x)
+    
+    # Encode corrupted input
+    z = encoder(x_corrupted)
+    
+    # Reconstruct original input
+    x_recon = encoder.decode(z)
+    
+    # Compute reconstruction loss
+    loss = encoder.reconstruction_loss(x, x_recon)
+    
+    return loss
+```
+
+### Using Corruption with Contrastive Learning
+
+```python
+from tabular_ssl.models import ContrastiveEventEncoder, CorruptionPipeline
+
+# Create two different corruption pipelines
+corruption1 = CorruptionPipeline({
+    "use_masking": True,
+    "corruption_rate": 0.15
+})
+
+corruption2 = CorruptionPipeline({
+    "use_noise": True,
+    "noise_scale": 0.1
+})
+
+# Create contrastive encoder
+encoder = ContrastiveEventEncoder({
+    "input_dim": 10,
+    "hidden_dims": [64, 32],
+    "output_dim": 16,
+    "dropout": 0.1,
+    "temperature": 0.07
+})
+
+# Training step
+def training_step(x):
+    # Create two different views
+    x1 = corruption1(x)
+    x2 = corruption2(x)
+    
+    # Get contrastive representations
+    z1 = encoder(x1)
+    z2 = encoder(x2)
+    
+    # Compute contrastive loss
+    loss = encoder.contrastive_loss(z1, z2)
+    
+    return loss
+```
+
+### Configuration Examples
+
+#### 1. Basic Corruption
+```yaml
+model:
+  corruption:
+    _target_: tabular_ssl.models.components.RandomMasking
+    corruption_rate: 0.15
+    mask_value: 0.0
+```
+
+#### 2. VIME-style Corruption
+```yaml
+model:
+  corruption:
+    _target_: tabular_ssl.models.components.VIMECorruption
+    mask_prob: 0.15
+    swap_prob: 0.1
+    noise_scale: 0.1
+    feature_importance: [0.1, 0.2, 0.3, 0.4]
+```
+
+#### 3. Corruption Pipeline
+```yaml
+model:
+  corruption:
+    _target_: tabular_ssl.models.components.CorruptionPipeline
+    use_masking: true
+    use_noise: true
+    use_swapping: true
+    use_vime: false
+    corruption_rate: 0.15
+    noise_scale: 0.1
+    swap_prob: 0.1
+    feature_groups:
+      - [0, 1, 2]
+      - [3, 4, 5]
 ``` 
