@@ -1,0 +1,106 @@
+# @package _global_
+
+# specify here default training configuration
+defaults:
+  - _self_
+  - model: default
+  - data: default
+  - callbacks: default
+  - logger: default
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+  - mode: default
+
+# experiment configs allow for version control of specific hyperparameters
+# e.g. best hyperparameters for given model and datamodule
+experiment: null
+
+# debugging config (enable through command line, e.g. `python train.py debug=true)
+debug: false
+
+# enable color logging
+enable_color_logging: true
+
+# pretty print config at the start of the run using Rich library
+print_config: true
+
+# disable python warnings if they annoy you
+ignore_warnings: true
+
+# set False to skip model training
+train: true
+
+# evaluate on test set, using best model weights achieved during training
+# lightning chooses best weights based on the metric specified in checkpoint callback
+test: false
+
+# seed for random number generators in pytorch, numpy and python.random
+seed: 42
+
+# Model configuration
+model:
+  event_encoder:
+    input_dim: 10
+    hidden_dims: [64, 32]
+    output_dim: 16
+    dropout: 0.1
+
+  sequence_encoder:
+    model_type: "transformer"
+    input_dim: 16
+    hidden_dim: 64
+    num_layers: 2
+    num_heads: 4
+    dropout: 0.1
+    bidirectional: true
+
+  embedding:
+    embedding_dims:
+      - [5, 8]  # 5 categories, 8-dimensional embedding
+      - [3, 4]  # 3 categories, 4-dimensional embedding
+
+  projection_head:
+    input_dim: 64
+    hidden_dim: 32
+    output_dim: 16
+
+  prediction_head:
+    input_dim: 16
+    num_classes: 2
+    dropout: 0.1
+
+  optimizer:
+    _target_: torch.optim.AdamW
+    lr: 0.0005
+    weight_decay: 0.0001
+
+  scheduler:
+    _target_: torch.optim.lr_scheduler.CosineAnnealingLR
+    T_max: 1000
+
+# Trainer configuration
+trainer:
+  max_epochs: 50
+  accelerator: "auto"
+  devices: 1
+  precision: "32"
+  log_every_n_steps: 50
+
+# Data configuration
+data:
+  batch_size: 32
+  num_workers: 2
+  pin_memory: true
+  sequence_length: 500
+  normalize_numerical: true
+  categorical_encoding: "embedding"
+
+# Logger configuration
+logger:
+  wandb:
+    project: "tabular-ssl"
+    name: ${now:%Y-%m-%d_%H-%M-%S}
+    tags: ["transformer", "small"]
+    log_model: true 

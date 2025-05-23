@@ -1,0 +1,28 @@
+_target_: pytorch_lightning.Trainer
+
+# training parameters
+max_epochs: 100
+accelerator: "auto"  # "cpu", "gpu", "tpu", "ipu", "auto"
+devices: 1
+precision: 32  # 16, 32, 64, "bf16", "16-mixed", "32-mixed", "64-mixed", "bf16-mixed"
+
+# logging
+log_every_n_steps: 50
+
+# callbacks
+callbacks:
+  - _target_: pytorch_lightning.callbacks.ModelCheckpoint
+    monitor: "val/loss"
+    mode: "min"
+    save_top_k: 3
+    save_last: true
+    verbose: true
+
+  - _target_: pytorch_lightning.callbacks.EarlyStopping
+    monitor: "val/loss"
+    mode: "min"
+    patience: 10
+    verbose: true
+
+  - _target_: pytorch_lightning.callbacks.LearningRateMonitor
+    logging_interval: "step" 

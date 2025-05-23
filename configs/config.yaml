@@ -1,0 +1,55 @@
+# @package _global_
+
+# specify here default training configuration
+defaults:
+  - _self_
+  - model: default
+  - data: default
+  - callbacks: default
+  - logger: default
+  - trainer: default
+  - paths: default
+  - extras: default
+  - hydra: default
+  - mode: default
+
+# experiment configs allow for version control of specific hyperparameters
+# e.g. best hyperparameters for given model and datamodule
+experiment: null
+
+# debugging config (enable through command line, e.g. `python train.py debug=true)
+debug: false
+
+# enable color logging
+enable_color_logging: true
+
+# pretty print config at the start of the run using Rich library
+print_config: true
+
+# disable python warnings if they annoy you
+ignore_warnings: true
+
+# set False to skip model training
+train: true
+
+# evaluate on test set, using best model weights achieved during training
+# lightning chooses best weights based on the metric specified in checkpoint callback
+test: false
+
+# seed for random number generators in pytorch, numpy and python.random
+seed: 42
+
+# path to original working directory
+# hydra hijacks working directory by changing it to the new log directory
+# so it's useful to have this path as a special variable
+# https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
+work_dir: ${hydra:runtime.cwd}
+
+# path to a file with parameters to override
+# useful to keep default config in the repository and override some parameters
+# for specific experiments without changing the code
+# override_config_path: null
+
+# use this to override any parameter from the config
+# example: override hydra/hydra_logging=disabled
+override_hydra: null 
