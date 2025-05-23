@@ -29,43 +29,68 @@ class BaseComponent(ABC, nn.Module):
         pass
 
 
-class EventEncoder(BaseComponent):
+class EventEncoder(nn.Module, ABC):
     """Base class for event encoders."""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__()
+        self.config = config
 
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of the event encoder."""
         pass
 
 
-class SequenceEncoder(BaseComponent):
+class SequenceEncoder(nn.Module, ABC):
     """Base class for sequence encoders."""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__()
+        self.config = config
 
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of the sequence encoder."""
         pass
 
 
-class EmbeddingLayer(BaseComponent):
+class EmbeddingLayer(nn.Module, ABC):
     """Base class for embedding layers."""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__()
+        self.config = config
 
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of the embedding layer."""
         pass
 
 
-class ProjectionHead(BaseComponent):
+class ProjectionHead(nn.Module, ABC):
     """Base class for projection heads."""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__()
+        self.config = config
 
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of the projection head."""
         pass
 
 
-class PredictionHead(BaseComponent):
+class PredictionHead(nn.Module, ABC):
     """Base class for prediction heads."""
+    
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__()
+        self.config = config
 
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass of the prediction head."""
         pass
 
 

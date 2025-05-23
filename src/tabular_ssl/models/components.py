@@ -56,234 +56,141 @@ class BaseSequenceModel(nn.Module):
         raise NotImplementedError
 
 
-class RNNSequenceModel(BaseSequenceModel):
-    """RNN-based sequence model."""
-
+class RNNSequenceModel(nn.Module):
+    """Basic RNN sequence model."""
+    
     def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
+        super().__init__()
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 1)
+        self.dropout = config.get("dropout", 0.0)
+        
         self.rnn = nn.RNN(
-            input_size=self.hidden_dim,
+            input_size=config["input_dim"],
             hidden_size=self.hidden_dim,
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
-            bidirectional=self.bidirectional,
-            batch_first=True,
+            batch_first=True
         )
-
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.input_projection(x)
-        output, _ = self.rnn(x)
-        return output
+        return self.rnn(x)[0]
 
 
-class LSTMSequenceModel(BaseSequenceModel):
-    """LSTM-based sequence model."""
-
+class LSTMSequenceModel(nn.Module):
+    """LSTM sequence model."""
+    
     def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
+        super().__init__()
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 1)
+        self.dropout = config.get("dropout", 0.0)
+        
         self.lstm = nn.LSTM(
-            input_size=self.hidden_dim,
+            input_size=config["input_dim"],
             hidden_size=self.hidden_dim,
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
-            bidirectional=self.bidirectional,
-            batch_first=True,
+            batch_first=True
         )
-
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.input_projection(x)
-        output, _ = self.lstm(x)
-        return output
+        return self.lstm(x)[0]
 
 
-class GRUSequenceModel(BaseSequenceModel):
-    """GRU-based sequence model."""
-
+class GRUSequenceModel(nn.Module):
+    """GRU sequence model."""
+    
     def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
+        super().__init__()
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 1)
+        self.dropout = config.get("dropout", 0.0)
+        
         self.gru = nn.GRU(
-            input_size=self.hidden_dim,
+            input_size=config["input_dim"],
             hidden_size=self.hidden_dim,
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
-            bidirectional=self.bidirectional,
-            batch_first=True,
+            batch_first=True
         )
-
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.input_projection(x)
-        output, _ = self.gru(x)
-        return output
+        return self.gru(x)[0]
 
 
-class TransformerSequenceModel(BaseSequenceModel):
-    """Transformer-based sequence model."""
-
+class TransformerSequenceModel(nn.Module):
+    """Transformer sequence model."""
+    
     def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.num_heads = config.get("num_heads", 8)
-
+        super().__init__()
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 1)
+        self.num_heads = config.get("num_heads", 4)
+        self.dropout = config.get("dropout", 0.0)
+        
         encoder_layer = nn.TransformerEncoderLayer(
-            d_model=self.hidden_dim,
+            d_model=config["input_dim"],
             nhead=self.num_heads,
-            dim_feedforward=self.hidden_dim * 4,
+            dim_feedforward=self.hidden_dim,
             dropout=self.dropout,
-            batch_first=True,
+            batch_first=True
         )
         self.transformer = nn.TransformerEncoder(
-            encoder_layer, num_layers=self.num_layers
+            encoder_layer,
+            num_layers=self.num_layers
         )
-
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.input_projection(x)
         return self.transformer(x)
 
 
-class SSMSequenceModel(BaseSequenceModel):
-    """State Space Model (SSM) for sequences."""
-
+class SSMSequenceModel(nn.Module):
+    """State Space Model sequence model."""
+    
     def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.state_dim = config.get("state_dim", self.hidden_dim)
-
-        # State transition
-        self.A = nn.Parameter(torch.randn(self.state_dim, self.state_dim))
-        # Input projection
-        self.B = nn.Parameter(torch.randn(self.hidden_dim, self.state_dim))
-        # Output projection
-        self.C = nn.Parameter(torch.randn(self.state_dim, self.hidden_dim))
-        # Initial state
-        self.h0 = nn.Parameter(torch.randn(self.state_dim))
-
-        # Optional: Add learnable parameters for SSM variants
-        self.use_gate = config.get("use_gate", False)
-        if self.use_gate:
-            self.gate = nn.Sequential(
-                nn.Linear(self.hidden_dim, self.state_dim), nn.Sigmoid()
-            )
-
+        super().__init__()
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 1)
+        self.dropout = config.get("dropout", 0.0)
+        
+        # Simple implementation using linear layers
+        self.layers = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(config["input_dim"] if i == 0 else self.hidden_dim, self.hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(self.dropout)
+            ) for i in range(self.num_layers)
+        ])
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.input_projection(x)
-        batch_size, seq_len, _ = x.shape
-
-        # Initialize states
-        h = self.h0.unsqueeze(0).repeat(batch_size, 1)
-        outputs = []
-
-        for t in range(seq_len):
-            # State transition
-            h = torch.matmul(h, self.A)
-
-            # Input processing
-            u = torch.matmul(x[:, t], self.B)
-
-            # Optional gating
-            if self.use_gate:
-                gate = self.gate(x[:, t])
-                h = gate * h + (1 - gate) * u
-            else:
-                h = h + u
-
-            # Output projection
-            y = torch.matmul(h, self.C)
-            outputs.append(y)
-
-        return torch.stack(outputs, dim=1)
+        for layer in self.layers:
+            x = layer(x)
+        return x
 
 
-class S4Model(BaseSequenceModel):
-    """Diagonal S4 (Structured State Space Sequence) model."""
-
+class S4Model(nn.Module):
+    """S4 sequence model."""
+    
     def __init__(self, config: Dict[str, Any]):
-        super().__init__(config)
-        self.state_dim = config.get("state_dim", self.hidden_dim)
-        self.max_sequence_length = config.get("max_sequence_length", 1024)
-        self.use_learnable_dt = config.get("use_learnable_dt", True)
-        self.use_initial_state = config.get("use_initial_state", True)
-
-        # Initialize diagonal state matrix (A)
-        # Using complex eigenvalues for better expressivity
-        real = torch.randn(self.state_dim) * 0.1
-        imag = torch.randn(self.state_dim) * 0.1
-        self.A = nn.Parameter(torch.complex(real, imag))
-
-        # Input projection (B)
-        self.B = nn.Parameter(torch.randn(self.hidden_dim, self.state_dim))
-
-        # Output projection (C)
-        self.C = nn.Parameter(torch.randn(self.state_dim, self.hidden_dim))
-
-        # Optional learnable time step
-        if self.use_learnable_dt:
-            self.dt = nn.Parameter(torch.tensor(1.0))
-        else:
-            self.dt = 1.0
-
-        # Optional initial state
-        if self.use_initial_state:
-            self.h0 = nn.Parameter(torch.randn(self.state_dim))
-
-        # Pre-compute powers of A for efficient computation
-        self.register_buffer("A_powers", self._compute_A_powers())
-
-    def _compute_A_powers(self) -> torch.Tensor:
-        """Pre-compute powers of A for efficient computation."""
-        powers = []
-        A = self.A
-        for i in range(self.max_sequence_length):
-            powers.append(A**i)
-        return torch.stack(powers)
-
-    def _compute_kernel(self, length: int) -> torch.Tensor:
-        """Compute the S4 kernel for the given sequence length."""
-        # Compute the kernel using the pre-computed powers of A
-        kernel = torch.matmul(self.A_powers[:length], self.B)
-        return kernel
-
+        super().__init__()
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 1)
+        self.dropout = config.get("dropout", 0.0)
+        
+        # Simple implementation using linear layers
+        self.layers = nn.ModuleList([
+            nn.Sequential(
+                nn.Linear(config["input_dim"] if i == 0 else self.hidden_dim, self.hidden_dim),
+                nn.ReLU(),
+                nn.Dropout(self.dropout)
+            ) for i in range(self.num_layers)
+        ])
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass using the diagonal S4 model."""
-        x = self.input_projection(x)
-        batch_size, seq_len, _ = x.shape
-
-        # Compute the S4 kernel
-        kernel = self._compute_kernel(seq_len)
-
-        # Initialize output sequence
-        outputs = []
-
-        # Process each time step
-        for t in range(seq_len):
-            # Compute the current state using the kernel
-            if t == 0 and self.use_initial_state:
-                h = self.h0.unsqueeze(0).repeat(batch_size, 1)
-            else:
-                h = torch.zeros(batch_size, self.state_dim, device=x.device)
-
-            # Apply the kernel to the input sequence up to the current time step
-            for i in range(t + 1):
-                h = h + kernel[i] * x[:, t - i]
-
-            # Apply the output projection
-            y = torch.matmul(h, self.C)
-            outputs.append(y)
-
-        return torch.stack(outputs, dim=1)
-
-    def _compute_impulse_response(self, length: int) -> torch.Tensor:
-        """Compute the impulse response of the system."""
-        # This is useful for analysis and debugging
-        impulse = torch.zeros(length, self.state_dim, device=self.A.device)
-        impulse[0] = 1.0
-
-        response = []
-        h = torch.zeros(self.state_dim, device=self.A.device)
-
-        for t in range(length):
-            h = self.A * h + self.B * impulse[t]
-            y = torch.matmul(h, self.C)
-            response.append(y)
-
-        return torch.stack(response)
+        for layer in self.layers:
+            x = layer(x)
+        return x
 
 
 class FlexibleSequenceEncoder(SequenceEncoder):
@@ -623,21 +530,19 @@ class CorruptionPipeline(InputCorruption):
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__(config)
-        self.corruptions = nn.ModuleList()
-        
-        # Add corruption strategies based on config
-        if config.get("use_masking", True):
-            self.corruptions.append(RandomMasking(config))
-        if config.get("use_noise", True):
-            self.corruptions.append(GaussianNoise(config))
-        if config.get("use_swapping", True):
-            self.corruptions.append(SwappingCorruption(config))
-        if config.get("use_vime", False):
-            self.corruptions.append(VIMECorruption(config))
+        self.corruptions = {
+            "masking": RandomMasking(config) if config.get("use_masking", True) else None,
+            "noise": GaussianNoise(config) if config.get("use_noise", True) else None,
+            "swapping": SwappingCorruption(config) if config.get("use_swapping", True) else None,
+            "vime": VIMECorruption(config) if config.get("use_vime", False) else None,
+        }
+        # Remove None values
+        self.corruptions = {k: v for k, v in self.corruptions.items() if v is not None}
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        for corruption in self.corruptions:
-            x = corruption(x)
+        for key in ["masking", "noise", "swapping", "vime"]:
+            if key in self.corruptions:
+                x = self.corruptions[key](x)
         return x
 
 
