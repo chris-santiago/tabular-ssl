@@ -7,7 +7,7 @@ event_encoder:
   output_dim: 16
 
 sequence_encoder:
-  model_type: "transformer"  # "rnn", "lstm", "gru", "transformer", "ssm", or "s4"
+  _target_: tabular_ssl.models.encoders.TransformerEncoder  # Can be changed to any encoder class
   input_dim: 16
   hidden_dim: 32
   num_layers: 2
