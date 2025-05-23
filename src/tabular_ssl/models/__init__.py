@@ -6,6 +6,8 @@ from .base import (
     EmbeddingLayer,
     ProjectionHead,
     PredictionHead,
+    TabularSSL,
+    TabularSSLConfig,
 )
 
 from .components import (
@@ -36,4 +38,6 @@ __all__ = [
     "MLPProjectionHead",
     "ClassificationHead",
     "ExampleModel",
+    "TabularSSL",
+    "TabularSSLConfig",
 ]

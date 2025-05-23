@@ -6,6 +6,13 @@ requires-python = ">=3.12"
 dependencies = [
     "hydra-core>=1.3.2",
     "torch>=2.7.0",
+    "pytorch-lightning>=2.2.0",
+    "numpy>=2.2.6",
+    "pandas>=2.2.3",
+    "polars>=0.20.0",
+    "scikit-learn>=1.4.0",
+    "matplotlib>=3.8.0",
+    "shap>=0.44.0"
 ]
 
 [dependency-groups]
@@ -15,5 +22,31 @@ dev = [
     "mkdocstrings[python]>=0.29.1",
     "mkdocstrings-python>=1.16.10",
     "pytest>=8.3.5",
-    "ruff>=0.11.11",
+    "pytest-cov>=4.1.0",
+    "pytest-xdist>=3.5.0",
+    "pytest-benchmark>=4.0.0",
+    "pytest-mock>=3.12.0",
+    "pytest-timeout>=2.2.0",
+    "ruff>=0.11.11"
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["tabular_ssl*"]
+exclude = ["tests*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--verbose --cov=tabular_ssl --cov-report=term-missing --cov-report=html --no-cov-on-fail"
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "slow: Tests that take longer to run",
+    "gpu: Tests that require GPU"
 ]

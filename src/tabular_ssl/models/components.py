@@ -639,3 +639,36 @@ class CorruptionPipeline(InputCorruption):
         for corruption in self.corruptions:
             x = corruption(x)
         return x
+
+
+class TransformerSequenceEncoder(SequenceEncoder):
+    """Transformer-based sequence encoder."""
+
+    def __init__(self, config: Dict[str, Any]):
+        super().__init__(config)
+        self.input_dim = config["input_dim"]
+        self.hidden_dim = config["hidden_dim"]
+        self.num_layers = config.get("num_layers", 2)
+        self.num_heads = config.get("num_heads", 4)
+        self.dropout = config.get("dropout", 0.1)
+
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=self.hidden_dim,
+            nhead=self.num_heads,
+            dim_feedforward=self.hidden_dim * 4,
+            dropout=self.dropout,
+            batch_first=True,
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers=self.num_layers
+        )
+
+        # Input projection if needed
+        if self.input_dim != self.hidden_dim:
+            self.input_projection = nn.Linear(self.input_dim, self.hidden_dim)
+        else:
+            self.input_projection = nn.Identity()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        x = self.input_projection(x)
+        return self.transformer(x)

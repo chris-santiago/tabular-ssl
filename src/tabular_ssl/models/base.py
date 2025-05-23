@@ -147,3 +147,11 @@ class BaseModel(pl.LightningModule):
     def configure_optimizers(self):
         """Configure optimizers."""
         raise NotImplementedError("Optimizer configuration must be implemented")
+
+
+class TabularSSL:
+    pass
+
+
+class TabularSSLConfig:
+    pass
