@@ -148,6 +148,7 @@ class TransformerSequenceEncoder(SequenceEncoder):
         dim_feedforward: int = 2048,
         dropout: float = 0.1,
         max_seq_length: int = 2048,
+        use_positional_encoding: bool = True,
     ):
         super().__init__()
 
@@ -155,6 +156,7 @@ class TransformerSequenceEncoder(SequenceEncoder):
         self.hidden_dim = hidden_dim
         self.output_dim = hidden_dim  # Output dimension is same as hidden dimension
         self.max_seq_length = max_seq_length
+        self.use_positional_encoding = use_positional_encoding
 
         # Input projection if needed
         if input_dim != hidden_dim:
@@ -162,8 +164,11 @@ class TransformerSequenceEncoder(SequenceEncoder):
         else:
             self.input_proj = nn.Identity()
 
-        # Positional encoding
-        self.pos_encoding = nn.Parameter(torch.randn(max_seq_length, hidden_dim) * 0.02)
+        # Positional encoding (optional)
+        if self.use_positional_encoding:
+            self.pos_encoding = nn.Parameter(torch.randn(max_seq_length, hidden_dim) * 0.02)
+        else:
+            self.pos_encoding = None
 
         # Transformer encoder
         encoder_layer = nn.TransformerEncoderLayer(
@@ -186,9 +191,15 @@ class TransformerSequenceEncoder(SequenceEncoder):
         # Input projection
         x = self.input_proj(x)
 
-        # Add positional encoding
-        if seq_len <= self.max_seq_length:
-            x = x + self.pos_encoding[:seq_len]
+        # Add positional encoding (if enabled)
+        if self.use_positional_encoding and self.pos_encoding is not None:
+            if seq_len <= self.max_seq_length:
+                x = x + self.pos_encoding[:seq_len]
+            else:
+                # If sequence is longer than max_seq_length, truncate positional encoding
+                x = x + self.pos_encoding[:self.max_seq_length].repeat(
+                    (seq_len + self.max_seq_length - 1) // self.max_seq_length, 1
+                )[:seq_len]
 
         # Apply dropout and layer norm
         x = self.dropout(x)
