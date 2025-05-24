@@ -1,9 +1,7 @@
 from .utils import (
     get_logger,
     extras,
-    print_config,
     log_hyperparameters,
-    flatten,
     compute_metrics,
     plot_training_history,
 )
@@ -11,9 +9,7 @@ from .utils import (
 __all__ = [
     "get_logger",
     "extras", 
-    "print_config",
     "log_hyperparameters",
-    "flatten",
     "compute_metrics",
     "plot_training_history",
 ]
