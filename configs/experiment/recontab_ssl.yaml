@@ -1,20 +1,20 @@
 # @package _global_
 
-# VIME SSL Experiment
-# Value Imputation and Mask Estimation for tabular self-supervised learning
+# ReConTab SSL Experiment
+# Reconstruction-based Contrastive Learning for Tabular Data
 
 defaults:
-  - override /model: ssl_vime
+  - override /model: ssl_recontab
   - override /data: credit_card  
   - override /trainer: default
   - override /logger: null
   - override /callbacks: default
 
 # Experiment metadata
-tags: ["vime", "ssl", "tabular"]
-experiment_name: "vime_ssl"
+tags: ["recontab", "ssl", "reconstruction", "multi_task"]
+experiment_name: "recontab_ssl"
 
-# Data configuration overrides
+# Data configuration
 data:
   batch_size: 64
   sequence_length: 32
@@ -23,20 +23,23 @@ data:
     data_source: "credit_card"
     n_users: 1000
   
-# Model configuration (SSL-specific parameters)
+# Model configuration (ReConTab-specific parameters)
 model:
-  mask_estimation_weight: 1.0
-  value_imputation_weight: 1.0
+  # Reconstruction loss weights for different corruption types
+  reconstruction_weights:
+    masked: 1.0      # Weight for masked token reconstruction
+    denoising: 0.5   # Weight for denoising reconstruction  
+    unswapping: 0.3  # Weight for unswapping reconstruction
   learning_rate: 1.0e-4
   weight_decay: 0.01
 
 # Training configuration
 trainer:
-  max_epochs: 100
+  max_epochs: 120
   precision: "16-mixed"
   gradient_clip_val: 1.0
-  val_check_interval: 0.25
-  log_every_n_steps: 25
+  val_check_interval: 0.33
+  log_every_n_steps: 30
   
 # Callbacks configuration
 callbacks:
@@ -46,7 +49,7 @@ callbacks:
     mode: "min"
   early_stopping:
     monitor: "val/loss"
-    patience: 15
+    patience: 25
     min_delta: 0.001
 
 # Seed for reproducibility

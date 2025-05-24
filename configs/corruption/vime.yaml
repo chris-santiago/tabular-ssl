@@ -14,8 +14,4 @@ numerical_indices: null
 categorical_vocab_sizes: null
 
 # Statistical distributions for numerical features (auto-detected if null)  
-numerical_distributions: null
-
-# VIME-specific parameters
-mask_estimation_weight: 1.0  # Weight for mask estimation loss
-value_imputation_weight: 1.0  # Weight for value imputation loss 
+numerical_distributions: null 

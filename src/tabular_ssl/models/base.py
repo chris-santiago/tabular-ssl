@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, List, Union, Tuple
+from typing import Dict, Any, Optional, List, Union, Tuple, Callable
+from functools import partial
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
@@ -170,10 +171,15 @@ class BaseModel(pl.LightningModule):
         Learning rate for optimization.
     weight_decay : float, default=1e-4
         Weight decay (L2 regularization) coefficient.
-    optimizer_type : str, default="adamw"
-        Optimizer type. One of {"adam", "adamw"}.
-    scheduler_type : Optional[str], default="cosine"
-        Learning rate scheduler type. One of {"cosine", "step", None}.
+    optimizer_type : Union[str, Callable], default="adamw"
+        Optimizer specification. Can be either:
+        - str: One of {"adam", "adamw"} to use built-in optimizers with learning_rate and weight_decay
+        - Callable: A partial function or class that takes model parameters as first argument
+    scheduler_type : Union[str, Callable, None], default="cosine"
+        Learning rate scheduler specification. Can be either:
+        - str: One of {"cosine", "step"} to use built-in schedulers
+        - Callable: A partial function, class, or function that takes optimizer as first argument
+        - None: No scheduler will be used
     **kwargs : Any
         Additional keyword arguments.
         
@@ -193,10 +199,45 @@ class BaseModel(pl.LightningModule):
         Learning rate for optimization.
     weight_decay : float
         Weight decay coefficient.
-    optimizer_type : str
-        Optimizer type.
-    scheduler_type : Optional[str]
-        Scheduler type.
+    optimizer_type : Union[str, Callable]
+        Optimizer specification.
+    scheduler_type : Union[str, Callable, None]
+        Scheduler specification.
+        
+    Examples
+    --------
+    Using string-based optimizer and scheduler (backward compatible):
+    
+    >>> model = BaseModel(
+    ...     event_encoder=encoder,
+    ...     optimizer_type="adamw",
+    ...     scheduler_type="cosine",
+    ...     learning_rate=1e-3,
+    ...     weight_decay=1e-4
+    ... )
+    
+    Using custom optimizer with partial:
+    
+    >>> from functools import partial
+    >>> custom_optimizer = partial(torch.optim.SGD, lr=0.01, momentum=0.9)
+    >>> model = BaseModel(
+    ...     event_encoder=encoder,
+    ...     optimizer_type=custom_optimizer
+    ... )
+    
+    Using custom scheduler:
+    
+    >>> custom_scheduler = partial(
+    ...     torch.optim.lr_scheduler.OneCycleLR,
+    ...     max_lr=0.1, 
+    ...     epochs=100,
+    ...     steps_per_epoch=500
+    ... )
+    >>> model = BaseModel(
+    ...     event_encoder=encoder,
+    ...     optimizer_type="adam",
+    ...     scheduler_type=custom_scheduler
+    ... )
     """
 
     def __init__(
@@ -209,8 +250,8 @@ class BaseModel(pl.LightningModule):
         embedding: Optional[EmbeddingLayer] = None,  # Alternative name for Hydra configs
         learning_rate: float = 1e-3,
         weight_decay: float = 1e-4,
-        optimizer_type: str = "adamw",
-        scheduler_type: Optional[str] = "cosine",
+        optimizer_type: Union[str, Callable] = "adamw",
+        scheduler_type: Union[str, Callable, None] = "cosine",
         **kwargs: Any
     ) -> None:
         super().__init__()
@@ -314,12 +355,7 @@ class BaseModel(pl.LightningModule):
         batch: Union[torch.Tensor, Dict[str, torch.Tensor]], 
         batch_idx: int
     ) -> torch.Tensor:
-        """SSL training step with corruption strategy support.
-        
-        This method handles the training step for different SSL strategies.
-        It automatically detects the input format (tensor vs dict), applies
-        the appropriate corruption strategy if available, and computes the
-        corresponding SSL loss.
+        """Training step - to be implemented by subclasses.
         
         Parameters
         ----------
@@ -333,48 +369,21 @@ class BaseModel(pl.LightningModule):
         Returns
         -------
         torch.Tensor
-            Computed training loss scalar. The specific loss depends on the
-            corruption strategy:
-            - No corruption: Standard reconstruction loss
-            - VIME: Weighted combination of mask estimation and value imputation losses
-            - SCARF: Contrastive loss (InfoNCE)
-            - ReConTab: Multi-task reconstruction loss
+            Computed training loss scalar.
             
         Raises
         ------
-        ValueError
-            If batch is a dictionary but doesn't contain 'input' or 'x' keys.
+        NotImplementedError
+            Must be implemented by subclasses.
         """
-        # Handle both tensor and dict inputs
-        if isinstance(batch, dict):
-            x = batch.get('input', batch.get('x', None))
-            if x is None:
-                raise ValueError("Batch dict must contain 'input' or 'x' key")
-        else:
-            x = batch
-        
-        # Apply corruption strategy
-        if self.corruption is None:
-            # No corruption - just standard forward pass
-            representations = self.encode(x)
-            loss = self._compute_standard_loss(representations, x)
-        else:
-            loss = self._compute_ssl_loss(x)
-        
-        # Log loss
-        self.log("train/loss", loss, on_step=True, on_epoch=True, prog_bar=True)
-        return loss
+        raise NotImplementedError("Training step must be implemented by subclasses")
 
     def validation_step(
         self, 
         batch: Union[torch.Tensor, Dict[str, torch.Tensor]], 
         batch_idx: int
     ) -> torch.Tensor:
-        """Validation step for SSL model evaluation.
-        
-        This method computes validation loss using the same SSL strategy as
-        training but without gradient computation. The validation loss is
-        logged automatically for monitoring training progress.
+        """Validation step - to be implemented by subclasses.
         
         Parameters
         ----------
@@ -388,77 +397,86 @@ class BaseModel(pl.LightningModule):
         Returns
         -------
         torch.Tensor
-            Computed validation loss scalar. Uses the same loss computation
-            as the training step but without gradient updates.
+            Computed validation loss scalar.
             
         Raises
         ------
-        ValueError
-            If batch is a dictionary but doesn't contain 'input' or 'x' keys.
+        NotImplementedError
+            Must be implemented by subclasses.
         """
-        # Handle both tensor and dict inputs
-        if isinstance(batch, dict):
-            x = batch.get('input', batch.get('x', None))
-            if x is None:
-                raise ValueError("Batch dict must contain 'input' or 'x' key")
-        else:
-            x = batch
-        
-        # Compute validation loss (same as training but no gradients)
-        if self.corruption is None:
-            representations = self.encode(x)
-            loss = self._compute_standard_loss(representations, x)
-        else:
-            loss = self._compute_ssl_loss(x)
-        
-        # Log validation loss
-        self.log("val/loss", loss, on_step=False, on_epoch=True, prog_bar=True)
-        return loss
+        raise NotImplementedError("Validation step must be implemented by subclasses")
 
     def configure_optimizers(self) -> Union[torch.optim.Optimizer, Tuple[List[torch.optim.Optimizer], List[Any]]]:
         """Configure optimizers and schedulers.
         
+        Supports both string-based and callable-based optimizer/scheduler configuration.
+        For string types, uses built-in optimizers/schedulers with class parameters.
+        For callable types, calls the function/partial with appropriate arguments.
+        
         Returns
         -------
         Union[torch.optim.Optimizer, Tuple[List[torch.optim.Optimizer], List[Any]]]
-            Either a single optimizer or a tuple of (optimizers, schedulers).
+            Either a single optimizer (if no scheduler) or a tuple of 
+            (optimizers list, schedulers list).
             
         Raises
         ------
         ValueError
-            If an unknown optimizer type is specified.
+            If an unknown optimizer or scheduler type is specified.
+        TypeError
+            If optimizer_type or scheduler_type is not a string or callable.
         """
         # Choose optimizer
-        if self.optimizer_type.lower() == "adam":
-            optimizer = torch.optim.Adam(
-                self.parameters(),
-                lr=self.learning_rate,
-                weight_decay=self.weight_decay
-            )
-        elif self.optimizer_type.lower() == "adamw":
-            optimizer = torch.optim.AdamW(
-                self.parameters(),
-                lr=self.learning_rate,
-                weight_decay=self.weight_decay
-            )
+        if isinstance(self.optimizer_type, str):
+            # String-based optimizer configuration
+            if self.optimizer_type.lower() == "adam":
+                optimizer = torch.optim.Adam(
+                    self.parameters(),
+                    lr=self.learning_rate,
+                    weight_decay=self.weight_decay
+                )
+            elif self.optimizer_type.lower() == "adamw":
+                optimizer = torch.optim.AdamW(
+                    self.parameters(),
+                    lr=self.learning_rate,
+                    weight_decay=self.weight_decay
+                )
+            else:
+                raise ValueError(f"Unknown optimizer type: {self.optimizer_type}")
+        elif callable(self.optimizer_type):
+            # Callable optimizer configuration
+            optimizer = self.optimizer_type(self.parameters())
         else:
-            raise ValueError(f"Unknown optimizer type: {self.optimizer_type}")
+            raise TypeError(
+                f"optimizer_type must be str or callable, got {type(self.optimizer_type)}"
+            )
         
         # Configure scheduler if specified
         if self.scheduler_type is None:
             return optimizer
-        elif self.scheduler_type.lower() == "cosine":
-            scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-                optimizer, T_max=self.trainer.max_epochs
-            )
-            return [optimizer], [scheduler]
-        elif self.scheduler_type.lower() == "step":
-            scheduler = torch.optim.lr_scheduler.StepLR(
-                optimizer, step_size=30, gamma=0.1
-            )
-            return [optimizer], [scheduler]
+        elif isinstance(self.scheduler_type, str):
+            # String-based scheduler configuration
+            if self.scheduler_type.lower() == "cosine":
+                # Use a default T_max if trainer is not available yet
+                T_max = getattr(self.trainer, 'max_epochs', 100) if hasattr(self, 'trainer') and self.trainer else 100
+                scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+                    optimizer, T_max=T_max
+                )
+            elif self.scheduler_type.lower() == "step":
+                scheduler = torch.optim.lr_scheduler.StepLR(
+                    optimizer, step_size=30, gamma=0.1
+                )
+            else:
+                raise ValueError(f"Unknown scheduler type: {self.scheduler_type}")
+        elif callable(self.scheduler_type):
+            # Callable scheduler configuration
+            scheduler = self.scheduler_type(optimizer)
         else:
-            return optimizer
+            raise TypeError(
+                f"scheduler_type must be str, callable, or None, got {type(self.scheduler_type)}"
+            )
+        
+        return [optimizer], [scheduler]
 
 
 # Concrete implementations for common use cases
@@ -850,10 +868,15 @@ class SSLModel(BaseModel):
         Learning rate for optimization.
     weight_decay : float, default=1e-4
         Weight decay (L2 regularization) coefficient.
-    optimizer_type : str, default="adamw"
-        Optimizer type. One of {"adam", "adamw"}.
-    scheduler_type : Optional[str], default="cosine"
-        Learning rate scheduler type. One of {"cosine", "step", None}.
+    optimizer_type : Union[str, Callable], default="adamw"
+        Optimizer specification. Can be either:
+        - str: One of {"adam", "adamw"} to use built-in optimizers with learning_rate and weight_decay
+        - Callable: A partial function or class that takes model parameters as first argument
+    scheduler_type : Union[str, Callable, None], default="cosine"
+        Learning rate scheduler specification. Can be either:
+        - str: One of {"cosine", "step"} to use built-in schedulers
+        - Callable: A partial function, class, or function that takes optimizer as first argument
+        - None: No scheduler will be used
     mask_estimation_weight : float, default=1.0
         Weight for mask estimation loss in VIME. Only used when corruption
         type is "vime".
@@ -948,8 +971,8 @@ class SSLModel(BaseModel):
         embedding_layer: Optional[EmbeddingLayer] = None,
         learning_rate: float = 1e-3,
         weight_decay: float = 1e-4,
-        optimizer_type: str = "adamw",
-        scheduler_type: Optional[str] = "cosine",
+        optimizer_type: Union[str, Callable] = "adamw",
+        scheduler_type: Union[str, Callable, None] = "cosine",
         # SSL-specific parameters (auto-detected from corruption module)
         mask_estimation_weight: float = 1.0,
         value_imputation_weight: float = 1.0,

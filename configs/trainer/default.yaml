@@ -29,22 +29,4 @@ log_every_n_steps: 50
 val_check_interval: 1.0
 enable_progress_bar: true
 enable_model_summary: true
-enable_checkpointing: true
-
-# callbacks
-callbacks:
-  - _target_: pytorch_lightning.callbacks.ModelCheckpoint
-    monitor: "val/loss"
-    mode: "min"
-    save_top_k: 3
-    save_last: true
-    verbose: true
-
-  - _target_: pytorch_lightning.callbacks.EarlyStopping
-    monitor: "val/loss"
-    mode: "min"
-    patience: 10
-    verbose: true
-
-  - _target_: pytorch_lightning.callbacks.LearningRateMonitor
-    logging_interval: "step" 
+enable_checkpointing: true 

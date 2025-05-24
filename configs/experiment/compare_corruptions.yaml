@@ -5,37 +5,47 @@
 
 defaults:
   - override /model: ssl_vime  # Default to VIME, override via command line
-  - override /data: sample_data
+  - override /data: credit_card
   - override /trainer: default
-  - override /logger: wandb
+  - override /logger: null
   - override /callbacks: default
 
 # Experiment metadata
 tags: ["corruption_comparison", "ssl"]
 experiment_name: "compare_corruptions"
 
-# Shared model configuration
-model:
-  learning_rate: 1.0e-4
-  weight_decay: 0.01
-
 # Data configuration
 data:
   batch_size: 64
   sequence_length: 32
+  use_sample_data: true
+  sample_data_config:
+    data_source: "credit_card"
+    n_users: 1000
+
+# Shared model configuration
+model:
+  learning_rate: 1.0e-4
+  weight_decay: 0.01
 
 # Training configuration
 trainer:
   max_epochs: 50
   precision: "16-mixed"
   gradient_clip_val: 1.0
+  val_check_interval: 0.5
+  log_every_n_steps: 50
 
-# Logging
-logger:
-  wandb:
-    project: "tabular-ssl"
-    name: "${model._target_}_${now:%Y-%m-%d_%H-%M-%S}"
-    tags: ${tags}
+# Callbacks configuration
+callbacks:
+  model_checkpoint:
+    monitor: "val/loss"
+    save_top_k: 3
+    mode: "min"
+  early_stopping:
+    monitor: "val/loss"
+    patience: 10
+    min_delta: 0.001
 
 # Seed for reproducibility
 seed: 42

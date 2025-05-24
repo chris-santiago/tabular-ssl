@@ -1,1 +1,55 @@
- 
+# @package _global_
+
+# Quick VIME SSL Experiment
+# Fast version for testing and debugging
+
+defaults:
+  - override /model: ssl_vime
+  - override /data: credit_card  
+  - override /trainer: default
+  - override /logger: null
+  - override /callbacks: default
+
+# Experiment metadata
+tags: ["vime", "ssl", "quick", "debug"]
+experiment_name: "quick_vime_ssl"
+
+# Data configuration (smaller dataset for speed)
+data:
+  batch_size: 32
+  sequence_length: 16  # Shorter sequences for speed
+  use_sample_data: true
+  sample_data_config:
+    data_source: "credit_card"
+    n_users: 100  # Much smaller dataset
+  
+# Model configuration
+model:
+  mask_estimation_weight: 1.0
+  value_imputation_weight: 1.0
+  learning_rate: 1.0e-3  # Higher learning rate for faster convergence
+  weight_decay: 0.01
+
+# Training configuration (fast settings)
+trainer:
+  max_epochs: 5  # Very few epochs for quick testing
+  precision: "16-mixed"
+  gradient_clip_val: 1.0
+  val_check_interval: 1.0  # Check validation every epoch
+  log_every_n_steps: 10
+  limit_train_batches: 10  # Limit batches for speed
+  limit_val_batches: 5
+  
+# Callbacks configuration
+callbacks:
+  model_checkpoint:
+    monitor: "val/loss"
+    save_top_k: 1  # Save only best model
+    mode: "min"
+  early_stopping:
+    monitor: "val/loss"
+    patience: 3
+    min_delta: 0.01  # Less strict for quick experiments
+
+# Seed for reproducibility
+seed: 42 
