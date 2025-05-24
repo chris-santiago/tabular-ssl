@@ -1,11 +1,15 @@
 from .base import (
     BaseModel,
-    ModelConfig,
+    BaseComponent,
     EventEncoder,
     SequenceEncoder,
     EmbeddingLayer,
     ProjectionHead,
     PredictionHead,
+    FeatureEncoder,
+    create_mlp,
+    # Backward compatibility (deprecated)
+    ModelConfig,
     TabularSSL,
     TabularSSLConfig,
 )
@@ -15,29 +19,50 @@ from .components import (
     AutoEncoderEventEncoder,
     ContrastiveEventEncoder,
     TransformerSequenceEncoder,
+    RNNSequenceEncoder,
+    S4SequenceEncoder,
     CategoricalEmbedding,
     MLPProjectionHead,
     ClassificationHead,
+    RandomMasking,
+    GaussianNoise,
+    SwappingCorruption,
 )
 
-from .example_model import ExampleModel
-
 __all__ = [
+    # Base classes
     "BaseModel",
-    "ModelConfig",
+    "BaseComponent", 
     "EventEncoder",
     "SequenceEncoder",
     "EmbeddingLayer",
     "ProjectionHead",
     "PredictionHead",
+    "FeatureEncoder",
+    "create_mlp",
+    
+    # Event encoders
     "MLPEventEncoder",
-    "AutoEncoderEventEncoder",
+    "AutoEncoderEventEncoder", 
     "ContrastiveEventEncoder",
+    
+    # Sequence encoders
     "TransformerSequenceEncoder",
+    "RNNSequenceEncoder",
+    "S4SequenceEncoder",
+    
+    # Embeddings and heads
     "CategoricalEmbedding",
     "MLPProjectionHead",
     "ClassificationHead",
-    "ExampleModel",
+    
+    # Data corruption
+    "RandomMasking",
+    "GaussianNoise", 
+    "SwappingCorruption",
+    
+    # Backward compatibility (deprecated)
+    "ModelConfig",
     "TabularSSL",
     "TabularSSLConfig",
 ]

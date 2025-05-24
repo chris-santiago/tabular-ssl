@@ -1,11 +1,11 @@
-import numpy as np
-import pandas as pd
+import polars as pl
 from datetime import datetime, timedelta
 import logging
 from pathlib import Path
 from typing import Dict, List
 import multiprocessing as mp
 from functools import partial
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -38,10 +38,11 @@ class TransactionDataGenerator:
         self.n_jobs = mp.cpu_count() if n_jobs == -1 else n_jobs
 
         # Set random seed
-        np.random.seed(seed)
+        random.seed(seed)
+        pl.set_random_seed(seed)
 
         # Cache for random values
-        self._cache: Dict[str, np.ndarray] = {}
+        self._cache: Dict[str, pl.Series] = {}
 
         # Define transaction categories and their probabilities
         self.categories = {
@@ -66,46 +67,44 @@ class TransactionDataGenerator:
 
     def _get_cached_random(
         self, key: str, generator: callable, *args, **kwargs
-    ) -> np.ndarray:
+    ) -> pl.Series:
         """Get or generate cached random values."""
         if key not in self._cache:
             self._cache[key] = generator(*args, **kwargs)
         return self._cache[key]
 
-    def generate_entity_data(self) -> pd.DataFrame:
+    def generate_entity_data(self) -> pl.DataFrame:
         """Generate entity (customer) data with features using vectorized operations."""
         # Generate entity IDs
-        entity_ids = np.array([f"ENT_{i:06d}" for i in range(self.n_entities)])
+        entity_ids = [f"ENT_{i:06d}" for i in range(self.n_entities)]
 
         # Generate entity features using vectorized operations
         data = {
             "entity_id": entity_ids,
-            "age": self._get_cached_random(
-                "age", np.random.randint, 18, 80, size=self.n_entities
+            "age": pl.Series(random.randint(18, 80) for _ in range(self.n_entities)),
+            "income_level": pl.Series(
+                random.choices(
+                    ["low", "medium", "high"],
+                    weights=[0.3, 0.5, 0.2],
+                    k=self.n_entities
+                )
             ),
-            "income_level": self._get_cached_random(
-                "income_level",
-                np.random.choice,
-                ["low", "medium", "high"],
-                size=self.n_entities,
-                p=[0.3, 0.5, 0.2],
+            "credit_score": pl.Series(
+                random.randint(300, 850) for _ in range(self.n_entities)
             ),
-            "credit_score": self._get_cached_random(
-                "credit_score", np.random.randint, 300, 850, size=self.n_entities
+            "account_age_days": pl.Series(
+                random.randint(0, 3650) for _ in range(self.n_entities)
             ),
-            "account_age_days": self._get_cached_random(
-                "account_age", np.random.randint, 0, 3650, size=self.n_entities
-            ),
-            "risk_level": self._get_cached_random(
-                "risk_level",
-                np.random.choice,
-                list(self.risk_levels.keys()),
-                size=self.n_entities,
-                p=list(self.risk_levels.values()),
+            "risk_level": pl.Series(
+                random.choices(
+                    list(self.risk_levels.keys()),
+                    weights=list(self.risk_levels.values()),
+                    k=self.n_entities
+                )
             ),
         }
 
-        return pd.DataFrame(data)
+        return pl.DataFrame(data)
 
     def _generate_timestamps_chunk(
         self, chunk_size: int, start_date: datetime
@@ -119,17 +118,11 @@ class TransactionDataGenerator:
                 break
 
             # Generate more transactions during business hours
-            n_transactions = np.random.poisson(
-                100 if current_date.weekday() < 5 else 50
-            )
+            n_transactions = random.randint(50, 150) if current_date.weekday() < 5 else random.randint(20, 80)
 
-            # Vectorized hour generation
-            hours = np.clip(np.random.normal(14, 3, size=n_transactions), 0, 23).astype(
-                int
-            )
-            minutes = np.random.randint(0, 60, size=n_transactions)
-
-            for hour, minute in zip(hours, minutes):
+            for _ in range(n_transactions):
+                hour = min(max(int(random.gauss(14, 3)), 0), 23)
+                minute = random.randint(0, 59)
                 timestamp = current_date.replace(hour=hour, minute=minute)
                 timestamps.append(timestamp)
 
@@ -137,7 +130,7 @@ class TransactionDataGenerator:
 
         return timestamps[:chunk_size]
 
-    def _generate_amounts_vectorized(self, categories: np.ndarray) -> np.ndarray:
+    def _generate_amounts_vectorized(self, categories: List[str]) -> pl.Series:
         """Generate transaction amounts using vectorized operations."""
         # Define distribution parameters for each category
         dist_params = {
@@ -150,27 +143,28 @@ class TransactionDataGenerator:
         }
 
         # Generate amounts for each category
-        amounts = np.zeros(len(categories))
-        for category, (mu, sigma) in dist_params.items():
-            mask = categories == category
-            amounts[mask] = np.random.lognormal(mu, sigma, size=mask.sum())
+        amounts = []
+        for category in categories:
+            mu, sigma = dist_params[category]
+            # Generate lognormal distribution using random.gauss
+            amount = random.lognormvariate(mu, sigma)
+            amounts.append(round(amount, 2))
 
-        return np.round(amounts, 2)
+        return pl.Series(amounts)
 
-    def generate_transaction_data(self) -> pd.DataFrame:
+    def generate_transaction_data(self) -> pl.DataFrame:
         """Generate transaction data with realistic patterns using vectorized operations."""
         # Generate transaction IDs
-        transaction_ids = np.array([f"TXN_{i:08d}" for i in range(self.n_transactions)])
+        transaction_ids = [f"TXN_{i:08d}" for i in range(self.n_transactions)]
 
         # Generate entity IDs with some entities having more transactions
-        entity_weights = self._get_cached_random(
-            "entity_weights", np.random.power, 2, size=self.n_entities
-        )
-        entity_weights = entity_weights / entity_weights.sum()
-        entity_ids = np.random.choice(
+        entity_weights = [random.paretovariate(2) for _ in range(self.n_entities)]
+        total_weight = sum(entity_weights)
+        entity_weights = [w / total_weight for w in entity_weights]
+        entity_ids = random.choices(
             [f"ENT_{i:06d}" for i in range(self.n_entities)],
-            size=self.n_transactions,
-            p=entity_weights,
+            weights=entity_weights,
+            k=self.n_transactions
         )
 
         # Generate timestamps in parallel
@@ -185,33 +179,39 @@ class TransactionDataGenerator:
         timestamps.sort()
 
         # Generate categories
-        categories = np.random.choice(
+        categories = random.choices(
             list(self.categories.keys()),
-            size=self.n_transactions,
-            p=list(self.categories.values()),
+            weights=list(self.categories.values()),
+            k=self.n_transactions
         )
 
         # Generate amounts using vectorized operations
         amounts = self._generate_amounts_vectorized(categories)
 
         # Generate other features using vectorized operations
-        merchant_types = np.random.choice(
+        merchant_types = random.choices(
             list(self.merchant_types.keys()),
-            size=self.n_transactions,
-            p=list(self.merchant_types.values()),
+            weights=list(self.merchant_types.values()),
+            k=self.n_transactions
         )
 
-        locations = np.random.choice(
-            ["domestic", "international"], size=self.n_transactions, p=[0.9, 0.1]
+        locations = random.choices(
+            ["domestic", "international"],
+            weights=[0.9, 0.1],
+            k=self.n_transactions
         )
 
-        statuses = np.random.choice(
+        statuses = random.choices(
             ["completed", "failed", "pending"],
-            size=self.n_transactions,
-            p=[0.95, 0.03, 0.02],
+            weights=[0.95, 0.03, 0.02],
+            k=self.n_transactions
         )
 
-        is_fraud = np.random.choice([0, 1], size=self.n_transactions, p=[0.99, 0.01])
+        is_fraud = random.choices(
+            [0, 1],
+            weights=[0.99, 0.01],
+            k=self.n_transactions
+        )
 
         # Create transaction dataframe
         data = {
@@ -226,7 +226,7 @@ class TransactionDataGenerator:
             "is_fraud": is_fraud,
         }
 
-        return pd.DataFrame(data)
+        return pl.DataFrame(data)
 
     def generate_data(self, output_dir: str) -> None:
         """Generate and save sample data efficiently.
@@ -240,25 +240,25 @@ class TransactionDataGenerator:
         # Generate entity data
         entity_df = self.generate_entity_data()
         entity_path = output_dir / "entities.parquet"
-        entity_df.to_parquet(entity_path, index=False)
+        entity_df.write_parquet(entity_path)
         logger.info(f"Generated entity data: {entity_path}")
 
         # Generate transaction data
         transaction_df = self.generate_transaction_data()
         transaction_path = output_dir / "transactions.parquet"
-        transaction_df.to_parquet(transaction_path, index=False)
+        transaction_df.write_parquet(transaction_path)
         logger.info(f"Generated transaction data: {transaction_path}")
 
         # Create train/val/test splits efficiently
-        transaction_df = transaction_df.sort_values("timestamp")
+        transaction_df = transaction_df.sort("timestamp")
         n = len(transaction_df)
         train_idx = int(0.7 * n)
         val_idx = int(0.85 * n)
 
         # Split data
-        train_df = transaction_df[:train_idx]
-        val_df = transaction_df[train_idx:val_idx]
-        test_df = transaction_df[val_idx:]
+        train_df = transaction_df.slice(0, train_idx)
+        val_df = transaction_df.slice(train_idx, val_idx - train_idx)
+        test_df = transaction_df.slice(val_idx, n - val_idx)
 
         # Save splits
         train_path = output_dir / "train.parquet"
@@ -266,9 +266,9 @@ class TransactionDataGenerator:
         test_path = output_dir / "test.parquet"
 
         # Save dataframes without index for better performance
-        train_df.to_parquet(train_path, index=False)
-        val_df.to_parquet(val_path, index=False)
-        test_df.to_parquet(test_path, index=False)
+        train_df.write_parquet(train_path)
+        val_df.write_parquet(val_path)
+        test_df.write_parquet(test_path)
 
         logger.info("Created data splits:")
         logger.info(f"  Train: {train_path} ({len(train_df)} samples)")

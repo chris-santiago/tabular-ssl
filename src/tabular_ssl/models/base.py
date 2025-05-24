@@ -1,77 +1,19 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Type, TypeVar, Generic, ClassVar
+from typing import Dict, Any, Optional, List
 import torch
 import torch.nn as nn
 import pytorch_lightning as pl
-from pydantic import BaseModel as PydanticBaseModel, Field, validator
+from omegaconf import DictConfig
 import logging
-from omegaconf import DictConfig, OmegaConf
-import hydra
 
 logger = logging.getLogger(__name__)
 
-T = TypeVar("T", bound="BaseComponent")
 
+class BaseComponent(nn.Module, ABC):
+    """Base class for model components."""
 
-class ComponentRegistry:
-    """Registry for model components."""
-
-    _components: ClassVar[Dict[str, Type["BaseComponent"]]] = {}
-
-    @classmethod
-    def register(cls, name: str) -> Type[T]:
-        """Register a component class."""
-
-        def decorator(component_cls: Type[T]) -> Type[T]:
-            cls._components[name] = component_cls
-            return component_cls
-
-        return decorator
-
-    @classmethod
-    def get(cls, name: str) -> Type["BaseComponent"]:
-        """Get a component class by name."""
-        if name not in cls._components:
-            raise KeyError(f"Component {name} not found in registry")
-        return cls._components[name]
-
-    @classmethod
-    def list_components(cls) -> Dict[str, Type["BaseComponent"]]:
-        """List all registered components."""
-        return cls._components.copy()
-
-
-class ComponentConfig(PydanticBaseModel):
-    """Base configuration for components."""
-
-    name: str = Field(..., description="Name of the component")
-    type: str = Field(..., description="Type of the component")
-
-    @validator("type")
-    def validate_type(cls, v: str) -> str:
-        """Validate that the component type exists in the registry."""
-        if v not in ComponentRegistry._components:
-            raise ValueError(f"Component type {v} not found in registry")
-        return v
-
-    @classmethod
-    def from_hydra(cls, config: DictConfig) -> "ComponentConfig":
-        """Create a ComponentConfig from a Hydra config."""
-        return cls(**OmegaConf.to_container(config, resolve=True))
-
-
-class BaseComponent(ABC, nn.Module, Generic[T]):
-    """Base class for all model components."""
-
-    def __init__(self, config: ComponentConfig):
+    def __init__(self, **kwargs):
         super().__init__()
-        self.config = config
-        self._validate_config()
-
-    def _validate_config(self) -> None:
-        """Validate the component configuration."""
-        if not isinstance(self.config, ComponentConfig):
-            raise ValueError("Config must be an instance of ComponentConfig")
 
     @abstractmethod
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -79,98 +21,253 @@ class BaseComponent(ABC, nn.Module, Generic[T]):
         pass
 
 
+# Simple base classes for backward compatibility
 class EventEncoder(BaseComponent):
     """Base class for event encoders."""
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the event encoder."""
-        raise NotImplementedError("Event encoder forward pass must be implemented")
+    pass
 
 
 class SequenceEncoder(BaseComponent):
     """Base class for sequence encoders."""
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the sequence encoder."""
-        raise NotImplementedError("Sequence encoder forward pass must be implemented")
+    pass
 
 
 class EmbeddingLayer(BaseComponent):
-    """Base class for embedding layers."""
-
+    """Embedding layer for categorical features."""
+    
+    def __init__(self, vocab_sizes: Dict[str, int], embedding_dims: Dict[str, int]):
+        super().__init__()
+        self.vocab_sizes = vocab_sizes
+        self.embedding_dims = embedding_dims
+        
+        # Create embedding layers for each categorical feature
+        self.embeddings = nn.ModuleDict({
+            col: nn.Embedding(vocab_size, embedding_dims[col])
+            for col, vocab_size in vocab_sizes.items()
+        })
+        
+        self.output_dim = sum(embedding_dims.values())
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the embedding layer."""
-        raise NotImplementedError("Embedding layer forward pass must be implemented")
+        """Forward pass: x shape is (batch_size, sequence_length, num_categorical_features)"""
+        batch_size, seq_len, num_features = x.shape
+        
+        embedded_features = []
+        for i, (col, embedding) in enumerate(self.embeddings.items()):
+            # Get indices for this categorical feature
+            indices = x[:, :, i].long()  # (batch_size, sequence_length)
+            # Embed: (batch_size, sequence_length, embedding_dim)
+            embedded = embedding(indices)
+            embedded_features.append(embedded)
+        
+        # Concatenate all embeddings: (batch_size, sequence_length, total_embedding_dim)
+        return torch.cat(embedded_features, dim=-1)
 
 
 class ProjectionHead(BaseComponent):
-    """Base class for projection heads."""
-
+    """Simple projection head for downstream tasks."""
+    
+    def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, dropout: float = 0.1):
+        super().__init__()
+        self.projection = nn.Sequential(
+            nn.Linear(input_dim, hidden_dim),
+            nn.ReLU(),
+            nn.Dropout(dropout),
+            nn.Linear(hidden_dim, output_dim)
+        )
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the projection head."""
-        raise NotImplementedError("Projection head forward pass must be implemented")
+        return self.projection(x)
 
 
 class PredictionHead(BaseComponent):
-    """Base class for prediction heads."""
-
+    """Prediction head for classification tasks."""
+    
+    def __init__(self, input_dim: int, num_classes: int, dropout: float = 0.1):
+        super().__init__()
+        self.classifier = nn.Sequential(
+            nn.Dropout(dropout),
+            nn.Linear(input_dim, num_classes)
+        )
+    
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the prediction head."""
-        raise NotImplementedError("Prediction head forward pass must be implemented")
+        return self.classifier(x)
+
+
+def create_mlp(
+    input_dim: int,
+    hidden_dims: List[int],
+    output_dim: int,
+    dropout: float = 0.1,
+    activation: str = "relu",
+    use_batch_norm: bool = False
+) -> nn.Sequential:
+    """Utility function to create MLP layers."""
+    activation_fn = {
+        "relu": nn.ReLU(),
+        "gelu": nn.GELU(),
+        "tanh": nn.Tanh(),
+        "leaky_relu": nn.LeakyReLU()
+    }[activation]
+    
+    layers = []
+    prev_dim = input_dim
+    
+    for hidden_dim in hidden_dims:
+        layers.append(nn.Linear(prev_dim, hidden_dim))
+        if use_batch_norm:
+            layers.append(nn.BatchNorm1d(hidden_dim))
+        layers.append(activation_fn)
+        layers.append(nn.Dropout(dropout))
+        prev_dim = hidden_dim
+    
+    layers.append(nn.Linear(prev_dim, output_dim))
+    return nn.Sequential(*layers)
+
+
+class FeatureEncoder(BaseComponent):
+    """Encodes tabular features (categorical + numerical)."""
+    
+    def __init__(
+        self, 
+        vocab_sizes: Dict[str, int], 
+        embedding_dims: Dict[str, int], 
+        numerical_dim: int,
+        hidden_dim: int = 128
+    ):
+        super().__init__()
+        
+        # Categorical embeddings
+        if vocab_sizes:
+            self.categorical_encoder = EmbeddingLayer(vocab_sizes, embedding_dims)
+            categorical_dim = self.categorical_encoder.output_dim
+        else:
+            self.categorical_encoder = None
+            categorical_dim = 0
+        
+        # Numerical features projection
+        if numerical_dim > 0:
+            self.numerical_encoder = nn.Linear(numerical_dim, hidden_dim)
+        else:
+            self.numerical_encoder = None
+            hidden_dim = 0
+        
+        self.output_dim = categorical_dim + hidden_dim
+        
+        # Optional feature fusion
+        if categorical_dim > 0 and hidden_dim > 0:
+            self.fusion = nn.Linear(self.output_dim, hidden_dim)
+            self.output_dim = hidden_dim
+        else:
+            self.fusion = None
+    
+    def forward(self, categorical: Optional[torch.Tensor] = None, 
+                numerical: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """Forward pass with separate categorical and numerical inputs."""
+        features = []
+        
+        # Process categorical features
+        if categorical is not None and self.categorical_encoder is not None:
+            cat_features = self.categorical_encoder(categorical)
+            features.append(cat_features)
+        
+        # Process numerical features  
+        if numerical is not None and self.numerical_encoder is not None:
+            num_features = self.numerical_encoder(numerical)
+            features.append(num_features)
+        
+        if not features:
+            raise ValueError("No features provided")
+        
+        # Concatenate features
+        combined = torch.cat(features, dim=-1)
+        
+        # Optional fusion layer
+        if self.fusion is not None:
+            combined = self.fusion(combined)
+        
+        return combined
 
 
 class BaseModel(pl.LightningModule):
-    """Base model class for self-supervised sequence modeling."""
+    """Base model class for tabular self-supervised learning."""
 
-    def __init__(self, config: DictConfig):
+    def __init__(
+        self,
+        vocab_sizes: Dict[str, int],
+        embedding_dims: Dict[str, int], 
+        numerical_dim: int,
+        hidden_dim: int = 128,
+        learning_rate: float = 1e-3,
+        weight_decay: float = 1e-4,
+        **kwargs
+    ):
         super().__init__()
-        self.config = config
+        
+        # Store hyperparameters
+        self.save_hyperparameters()
+        
+        # Feature encoder
+        self.feature_encoder = FeatureEncoder(
+            vocab_sizes=vocab_sizes,
+            embedding_dims=embedding_dims,
+            numerical_dim=numerical_dim,
+            hidden_dim=hidden_dim
+        )
+        
+        self.learning_rate = learning_rate
+        self.weight_decay = weight_decay
 
-        # Convert Hydra configs to ComponentConfigs
-        self.component_configs = {
-            name: ComponentConfig.from_hydra(cfg)
-            for name, cfg in config.model.items()
-            if cfg is not None
-        }
+    def encode_features(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
+        """Encode input features."""
+        categorical = batch.get("categorical")
+        numerical = batch.get("numerical")
+        return self.feature_encoder(categorical=categorical, numerical=numerical)
 
-        # Initialize components
-        self.components = {
-            name: self._init_component(cfg)
-            for name, cfg in self.component_configs.items()
-        }
-
-        self.save_hyperparameters(OmegaConf.to_container(config, resolve=True))
-
-    def _init_component(self, config: ComponentConfig) -> BaseComponent:
-        """Initialize a component from its configuration."""
-        component_cls = ComponentRegistry.get(config.type)
-        return component_cls(config)
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, batch: Dict[str, torch.Tensor]) -> torch.Tensor:
         """Forward pass through the model."""
-        for name, component in self.components.items():
-            x = component(x)
-        return x
+        return self.encode_features(batch)
 
-    def training_step(self, batch, batch_idx):
-        """Training step."""
+    def training_step(self, batch: Dict[str, torch.Tensor], batch_idx: int):
+        """Training step - to be implemented by subclasses."""
         raise NotImplementedError("Training step must be implemented")
 
-    def validation_step(self, batch, batch_idx):
-        """Validation step."""
+    def validation_step(self, batch: Dict[str, torch.Tensor], batch_idx: int):
+        """Validation step - to be implemented by subclasses."""
         raise NotImplementedError("Validation step must be implemented")
 
     def configure_optimizers(self):
         """Configure optimizers."""
-        optimizer = hydra.utils.instantiate(
-            self.config.optimizer, params=self.parameters()
+        optimizer = torch.optim.AdamW(
+            self.parameters(),
+            lr=self.learning_rate,
+            weight_decay=self.weight_decay
         )
-        if "scheduler" in self.config:
-            scheduler = hydra.utils.instantiate(
-                self.config.scheduler, optimizer=optimizer
-            )
-            return {
-                "optimizer": optimizer,
-                "lr_scheduler": {"scheduler": scheduler, "monitor": "val_loss"},
+        
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer, 
+            T_max=self.trainer.max_epochs,
+            eta_min=self.learning_rate * 0.01
+        )
+        
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": scheduler,
+                "monitor": "val_loss"
             }
-        return optimizer
+        }
+
+
+# Backward compatibility placeholders (to be removed in future versions)
+class ModelConfig:
+    """Deprecated - use direct parameters instead."""
+    pass
+
+class TabularSSL(BaseModel):
+    """Deprecated - use BaseModel instead."""
+    pass
+
+class TabularSSLConfig:
+    """Deprecated - use direct parameters instead."""
+    pass
