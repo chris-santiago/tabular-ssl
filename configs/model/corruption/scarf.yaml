@@ -1,0 +1,15 @@
+_target_: tabular_ssl.models.components.SCARFCorruption
+
+# SCARF corruption settings
+corruption_rate: 0.6
+
+# Corruption strategy for feature replacement
+corruption_strategy: "random_swap"  # "random_swap" or "marginal_sampling"
+
+# Contrastive learning parameters
+temperature: 0.1  # Temperature for contrastive loss
+projection_dim: 128  # Dimension of projection head for contrastive learning
+
+# Training parameters
+use_momentum_encoder: false  # Whether to use momentum encoder (like MoCo)
+momentum: 0.999  # Momentum coefficient if using momentum encoder 

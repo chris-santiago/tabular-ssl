@@ -1,0 +1,16 @@
+_target_: tabular_ssl.models.components.VIMECorruption
+
+# VIME corruption settings
+corruption_rate: 0.3
+
+# Feature type indices (will be auto-detected if not specified)
+categorical_indices: null
+numerical_indices: null
+
+# Feature distributions (will be auto-computed if not specified)
+categorical_vocab_sizes: null
+numerical_distributions: null
+
+# VIME-specific parameters
+mask_estimation_weight: 1.0  # Weight for mask estimation loss
+value_imputation_weight: 1.0  # Weight for value imputation loss 

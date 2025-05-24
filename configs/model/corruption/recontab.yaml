@@ -1,0 +1,30 @@
+_target_: tabular_ssl.models.components.ReConTabCorruption
+
+# ReConTab corruption settings
+corruption_rate: 0.15
+
+# Feature type indices (will be auto-detected if not specified)
+categorical_indices: null
+numerical_indices: null
+
+# Multiple corruption strategies
+corruption_types: ["masking", "noise", "swapping"]
+
+# Masking strategy options
+masking_strategy: "random"  # "random", "column_wise", "block"
+
+# Noise corruption parameters
+noise_std: 0.1
+
+# Feature swapping parameters  
+swap_probability: 0.1
+
+# Reconstruction loss weights
+reconstruction_weights:
+  masked_reconstruction: 1.0
+  denoising: 0.5
+  unswapping: 0.3
+
+# Advanced options
+block_size_ratio: 0.15  # For block masking strategy
+column_corruption_prob: 0.3  # For column-wise masking 

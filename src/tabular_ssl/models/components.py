@@ -534,3 +534,339 @@ class SwappingCorruption(nn.Module):
                 x_corrupted[:, :, feat_idx] = x[perm_indices, :, feat_idx]
         
         return x_corrupted
+
+
+class VIMECorruption(nn.Module):
+    """
+    VIME (Value Imputation and Mask Estimation) corruption strategy.
+    
+    Based on "VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain"
+    https://arxiv.org/abs/2006.06775
+    
+    Creates corrupted views by:
+    1. Generating binary mask vectors to indicate which features to corrupt
+    2. For categorical features: replace with random category from vocabulary
+    3. For numerical features: replace with random value from feature distribution
+    4. Returns both corrupted data and mask for mask estimation pretext task
+    """
+
+    def __init__(
+        self,
+        corruption_rate: float = 0.3,
+        categorical_indices: Optional[List[int]] = None,
+        numerical_indices: Optional[List[int]] = None,
+        categorical_vocab_sizes: Optional[Dict[int, int]] = None,
+        numerical_distributions: Optional[Dict[int, Tuple[float, float]]] = None
+    ):
+        super().__init__()
+        self.corruption_rate = corruption_rate
+        self.categorical_indices = categorical_indices or []
+        self.numerical_indices = numerical_indices or []
+        self.categorical_vocab_sizes = categorical_vocab_sizes or {}
+        self.numerical_distributions = numerical_distributions or {}
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Apply VIME corruption.
+        
+        Args:
+            x: Input tensor of shape (batch_size, seq_len, num_features)
+            
+        Returns:
+            Tuple of (corrupted_x, mask) where:
+            - corrupted_x: Corrupted input with same shape as x
+            - mask: Binary mask indicating corrupted positions (1=corrupted, 0=original)
+        """
+        if not self.training:
+            return x, torch.zeros_like(x)
+            
+        batch_size, seq_len, num_features = x.shape
+        device = x.device
+        
+        # Generate corruption mask
+        mask = torch.bernoulli(
+            torch.full((batch_size, seq_len, num_features), self.corruption_rate, device=device)
+        )
+        
+        x_corrupted = x.clone()
+        
+        # Corrupt categorical features
+        for feat_idx in self.categorical_indices:
+            if feat_idx < num_features:
+                vocab_size = self.categorical_vocab_sizes.get(feat_idx, 10)  # Default vocab size
+                mask_positions = mask[:, :, feat_idx].bool()
+                
+                if mask_positions.any():
+                    # Replace with random categories
+                    random_categories = torch.randint(
+                        0, vocab_size, mask_positions.sum().shape, device=device
+                    )
+                    x_corrupted[:, :, feat_idx][mask_positions] = random_categories.float()
+        
+        # Corrupt numerical features  
+        for feat_idx in self.numerical_indices:
+            if feat_idx < num_features:
+                mask_positions = mask[:, :, feat_idx].bool()
+                
+                if mask_positions.any():
+                    # Get distribution parameters (mean, std)
+                    mean, std = self.numerical_distributions.get(feat_idx, (0.0, 1.0))
+                    
+                    # Replace with random values from normal distribution
+                    random_values = torch.normal(
+                        mean, std, mask_positions.sum().shape, device=device
+                    )
+                    x_corrupted[:, :, feat_idx][mask_positions] = random_values
+        
+        return x_corrupted, mask
+
+    def set_feature_distributions(self, data: torch.Tensor, categorical_indices: List[int], numerical_indices: List[int]):
+        """Set feature distributions from training data."""
+        self.categorical_indices = categorical_indices
+        self.numerical_indices = numerical_indices
+        
+        # Compute categorical vocabulary sizes
+        for feat_idx in categorical_indices:
+            if feat_idx < data.shape[-1]:
+                unique_values = torch.unique(data[:, :, feat_idx])
+                self.categorical_vocab_sizes[feat_idx] = len(unique_values)
+        
+        # Compute numerical feature distributions
+        for feat_idx in numerical_indices:
+            if feat_idx < data.shape[-1]:
+                feature_data = data[:, :, feat_idx].flatten()
+                mean = feature_data.mean().item()
+                std = feature_data.std().item()
+                self.numerical_distributions[feat_idx] = (mean, std)
+
+
+class SCARFCorruption(nn.Module):
+    """
+    SCARF (Self-Supervised Contrastive Learning using Random Feature Corruption) corruption strategy.
+    
+    Based on "SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption for Representation Learning"
+    https://arxiv.org/abs/2106.15147
+    
+    Creates corrupted views by randomly replacing feature values with values from other samples
+    in the batch, specifically designed for contrastive learning on tabular data.
+    """
+
+    def __init__(
+        self,
+        corruption_rate: float = 0.6,
+        corruption_strategy: str = "random_swap"  # "random_swap", "marginal_sampling"
+    ):
+        super().__init__()
+        self.corruption_rate = corruption_rate
+        self.corruption_strategy = corruption_strategy
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """
+        Apply SCARF corruption by randomly replacing features with values from other samples.
+        
+        Args:
+            x: Input tensor of shape (batch_size, seq_len, num_features)
+            
+        Returns:
+            Corrupted tensor with same shape as input
+        """
+        if not self.training:
+            return x
+            
+        batch_size, seq_len, num_features = x.shape
+        device = x.device
+        
+        x_corrupted = x.clone()
+        
+        # Generate corruption mask for features
+        corruption_mask = torch.rand(num_features, device=device) < self.corruption_rate
+        
+        for feat_idx in range(num_features):
+            if corruption_mask[feat_idx]:
+                if self.corruption_strategy == "random_swap":
+                    # Randomly permute this feature across all samples and sequences
+                    feature_values = x[:, :, feat_idx].flatten()
+                    perm_indices = torch.randperm(len(feature_values), device=device)
+                    shuffled_values = feature_values[perm_indices]
+                    x_corrupted[:, :, feat_idx] = shuffled_values.view(batch_size, seq_len)
+                    
+                elif self.corruption_strategy == "marginal_sampling":
+                    # Sample from marginal distribution (uniform sampling from feature values)
+                    feature_values = x[:, :, feat_idx].flatten()
+                    sample_indices = torch.randint(
+                        0, len(feature_values), (batch_size, seq_len), device=device
+                    )
+                    x_corrupted[:, :, feat_idx] = feature_values[sample_indices]
+        
+        return x_corrupted
+
+    def create_contrastive_pairs(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Create two different corrupted views for contrastive learning.
+        
+        Args:
+            x: Input tensor of shape (batch_size, seq_len, num_features)
+            
+        Returns:
+            Tuple of (view1, view2) - two differently corrupted versions
+        """
+        view1 = self.forward(x)
+        view2 = self.forward(x)
+        return view1, view2
+
+
+class ReConTabCorruption(nn.Module):
+    """
+    ReConTab (Reconstruction-based Contrastive Learning for Tabular Data) corruption strategy.
+    
+    Based on reconstruction-based self-supervised learning approaches for tabular data.
+    Combines multiple corruption techniques optimized for reconstruction tasks.
+    """
+
+    def __init__(
+        self,
+        corruption_rate: float = 0.15,
+        categorical_indices: Optional[List[int]] = None,
+        numerical_indices: Optional[List[int]] = None,
+        corruption_types: List[str] = ["masking", "noise", "swapping"],
+        masking_strategy: str = "random",  # "random", "column_wise", "block"
+        noise_std: float = 0.1,
+        swap_probability: float = 0.1
+    ):
+        super().__init__()
+        self.corruption_rate = corruption_rate
+        self.categorical_indices = categorical_indices or []
+        self.numerical_indices = numerical_indices or []
+        self.corruption_types = corruption_types
+        self.masking_strategy = masking_strategy
+        self.noise_std = noise_std
+        self.swap_probability = swap_probability
+
+    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Apply ReConTab corruption with multiple strategies.
+        
+        Args:
+            x: Input tensor of shape (batch_size, seq_len, num_features)
+            
+        Returns:
+            Tuple of (corrupted_x, corruption_info) where:
+            - corrupted_x: Corrupted input with same shape as x
+            - corruption_info: Information about applied corruptions for reconstruction
+        """
+        if not self.training:
+            return x, torch.zeros_like(x)
+            
+        batch_size, seq_len, num_features = x.shape
+        device = x.device
+        
+        x_corrupted = x.clone()
+        corruption_info = torch.zeros_like(x)  # 0=no corruption, 1=masked, 2=noise, 3=swapped
+        
+        # Apply each corruption type
+        for corruption_idx, corruption_type in enumerate(self.corruption_types):
+            
+            if corruption_type == "masking":
+                mask = self._generate_mask(x, strategy=self.masking_strategy)
+                x_corrupted = x_corrupted * (1 - mask)  # Zero out masked positions
+                corruption_info[mask.bool()] = 1
+                
+            elif corruption_type == "noise" and self.numerical_indices:
+                noise_mask = torch.rand(batch_size, seq_len, num_features, device=device) < self.corruption_rate
+                
+                # Apply noise only to numerical features
+                for feat_idx in self.numerical_indices:
+                    if feat_idx < num_features:
+                        feature_mask = noise_mask[:, :, feat_idx]
+                        noise = torch.randn_like(x_corrupted[:, :, feat_idx]) * self.noise_std
+                        x_corrupted[:, :, feat_idx] = torch.where(
+                            feature_mask,
+                            x_corrupted[:, :, feat_idx] + noise,
+                            x_corrupted[:, :, feat_idx]
+                        )
+                        corruption_info[:, :, feat_idx][feature_mask] = 2
+                        
+            elif corruption_type == "swapping":
+                swap_mask = torch.rand(num_features, device=device) < self.swap_probability
+                
+                for feat_idx in range(num_features):
+                    if swap_mask[feat_idx]:
+                        # Randomly permute this feature across batch
+                        perm_indices = torch.randperm(batch_size, device=device)
+                        x_corrupted[:, :, feat_idx] = x_corrupted[perm_indices, :, feat_idx]
+                        corruption_info[:, :, feat_idx] = 3
+        
+        return x_corrupted, corruption_info
+
+    def _generate_mask(self, x: torch.Tensor, strategy: str = "random") -> torch.Tensor:
+        """Generate corruption mask based on strategy."""
+        batch_size, seq_len, num_features = x.shape
+        device = x.device
+        
+        if strategy == "random":
+            # Random masking
+            mask = torch.bernoulli(
+                torch.full((batch_size, seq_len, num_features), self.corruption_rate, device=device)
+            )
+            
+        elif strategy == "column_wise":
+            # Randomly select columns to mask entirely
+            num_cols_to_mask = max(1, int(num_features * self.corruption_rate))
+            cols_to_mask = torch.randperm(num_features)[:num_cols_to_mask]
+            
+            mask = torch.zeros(batch_size, seq_len, num_features, device=device)
+            mask[:, :, cols_to_mask] = 1
+            
+        elif strategy == "block":
+            # Block-wise masking (mask contiguous regions)
+            mask = torch.zeros(batch_size, seq_len, num_features, device=device)
+            
+            for batch_idx in range(batch_size):
+                # Random block size
+                block_size = max(1, int(seq_len * self.corruption_rate))
+                start_pos = torch.randint(0, max(1, seq_len - block_size + 1), (1,)).item()
+                
+                # Random features to apply block mask
+                num_feat_mask = max(1, int(num_features * 0.5))
+                feat_indices = torch.randperm(num_features)[:num_feat_mask]
+                
+                mask[batch_idx, start_pos:start_pos + block_size, feat_indices] = 1
+        
+        else:
+            raise ValueError(f"Unknown masking strategy: {strategy}")
+            
+        return mask
+
+    def reconstruction_targets(self, original: torch.Tensor, corrupted: torch.Tensor, corruption_info: torch.Tensor) -> Dict[str, torch.Tensor]:
+        """
+        Create reconstruction targets for different corruption types.
+        
+        Args:
+            original: Original uncorrupted data
+            corrupted: Corrupted data  
+            corruption_info: Information about applied corruptions
+            
+        Returns:
+            Dictionary with reconstruction targets for each corruption type
+        """
+        targets = {}
+        
+        # Masking reconstruction: predict original values at masked positions
+        mask_positions = (corruption_info == 1)
+        if mask_positions.any():
+            targets["masked_values"] = original[mask_positions]
+            targets["mask_positions"] = mask_positions
+        
+        # Noise reconstruction: predict clean values at noisy positions  
+        noise_positions = (corruption_info == 2)
+        if noise_positions.any():
+            targets["denoised_values"] = original[noise_positions]
+            targets["noise_positions"] = noise_positions
+            
+        # Swap reconstruction: predict original values at swapped positions
+        swap_positions = (corruption_info == 3)
+        if swap_positions.any():
+            targets["unswapped_values"] = original[swap_positions]
+            targets["swap_positions"] = swap_positions
+        
+        return targets
