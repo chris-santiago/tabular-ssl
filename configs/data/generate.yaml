@@ -1,0 +1,25 @@
+# @package _global_
+
+defaults:
+  - _self_
+
+# Data generation parameters
+n_entities: 1000
+n_transactions: 100000
+start_date: "2023-01-01"
+end_date: "2023-12-31"
+seed: 42
+n_jobs: -1
+chunk_size: 10000
+
+# Output configuration
+output_dir: ${paths.data_dir}/sample
+
+# Data generation mode
+mode: "generate"  # Options: generate, preprocess
+
+# Preprocessing configuration (used when mode=preprocess)
+preprocessing:
+  input_dir: ${paths.data_dir}/raw
+  output_dir: ${paths.data_dir}/processed
+  n_jobs: -1 

@@ -1,0 +1,39 @@
+_target_: tabular_ssl.data.datamodule.TabularDataModule
+
+data_dir: ${paths.data_dir}
+dataset_name: "sample_dataset"
+batch_size: 64
+num_workers: 4
+pin_memory: True
+persistent_workers: True
+
+# data preprocessing settings
+train_val_test_split: [0.7, 0.15, 0.15]
+seed: ${seed}
+sequence_length: 32
+min_events: 2
+max_events: 100
+
+# feature configuration
+feature_config:
+  categorical_features:
+    - name: "category_1"
+      num_categories: 10
+    - name: "category_2"
+      num_categories: 20
+  numerical_features:
+    - name: "value_1"
+      mean: 0.0
+      std: 1.0
+    - name: "value_2"
+      mean: 0.0
+      std: 1.0
+
+# dataset parameters
+num_categorical_features: 2
+num_numerical_features: 8
+target_column: "target"
+
+# preprocessing
+normalize_numerical: true
+categorical_encoding: "embedding"  # "embedding" or "onehot" 
