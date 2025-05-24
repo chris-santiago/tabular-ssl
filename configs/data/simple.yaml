@@ -2,41 +2,36 @@ _target_: tabular_ssl.data.datamodule.TabularDataModule
 
 # Data paths and dataset
 data_dir: ${paths.data_dir}
-dataset_name: sample_dataset
+dataset_name: simple_test
 
 # DataLoader settings
-batch_size: 64
-num_workers: 4
+batch_size: 32
+num_workers: 2
 pin_memory: true
-persistent_workers: true
+persistent_workers: false
 
 # Data splitting
-train_val_test_split: [0.7, 0.15, 0.15]
+train_val_test_split: [0.8, 0.1, 0.1]
 seed: ${seed}
 
 # Sequence settings
-sequence_length: 32
-min_events: 2
-max_events: 100
+sequence_length: 16
+min_events: 1
+max_events: 50
 
 # Feature configuration
 feature_config:
   categorical_features:
     - name: category_1
-      num_categories: 10
-    - name: category_2
-      num_categories: 20
+      num_categories: 5
   numerical_features:
     - name: value_1
       mean: 0.0
       std: 1.0
-    - name: value_2
-      mean: 0.0
-      std: 1.0
 
 # Dataset parameters
-num_categorical_features: 2
-num_numerical_features: 8
+num_categorical_features: 1
+num_numerical_features: 4
 target_column: target
 
 # Preprocessing

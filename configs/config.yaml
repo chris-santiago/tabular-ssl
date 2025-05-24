@@ -1,67 +1,30 @@
 # @package _global_
 
-# specify here default configuration
-# order of defaults determines the order in which configs override each other
+# Main configuration file for tabular-ssl
 defaults:
   - _self_
-  - data: default.yaml
-  - model: default.yaml
-  - callbacks: default.yaml
-  - logger: null # set logger here or use command line (e.g. `python train.py logger=wandb`)
-  - trainer: default.yaml
-  - paths: default.yaml
-  - extras: default.yaml
-  - hydra: default.yaml
-  - experiment: null # chose experiment config here or use command line
+  - data: default
+  - model: default
+  - trainer: default
+  - callbacks: default
+  - paths: default
+  - hydra: default
+  - logger: null  # Set via command line: python train.py logger=wandb
+  - experiment: null  # Set via command line: python train.py experiment=transformer_small
 
-# task name, determines output directory path
-task_name: "train"
-
-# tags to help you identify your experiments
-# you can overwrite this in experiment configs
-# overwrite from command line with `python train.py tags="[first_tag, second_tag]"`
-tags: ["dev"]
-
-# seed for random number generators in pytorch, numpy and python.random
+# Task settings
+task_name: train
 seed: 42
 
-# name of the run, should be used along with experiment mode
+# Run settings  
 name: ${now:%Y-%m-%d_%H-%M-%S}
+tags: ["dev"]
 
-# use `python train.py debug=true` for easy debugging
-# this will run 1 train, val and test loop with toy datasets
+# Mode flags
+train: true
+test: false
 debug: false
 
-# get git info to log to W&B
-git_info: false
-
-# enable color logging
-enable_color_logging: true
-
-# pretty print config at the start of the run using Rich library
+# Optional settings
 print_config: true
-
-# disable python warnings if they annoy you
-ignore_warnings: true
-
-# set False to skip model training
-train: true
-
-# evaluate on test set, using best model weights achieved during training
-# lightning chooses best weights based on the metric specified in checkpoint callback
-test: false
-
-# path to original working directory
-# hydra hijacks working directory by changing it to the new log directory
-# so it's useful to have this path as a special variable
-# https://hydra.cc/docs/next/tutorials/basic/running_your_app/working_directory
-work_dir: ${hydra:runtime.cwd}
-
-# path to a file with parameters to override
-# useful to keep default config in the repository and override some parameters
-# for specific experiments without changing the code
-# override_config_path: null
-
-# use this to override any parameter from the config
-# example: override hydra/hydra_logging=disabled
-override_hydra: null 
+ignore_warnings: false 

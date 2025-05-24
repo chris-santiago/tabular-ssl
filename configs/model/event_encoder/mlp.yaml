@@ -1,7 +1,8 @@
-name: mlp_encoder
-type: mlp_event_encoder
+_target_: tabular_ssl.models.components.MLPEventEncoder
+
 input_dim: 64
 hidden_dims: [128, 256]
 output_dim: 512
 dropout: 0.1
+activation: relu
 use_batch_norm: true 

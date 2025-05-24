@@ -1,8 +1,8 @@
-name: s4_encoder
-type: s4
+_target_: tabular_ssl.models.components.S4SequenceEncoder
+
 input_dim: 512
 hidden_dim: 64
+num_layers: 2
 dropout: 0.1
 bidirectional: true
-max_sequence_length: 2048
-num_layers: 2 
+max_sequence_length: 2048 

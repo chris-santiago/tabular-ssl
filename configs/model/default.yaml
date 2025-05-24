@@ -1,32 +1,15 @@
 defaults:
   - _self_
-  - event_encoder: mlp.yaml
-  - sequence_encoder: transformer.yaml
-  - embedding: categorical.yaml
-  - projection_head: mlp.yaml
-  - prediction_head: classification.yaml
+  - event_encoder: mlp
+  - sequence_encoder: transformer
+  - embedding: categorical
+  - projection_head: mlp
+  - prediction_head: classification
 
 _target_: tabular_ssl.models.base.BaseModel
 
-model:
-  name: tabular_ssl_model
-  type: base
-  event_encoder: ${event_encoder}
-  sequence_encoder: ${sequence_encoder}
-  embedding: ${embedding}
-  projection_head: ${projection_head}
-  prediction_head: ${prediction_head}
-
-# optimizer configuration
-optimizer:
-  _target_: torch.optim.AdamW
-  lr: 1.0e-4
-  weight_decay: 0.01
-  betas: [0.9, 0.999]
-  eps: 1.0e-8
-
-# learning rate scheduler
-scheduler:
-  _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-  T_max: ${trainer.max_epochs}
-  eta_min: 1.0e-6 
+# Training configuration
+learning_rate: 1.0e-4
+weight_decay: 0.01
+optimizer_type: adamw  # adamw, adam, sgd
+scheduler_type: cosine  # cosine, step, plateau, null 

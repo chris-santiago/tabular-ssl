@@ -1,0 +1,2 @@
+# No sequence encoder - for MLP-only models
+_target_: null 

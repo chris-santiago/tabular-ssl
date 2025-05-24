@@ -1,16 +1,20 @@
 #!/usr/bin/env python
 
-import dotenv
+try:
+    import dotenv
+    # Load environment variables from `.env` file if it exists
+    # Recursively searches for `.env` in all folders starting from work dir
+    dotenv.load_dotenv(override=True)
+except ImportError:
+    # dotenv is optional
+    pass
+
 import hydra
 from omegaconf import DictConfig
 import pytorch_lightning as pl
 from pytorch_lightning import LightningModule, LightningDataModule, Callback, Trainer
 from pytorch_lightning.loggers import Logger
 from tabular_ssl import utils
-
-# Load environment variables from `.env` file if it exists
-# Recursively searches for `.env` in all folders starting from work dir
-dotenv.load_dotenv(override=True)
 
 log = utils.get_logger(__name__)
 

@@ -1,8 +1,10 @@
-# disable python warnings if they annoy you
-ignore_warnings: False
+# Extra utilities configuration
 
-# ask user for tags if none specified
-enforce_tags: True
+# Disable Python warnings
+ignore_warnings: false
 
-# pretty print config tree at the start of the run using rich library
-print_config: True 
+# Pretty print config at startup
+print_config: true
+
+# Ask for tags if none specified
+enforce_tags: true 

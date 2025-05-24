@@ -1,5 +1,5 @@
-name: classification_head
-type: classification
+_target_: tabular_ssl.models.components.ClassificationHead
+
 input_dim: 128
 num_classes: 2
 hidden_dims: [64]

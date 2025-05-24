@@ -1,109 +1,58 @@
 # @package _global_
 
-# specify here default training configuration
+# Large S4 sequence model experiment
+# Usage: python train.py experiment=s4_large
+
 defaults:
-  - _self_
-  - model: default
-  - data: default
-  - callbacks: default
-  - logger: default
-  - trainer: default
-  - paths: default
-  - extras: default
-  - hydra: default
-  - mode: default
+  - override /model/event_encoder: mlp
+  - override /model/sequence_encoder: s4
+  - override /model/projection_head: mlp
+  - override /model/prediction_head: classification
 
-# experiment configs allow for version control of specific hyperparameters
-# e.g. best hyperparameters for given model and datamodule
-experiment: null
+tags: ["s4", "large", "sequence", "long-range"]
 
-# debugging config (enable through command line, e.g. `python train.py debug=true)
-debug: false
-
-# enable color logging
-enable_color_logging: true
-
-# pretty print config at the start of the run using Rich library
-print_config: true
-
-# disable python warnings if they annoy you
-ignore_warnings: true
-
-# set False to skip model training
-train: true
-
-# evaluate on test set, using best model weights achieved during training
-# lightning chooses best weights based on the metric specified in checkpoint callback
-test: false
-
-# seed for random number generators in pytorch, numpy and python.random
-seed: 42
-
-# Model configuration
 model:
+  # Event encoder settings
   event_encoder:
-    input_dim: 10
-    hidden_dims: [256, 128, 64]
-    output_dim: 32
-    dropout: 0.2
-
+    input_dim: 64
+    hidden_dims: [128, 256]
+    output_dim: 512
+    dropout: 0.1
+    
+  # S4 sequence encoder settings
   sequence_encoder:
-    model_type: "s4"
-    input_dim: 32
-    hidden_dim: 128
-    num_layers: 4
+    input_dim: 512
+    hidden_dim: 512
+    num_layers: 6
     dropout: 0.1
-    bidirectional: true
-    state_dim: 64
+    bidirectional: false
     max_sequence_length: 2048
-    use_learnable_dt: true
-    use_initial_state: true
-
-  embedding:
-    embedding_dims:
-      - [5, 16]  # 5 categories, 16-dimensional embedding
-      - [3, 8]   # 3 categories, 8-dimensional embedding
-
+    
+  # Projection head settings
   projection_head:
-    input_dim: 128
-    hidden_dim: 64
-    output_dim: 32
-
+    input_dim: 512
+    hidden_dims: [256, 128]
+    output_dim: 64
+    
+  # Prediction head settings
   prediction_head:
-    input_dim: 32
+    input_dim: 64
     num_classes: 2
-    dropout: 0.1
+    hidden_dims: [32]
+    
+  # Training settings
+  learning_rate: 1e-4
+  weight_decay: 1e-2
+  optimizer_type: adamw
+  scheduler_type: cosine
 
-  optimizer:
-    _target_: torch.optim.AdamW
-    lr: 0.001
-    weight_decay: 0.0001
-
-  scheduler:
-    _target_: torch.optim.lr_scheduler.CosineAnnealingLR
-    T_max: 1000
-
-# Trainer configuration
 trainer:
   max_epochs: 100
-  accelerator: "auto"
-  devices: 1
-  precision: "16-mixed"
-  log_every_n_steps: 50
+  gradient_clip_val: 0.5
+  precision: 16-mixed
+  accumulate_grad_batches: 2
 
-# Data configuration
 data:
-  batch_size: 64
-  num_workers: 4
-  pin_memory: true
-  sequence_length: 1000
-  normalize_numerical: true
-  categorical_encoding: "embedding"
-
-# Logger configuration
-logger:
-  wandb:
-    project: "tabular-ssl"
-    name: ${now:%Y-%m-%d_%H-%M-%S}
-    tags: ["s4", "large"]
-    log_model: true 
+  batch_size: 32  # Smaller batch for larger model
+  sequence_length: 128
+  num_workers: 4 

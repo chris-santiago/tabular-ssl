@@ -1,7 +1,8 @@
-name: mlp_projection
-type: mlp_projection
+_target_: tabular_ssl.models.components.MLPProjectionHead
+
 input_dim: 512
 hidden_dims: [256]
 output_dim: 128
 dropout: 0.1
+activation: relu
 use_batch_norm: true 

@@ -31,9 +31,6 @@ enable_progress_bar: true
 enable_model_summary: true
 enable_checkpointing: true
 
-# logging
-log_every_n_steps: 50
-
 # callbacks
 callbacks:
   - _target_: pytorch_lightning.callbacks.ModelCheckpoint

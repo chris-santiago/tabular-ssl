@@ -1,0 +1,8 @@
+_target_: tabular_ssl.models.components.RNNSequenceEncoder
+
+input_dim: 128
+hidden_dim: 128
+num_layers: 2
+rnn_type: lstm  # lstm, gru, rnn
+dropout: 0.1
+bidirectional: false 

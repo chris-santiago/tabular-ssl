@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from typing import List, Optional, Dict, Tuple
-from .base import EventEncoder, SequenceEncoder, create_mlp
+from .base import EventEncoder, SequenceEncoder, EmbeddingLayer, ProjectionHead, PredictionHead, create_mlp
 
 
 class MLPEventEncoder(EventEncoder):
@@ -384,7 +384,7 @@ class S4SequenceEncoder(SequenceEncoder):
         return x
 
 
-class CategoricalEmbedding(nn.Module):
+class CategoricalEmbedding(EmbeddingLayer):
     """Embedding layer for categorical variables with flexible dimensions."""
 
     def __init__(self, vocab_sizes: Dict[str, int], embedding_dims: Dict[str, int]):
@@ -422,7 +422,7 @@ class CategoricalEmbedding(nn.Module):
         return torch.cat(embedded_features, dim=-1)
 
 
-class MLPProjectionHead(nn.Module):
+class MLPProjectionHead(ProjectionHead):
     """MLP-based projection head for downstream tasks."""
 
     def __init__(
@@ -449,7 +449,7 @@ class MLPProjectionHead(nn.Module):
         return self.projection(x)
 
 
-class ClassificationHead(nn.Module):
+class ClassificationHead(PredictionHead):
     """Classification head for supervised learning."""
 
     def __init__(

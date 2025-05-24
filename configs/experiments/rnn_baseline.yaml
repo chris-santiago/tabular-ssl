@@ -1,15 +1,15 @@
 # @package _global_
 
-# Small Transformer experiment 
-# Usage: python train.py experiment=transformer_small
+# RNN baseline experiment
+# Usage: python train.py experiment=rnn_baseline
 
 defaults:
   - override /model/event_encoder: mlp
-  - override /model/sequence_encoder: transformer
-  - override /model/projection_head: mlp  
+  - override /model/sequence_encoder: rnn
+  - override /model/projection_head: mlp
   - override /model/prediction_head: classification
 
-tags: ["transformer", "small", "sequence"]
+tags: ["rnn", "lstm", "baseline", "sequence"]
 
 model:
   # Event encoder settings
@@ -19,39 +19,37 @@ model:
     output_dim: 128
     dropout: 0.1
     
-  # Sequence encoder settings  
+  # RNN sequence encoder settings
   sequence_encoder:
     input_dim: 128
     hidden_dim: 128
     num_layers: 2
-    num_heads: 4
-    dim_feedforward: 256
+    rnn_type: lstm
     dropout: 0.1
-    max_seq_length: 512
+    bidirectional: true
     
   # Projection head settings
   projection_head:
-    input_dim: 128
-    hidden_dims: [64]
-    output_dim: 32
+    input_dim: 256  # 128 * 2 for bidirectional
+    hidden_dims: [128]
+    output_dim: 64
     
   # Prediction head settings
   prediction_head:
-    input_dim: 32
+    input_dim: 64
     num_classes: 2
     
   # Training settings
-  learning_rate: 5e-4
+  learning_rate: 1e-3
   weight_decay: 1e-4
   optimizer_type: adamw
-  scheduler_type: cosine
+  scheduler_type: step
 
 trainer:
   max_epochs: 50
   gradient_clip_val: 1.0
-  precision: 16-mixed
 
 data:
   batch_size: 64
-  sequence_length: 32
+  sequence_length: 64
   num_workers: 4 

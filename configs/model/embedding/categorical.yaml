@@ -1,6 +1,9 @@
-name: categorical_embedding
-type: categorical_embedding
+_target_: tabular_ssl.models.components.CategoricalEmbedding
+
+# Example configuration - should be overridden by datamodule
+vocab_sizes:
+  feature_1: 10
+  feature_2: 20
 embedding_dims:
-  - [10, 32]  # 10 categories, 32-dimensional embedding
-  - [20, 64]  # 20 categories, 64-dimensional embedding
-dropout: 0.1 
+  feature_1: 32
+  feature_2: 64 
