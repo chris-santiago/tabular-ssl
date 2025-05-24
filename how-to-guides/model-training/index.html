@@ -22,7 +22,7 @@
     
     
       
-        <title>Model Training Guide - Tabular SSL Documentation</title>
+        <title>How to Train Models Effectively - Tabular SSL Documentation</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#model-training-guide" class="md-skip">
+        <a href="#how-to-train-models-effectively" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Model Training Guide
+              How to Train Models Effectively
             
           </span>
         </div>
@@ -602,7 +602,7 @@
   
   
   <span class="md-ellipsis">
-    Model Training Guide
+    How to Train Models Effectively
     
   </span>
   
@@ -615,7 +615,7 @@
   
   
   <span class="md-ellipsis">
-    Model Training Guide
+    How to Train Models Effectively
     
   </span>
   
@@ -638,28 +638,46 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-training" class="md-nav__link">
+  <a href="#problem-your-first-training-run" class="md-nav__link">
     <span class="md-ellipsis">
-      Basic Training
+      Problem: Your First Training Run
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Basic Training">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem-training-takes-too-long" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem: Training Takes Too Long
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Training Takes Too Long">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#simple-training-loop" class="md-nav__link">
+  <a href="#solution-1-reduce-model-complexity" class="md-nav__link">
     <span class="md-ellipsis">
-      Simple Training Loop
+      Solution 1: Reduce Model Complexity
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#training-with-validation" class="md-nav__link">
+  <a href="#solution-2-use-mixed-precision-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Training with Validation
+      Solution 2: Use Mixed Precision Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-optimize-data-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Optimize Data Loading
     </span>
   </a>
   
@@ -671,28 +689,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-training" class="md-nav__link">
+  <a href="#problem-running-out-of-gpu-memory" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced Training
+      Problem: Running Out of GPU Memory
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Advanced Training">
+    <nav class="md-nav" aria-label="Problem: Running Out of GPU Memory">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#custom-training-configuration" class="md-nav__link">
+  <a href="#solution-1-reduce-batch-size" class="md-nav__link">
     <span class="md-ellipsis">
-      Custom Training Configuration
+      Solution 1: Reduce Batch Size
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#learning-rate-scheduling" class="md-nav__link">
+  <a href="#solution-2-use-smaller-models" class="md-nav__link">
     <span class="md-ellipsis">
-      Learning Rate Scheduling
+      Solution 2: Use Smaller Models
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-enable-gradient-checkpointing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Enable Gradient Checkpointing
     </span>
   </a>
   
@@ -704,28 +731,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitoring-training" class="md-nav__link">
+  <a href="#problem-model-isnt-learning-loss-not-decreasing" class="md-nav__link">
     <span class="md-ellipsis">
-      Monitoring Training
+      Problem: Model Isn't Learning (Loss Not Decreasing)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Monitoring Training">
+    <nav class="md-nav" aria-label="Problem: Model Isn&#39;t Learning (Loss Not Decreasing)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#logging-metrics" class="md-nav__link">
+  <a href="#solution-1-check-learning-rate" class="md-nav__link">
     <span class="md-ellipsis">
-      Logging Metrics
+      Solution 1: Check Learning Rate
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#visualizing-progress" class="md-nav__link">
+  <a href="#solution-2-verify-data-loading" class="md-nav__link">
     <span class="md-ellipsis">
-      Visualizing Progress
+      Solution 2: Verify Data Loading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-add-gradient-clipping" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Add Gradient Clipping
     </span>
   </a>
   
@@ -737,28 +773,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#model-checkpointing" class="md-nav__link">
+  <a href="#problem-training-stops-early-due-to-errors" class="md-nav__link">
     <span class="md-ellipsis">
-      Model Checkpointing
+      Problem: Training Stops Early Due to Errors
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Model Checkpointing">
+    <nav class="md-nav" aria-label="Problem: Training Stops Early Due to Errors">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#saving-checkpoints" class="md-nav__link">
+  <a href="#solution-1-dimension-mismatches" class="md-nav__link">
     <span class="md-ellipsis">
-      Saving Checkpoints
+      Solution 1: Dimension Mismatches
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#loading-checkpoints" class="md-nav__link">
+  <a href="#solution-2-cuda-errors" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading Checkpoints
+      Solution 2: CUDA Errors
     </span>
   </a>
   
@@ -770,28 +806,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hyperparameter-tuning" class="md-nav__link">
+  <a href="#problem-need-to-monitor-training-progress" class="md-nav__link">
     <span class="md-ellipsis">
-      Hyperparameter Tuning
+      Problem: Need to Monitor Training Progress
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Hyperparameter Tuning">
+    <nav class="md-nav" aria-label="Problem: Need to Monitor Training Progress">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#grid-search" class="md-nav__link">
+  <a href="#solution-1-enable-logging" class="md-nav__link">
     <span class="md-ellipsis">
-      Grid Search
+      Solution 1: Enable Logging
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#random-search" class="md-nav__link">
+  <a href="#solution-2-add-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
-      Random Search
+      Solution 2: Add Callbacks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-custom-progress-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Custom Progress Logging
     </span>
   </a>
   
@@ -803,37 +848,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
+  <a href="#problem-hyperparameter-tuning" class="md-nav__link">
     <span class="md-ellipsis">
-      Best Practices
+      Problem: Hyperparameter Tuning
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-issues-and-solutions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Common Issues and Solutions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Issues and Solutions">
+    <nav class="md-nav" aria-label="Problem: Hyperparameter Tuning">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#overfitting" class="md-nav__link">
+  <a href="#solution-1-manual-grid-search" class="md-nav__link">
     <span class="md-ellipsis">
-      Overfitting
+      Solution 1: Manual Grid Search
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#underfitting" class="md-nav__link">
+  <a href="#solution-2-use-hydra-multirun" class="md-nav__link">
     <span class="md-ellipsis">
-      Underfitting
+      Solution 2: Use Hydra Multirun
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-structured-experiment-sweeps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Structured Experiment Sweeps
     </span>
   </a>
   
@@ -845,9 +890,126 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related-resources" class="md-nav__link">
+  <a href="#problem-reproducible-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Related Resources
+      Problem: Reproducible Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Reproducible Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-1-set-seeds-properly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 1: Set Seeds Properly
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-2-enable-deterministic-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 2: Enable Deterministic Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-version-control-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Version Control Configurations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem-validating-model-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem: Validating Model Performance
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Validating Model Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-1-enable-testing-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 1: Enable Testing Phase
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-2-test-only-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 2: Test Only Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-cross-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Cross-Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem-custom-training-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem: Custom Training Configurations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Custom Training Configurations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-create-your-own-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution: Create Your Own Experiment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-common-training-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference: Common Training Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
     </span>
   </a>
   
@@ -1230,28 +1392,46 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#basic-training" class="md-nav__link">
+  <a href="#problem-your-first-training-run" class="md-nav__link">
     <span class="md-ellipsis">
-      Basic Training
+      Problem: Your First Training Run
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Basic Training">
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem-training-takes-too-long" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem: Training Takes Too Long
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Training Takes Too Long">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#simple-training-loop" class="md-nav__link">
+  <a href="#solution-1-reduce-model-complexity" class="md-nav__link">
     <span class="md-ellipsis">
-      Simple Training Loop
+      Solution 1: Reduce Model Complexity
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#training-with-validation" class="md-nav__link">
+  <a href="#solution-2-use-mixed-precision-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Training with Validation
+      Solution 2: Use Mixed Precision Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-optimize-data-loading" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Optimize Data Loading
     </span>
   </a>
   
@@ -1263,28 +1443,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-training" class="md-nav__link">
+  <a href="#problem-running-out-of-gpu-memory" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced Training
+      Problem: Running Out of GPU Memory
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Advanced Training">
+    <nav class="md-nav" aria-label="Problem: Running Out of GPU Memory">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#custom-training-configuration" class="md-nav__link">
+  <a href="#solution-1-reduce-batch-size" class="md-nav__link">
     <span class="md-ellipsis">
-      Custom Training Configuration
+      Solution 1: Reduce Batch Size
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#learning-rate-scheduling" class="md-nav__link">
+  <a href="#solution-2-use-smaller-models" class="md-nav__link">
     <span class="md-ellipsis">
-      Learning Rate Scheduling
+      Solution 2: Use Smaller Models
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-enable-gradient-checkpointing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Enable Gradient Checkpointing
     </span>
   </a>
   
@@ -1296,28 +1485,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#monitoring-training" class="md-nav__link">
+  <a href="#problem-model-isnt-learning-loss-not-decreasing" class="md-nav__link">
     <span class="md-ellipsis">
-      Monitoring Training
+      Problem: Model Isn't Learning (Loss Not Decreasing)
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Monitoring Training">
+    <nav class="md-nav" aria-label="Problem: Model Isn&#39;t Learning (Loss Not Decreasing)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#logging-metrics" class="md-nav__link">
+  <a href="#solution-1-check-learning-rate" class="md-nav__link">
     <span class="md-ellipsis">
-      Logging Metrics
+      Solution 1: Check Learning Rate
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#visualizing-progress" class="md-nav__link">
+  <a href="#solution-2-verify-data-loading" class="md-nav__link">
     <span class="md-ellipsis">
-      Visualizing Progress
+      Solution 2: Verify Data Loading
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-add-gradient-clipping" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Add Gradient Clipping
     </span>
   </a>
   
@@ -1329,28 +1527,28 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#model-checkpointing" class="md-nav__link">
+  <a href="#problem-training-stops-early-due-to-errors" class="md-nav__link">
     <span class="md-ellipsis">
-      Model Checkpointing
+      Problem: Training Stops Early Due to Errors
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Model Checkpointing">
+    <nav class="md-nav" aria-label="Problem: Training Stops Early Due to Errors">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#saving-checkpoints" class="md-nav__link">
+  <a href="#solution-1-dimension-mismatches" class="md-nav__link">
     <span class="md-ellipsis">
-      Saving Checkpoints
+      Solution 1: Dimension Mismatches
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#loading-checkpoints" class="md-nav__link">
+  <a href="#solution-2-cuda-errors" class="md-nav__link">
     <span class="md-ellipsis">
-      Loading Checkpoints
+      Solution 2: CUDA Errors
     </span>
   </a>
   
@@ -1362,28 +1560,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#hyperparameter-tuning" class="md-nav__link">
+  <a href="#problem-need-to-monitor-training-progress" class="md-nav__link">
     <span class="md-ellipsis">
-      Hyperparameter Tuning
+      Problem: Need to Monitor Training Progress
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Hyperparameter Tuning">
+    <nav class="md-nav" aria-label="Problem: Need to Monitor Training Progress">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#grid-search" class="md-nav__link">
+  <a href="#solution-1-enable-logging" class="md-nav__link">
     <span class="md-ellipsis">
-      Grid Search
+      Solution 1: Enable Logging
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#random-search" class="md-nav__link">
+  <a href="#solution-2-add-callbacks" class="md-nav__link">
     <span class="md-ellipsis">
-      Random Search
+      Solution 2: Add Callbacks
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-custom-progress-logging" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Custom Progress Logging
     </span>
   </a>
   
@@ -1395,37 +1602,37 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#best-practices" class="md-nav__link">
+  <a href="#problem-hyperparameter-tuning" class="md-nav__link">
     <span class="md-ellipsis">
-      Best Practices
+      Problem: Hyperparameter Tuning
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#common-issues-and-solutions" class="md-nav__link">
-    <span class="md-ellipsis">
-      Common Issues and Solutions
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Common Issues and Solutions">
+    <nav class="md-nav" aria-label="Problem: Hyperparameter Tuning">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#overfitting" class="md-nav__link">
+  <a href="#solution-1-manual-grid-search" class="md-nav__link">
     <span class="md-ellipsis">
-      Overfitting
+      Solution 1: Manual Grid Search
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#underfitting" class="md-nav__link">
+  <a href="#solution-2-use-hydra-multirun" class="md-nav__link">
     <span class="md-ellipsis">
-      Underfitting
+      Solution 2: Use Hydra Multirun
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-structured-experiment-sweeps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Structured Experiment Sweeps
     </span>
   </a>
   
@@ -1437,9 +1644,126 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#related-resources" class="md-nav__link">
+  <a href="#problem-reproducible-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Related Resources
+      Problem: Reproducible Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Reproducible Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-1-set-seeds-properly" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 1: Set Seeds Properly
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-2-enable-deterministic-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 2: Enable Deterministic Training
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-version-control-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Version Control Configurations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem-validating-model-performance" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem: Validating Model Performance
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Validating Model Performance">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-1-enable-testing-phase" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 1: Enable Testing Phase
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-2-test-only-mode" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 2: Test Only Mode
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution-3-cross-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution 3: Cross-Validation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#problem-custom-training-configurations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Problem: Custom Training Configurations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Problem: Custom Training Configurations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#solution-create-your-own-experiment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Solution: Create Your Own Experiment
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#quick-reference-common-training-commands" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Reference: Common Training Commands
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
     </span>
   </a>
   
@@ -1461,190 +1785,234 @@
 
 
 
-<h1 id="model-training-guide">Model Training Guide<a class="headerlink" href="#model-training-guide" title="Permanent link">&para;</a></h1>
-<p>This guide covers best practices for training models with Tabular SSL.</p>
-<h2 id="basic-training">Basic Training<a class="headerlink" href="#basic-training" title="Permanent link">&para;</a></h2>
-<h3 id="simple-training-loop">Simple Training Loop<a class="headerlink" href="#simple-training-loop" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl</span><span class="w"> </span><span class="kn">import</span> <span class="n">TabularSSL</span>
+<h1 id="how-to-train-models-effectively">How to Train Models Effectively<a class="headerlink" href="#how-to-train-models-effectively" title="Permanent link">&para;</a></h1>
+<p>This guide solves specific problems you might encounter when training Tabular SSL models. Each section addresses a common training challenge with practical solutions.</p>
+<h2 id="problem-your-first-training-run">Problem: Your First Training Run<a class="headerlink" href="#problem-your-first-training-run" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Get a model training successfully from scratch</p>
+<p><strong>Solution</strong>: Use pre-configured experiments</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Start with the simplest baseline</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp
 
-<span class="c1"># Initialize model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">TabularSSL</span><span class="p">(</span><span class="n">input_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-
-<span class="c1"># Train model</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span>
-<span class="p">)</span>
+<span class="c1"># Check outputs directory for results</span>
+ls<span class="w"> </span>outputs/<span class="k">$(</span>date<span class="w"> </span>+%Y-%m-%d<span class="k">)</span>/
 </code></pre></div>
-<h3 id="training-with-validation">Training with Validation<a class="headerlink" href="#training-with-validation" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Split data into train and validation sets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.model_selection</span><span class="w"> </span><span class="kn">import</span> <span class="n">train_test_split</span>
-
-<span class="n">train_data</span><span class="p">,</span> <span class="n">val_data</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span>
-    <span class="n">data</span><span class="p">,</span>
-    <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>
-    <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span>
-<span class="p">)</span>
-
-<span class="c1"># Train with validation</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">validation_data</span><span class="o">=</span><span class="n">val_data</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">,</span>
-    <span class="n">epochs</span><span class="o">=</span><span class="mi">100</span>
-<span class="p">)</span>
+<p><strong>Why this works</strong>: Pre-configured experiments have tested hyperparameters and compatible component combinations.</p>
+<hr />
+<h2 id="problem-training-takes-too-long">Problem: Training Takes Too Long<a class="headerlink" href="#problem-training-takes-too-long" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Speed up training without sacrificing too much performance</p>
+<h3 id="solution-1-reduce-model-complexity">Solution 1: Reduce Model Complexity<a class="headerlink" href="#solution-1-reduce-model-complexity" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use smaller model components</span>
+python<span class="w"> </span>train.py<span class="w"> </span>model/sequence_encoder<span class="o">=</span>null<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">128</span>
 </code></pre></div>
-<h2 id="advanced-training">Advanced Training<a class="headerlink" href="#advanced-training" title="Permanent link">&para;</a></h2>
-<h3 id="custom-training-configuration">Custom Training Configuration<a class="headerlink" href="#custom-training-configuration" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">batch_size</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
-    <span class="n">epochs</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-4</span><span class="p">,</span>
-    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
-    <span class="n">early_stopping</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">min_delta</span><span class="o">=</span><span class="mf">0.001</span>
-<span class="p">)</span>
+<h3 id="solution-2-use-mixed-precision-training">Solution 2: Use Mixed Precision Training<a class="headerlink" href="#solution-2-use-mixed-precision-training" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Enable 16-bit precision for faster training</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.precision<span class="o">=</span><span class="m">16</span>-mixed
 </code></pre></div>
-<h3 id="learning-rate-scheduling">Learning Rate Scheduling<a class="headerlink" href="#learning-rate-scheduling" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_lr_scheduler</span>
-
-<span class="c1"># Create learning rate scheduler</span>
-<span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">get_lr_scheduler</span><span class="p">(</span>
-    <span class="n">initial_lr</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">scheduler_type</span><span class="o">=</span><span class="s1">&#39;cosine&#39;</span><span class="p">,</span>
-    <span class="n">warmup_epochs</span><span class="o">=</span><span class="mi">5</span>
-<span class="p">)</span>
-
-<span class="c1"># Train with scheduler</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-3</span><span class="p">,</span>
-    <span class="n">lr_scheduler</span><span class="o">=</span><span class="n">lr_scheduler</span>
-<span class="p">)</span>
+<h3 id="solution-3-optimize-data-loading">Solution 3: Optimize Data Loading<a class="headerlink" href="#solution-3-optimize-data-loading" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Increase data workers and enable memory pinning</span>
+python<span class="w"> </span>train.py<span class="w"> </span>data.num_workers<span class="o">=</span><span class="m">8</span><span class="w"> </span>data.pin_memory<span class="o">=</span><span class="nb">true</span>
 </code></pre></div>
-<h2 id="monitoring-training">Monitoring Training<a class="headerlink" href="#monitoring-training" title="Permanent link">&para;</a></h2>
-<h3 id="logging-metrics">Logging Metrics<a class="headerlink" href="#logging-metrics" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingLogger</span>
+<hr />
+<h2 id="problem-running-out-of-gpu-memory">Problem: Running Out of GPU Memory<a class="headerlink" href="#problem-running-out-of-gpu-memory" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Fit your model in available GPU memory</p>
+<h3 id="solution-1-reduce-batch-size">Solution 1: Reduce Batch Size<a class="headerlink" href="#solution-1-reduce-batch-size" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Halve the batch size</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>transformer_small<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">32</span>
 
-<span class="c1"># Initialize logger</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">TrainingLogger</span><span class="p">(</span><span class="n">log_dir</span><span class="o">=</span><span class="s1">&#39;logs&#39;</span><span class="p">)</span>
-
-<span class="c1"># Train with logging</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
-    <span class="n">log_interval</span><span class="o">=</span><span class="mi">100</span>
-<span class="p">)</span>
+<span class="c1"># Use gradient accumulation to maintain effective batch size</span>
+python<span class="w"> </span>train.py<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">32</span><span class="w"> </span>trainer.accumulate_grad_batches<span class="o">=</span><span class="m">2</span>
 </code></pre></div>
-<h3 id="visualizing-progress">Visualizing Progress<a class="headerlink" href="#visualizing-progress" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_training_history</span>
-
-<span class="c1"># Plot training metrics</span>
-<span class="n">fig</span> <span class="o">=</span> <span class="n">plot_training_history</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
-<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<h3 id="solution-2-use-smaller-models">Solution 2: Use Smaller Models<a class="headerlink" href="#solution-2-use-smaller-models" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Switch to more memory-efficient sequence encoder</span>
+python<span class="w"> </span>train.py<span class="w"> </span>model/sequence_encoder<span class="o">=</span>rnn
 </code></pre></div>
-<h2 id="model-checkpointing">Model Checkpointing<a class="headerlink" href="#model-checkpointing" title="Permanent link">&para;</a></h2>
-<h3 id="saving-checkpoints">Saving Checkpoints<a class="headerlink" href="#saving-checkpoints" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Save model checkpoints</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">save_dir</span><span class="o">=</span><span class="s1">&#39;checkpoints&#39;</span><span class="p">,</span>
-    <span class="n">save_best_only</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-    <span class="n">save_frequency</span><span class="o">=</span><span class="mi">5</span>
-<span class="p">)</span>
+<h3 id="solution-3-enable-gradient-checkpointing">Solution 3: Enable Gradient Checkpointing<a class="headerlink" href="#solution-3-enable-gradient-checkpointing" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/experiments/memory_efficient.yaml</span>
+<span class="c1"># @package _global_</span>
+<span class="nt">defaults</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/sequence_encoder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformer</span>
+
+<span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">sequence_encoder</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enable_checkpointing</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
-<h3 id="loading-checkpoints">Loading Checkpoints<a class="headerlink" href="#loading-checkpoints" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Load best model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">TabularSSL</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;checkpoints/best_model.pt&#39;</span><span class="p">)</span>
-
-<span class="c1"># Load specific checkpoint</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">TabularSSL</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s1">&#39;checkpoints/model_epoch_50.pt&#39;</span><span class="p">)</span>
+<hr />
+<h2 id="problem-model-isnt-learning-loss-not-decreasing">Problem: Model Isn't Learning (Loss Not Decreasing)<a class="headerlink" href="#problem-model-isnt-learning-loss-not-decreasing" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Debug and fix training issues</p>
+<h3 id="solution-1-check-learning-rate">Solution 1: Check Learning Rate<a class="headerlink" href="#solution-1-check-learning-rate" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Try different learning rates</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>model.learning_rate<span class="o">=</span>1e-2<span class="w">  </span><span class="c1"># Higher</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>model.learning_rate<span class="o">=</span>1e-5<span class="w">  </span><span class="c1"># Lower</span>
 </code></pre></div>
-<h2 id="hyperparameter-tuning">Hyperparameter Tuning<a class="headerlink" href="#hyperparameter-tuning" title="Permanent link">&para;</a></h2>
-<h3 id="grid-search">Grid Search<a class="headerlink" href="#grid-search" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">grid_search</span>
+<h3 id="solution-2-verify-data-loading">Solution 2: Verify Data Loading<a class="headerlink" href="#solution-2-verify-data-loading" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use simple data config to test</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">data</span><span class="o">=</span>simple
 
-<span class="c1"># Define parameter grid</span>
-<span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;hidden_dim&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span>
-    <span class="s1">&#39;num_layers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
-    <span class="s1">&#39;dropout&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
-<span class="p">}</span>
-
-<span class="c1"># Perform grid search</span>
-<span class="n">best_params</span> <span class="o">=</span> <span class="n">grid_search</span><span class="p">(</span>
-    <span class="n">model_class</span><span class="o">=</span><span class="n">TabularSSL</span><span class="p">,</span>
-    <span class="n">param_grid</span><span class="o">=</span><span class="n">param_grid</span><span class="p">,</span>
-    <span class="n">train_data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">val_data</span><span class="o">=</span><span class="n">val_data</span>
-<span class="p">)</span>
+<span class="c1"># Enable debug mode to see data shapes</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">debug</span><span class="o">=</span><span class="nb">true</span>
 </code></pre></div>
-<h3 id="random-search">Random Search<a class="headerlink" href="#random-search" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">random_search</span>
-
-<span class="c1"># Define parameter distributions</span>
-<span class="n">param_distributions</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;hidden_dim&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">,</span> <span class="mi">512</span><span class="p">],</span>
-    <span class="s1">&#39;num_layers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
-    <span class="s1">&#39;dropout&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">]</span>
-<span class="p">}</span>
-
-<span class="c1"># Perform random search</span>
-<span class="n">best_params</span> <span class="o">=</span> <span class="n">random_search</span><span class="p">(</span>
-    <span class="n">model_class</span><span class="o">=</span><span class="n">TabularSSL</span><span class="p">,</span>
-    <span class="n">param_distributions</span><span class="o">=</span><span class="n">param_distributions</span><span class="p">,</span>
-    <span class="n">train_data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">val_data</span><span class="o">=</span><span class="n">val_data</span><span class="p">,</span>
-    <span class="n">n_iter</span><span class="o">=</span><span class="mi">10</span>
-<span class="p">)</span>
+<h3 id="solution-3-add-gradient-clipping">Solution 3: Add Gradient Clipping<a class="headerlink" href="#solution-3-add-gradient-clipping" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Prevent exploding gradients</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.gradient_clip_val<span class="o">=</span><span class="m">1</span>.0
 </code></pre></div>
-<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Always use validation data during training</li>
-<li>Implement early stopping to prevent overfitting</li>
-<li>Use learning rate scheduling for better convergence</li>
-<li>Monitor training metrics regularly</li>
-<li>Save model checkpoints</li>
-<li>Experiment with different hyperparameters</li>
-<li>Use appropriate batch sizes for your data</li>
-<li>Normalize your data before training</li>
-</ol>
-<h2 id="common-issues-and-solutions">Common Issues and Solutions<a class="headerlink" href="#common-issues-and-solutions" title="Permanent link">&para;</a></h2>
-<h3 id="overfitting">Overfitting<a class="headerlink" href="#overfitting" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Increase dropout</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">TabularSSL</span><span class="p">(</span>
-    <span class="n">input_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">dropout</span><span class="o">=</span><span class="mf">0.3</span>  <span class="c1"># Increased from default</span>
-<span class="p">)</span>
-
-<span class="c1"># Add regularization</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">weight_decay</span><span class="o">=</span><span class="mf">1e-4</span>
-<span class="p">)</span>
+<hr />
+<h2 id="problem-training-stops-early-due-to-errors">Problem: Training Stops Early Due to Errors<a class="headerlink" href="#problem-training-stops-early-due-to-errors" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Resolve common training errors</p>
+<h3 id="solution-1-dimension-mismatches">Solution 1: Dimension Mismatches<a class="headerlink" href="#solution-1-dimension-mismatches" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check component compatibility in config files</span>
+python<span class="w"> </span>train.py<span class="w"> </span>--config-name<span class="o">=</span>config<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>--print-config
 </code></pre></div>
-<h3 id="underfitting">Underfitting<a class="headerlink" href="#underfitting" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Increase model capacity</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">TabularSSL</span><span class="p">(</span>
-    <span class="n">input_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>  <span class="c1"># Increased from default</span>
-    <span class="n">num_layers</span><span class="o">=</span><span class="mi">6</span>     <span class="c1"># Increased from default</span>
-<span class="p">)</span>
+<h3 id="solution-2-cuda-errors">Solution 2: CUDA Errors<a class="headerlink" href="#solution-2-cuda-errors" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Force CPU training for debugging</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.accelerator<span class="o">=</span>cpu
 
-<span class="c1"># Train for more epochs</span>
-<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
-    <span class="n">data</span><span class="o">=</span><span class="n">train_data</span><span class="p">,</span>
-    <span class="n">epochs</span><span class="o">=</span><span class="mi">300</span>  <span class="c1"># Increased from default</span>
-<span class="p">)</span>
+<span class="c1"># Or specify GPU explicitly</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.devices<span class="o">=</span><span class="m">1</span>
 </code></pre></div>
-<h2 id="related-resources">Related Resources<a class="headerlink" href="#related-resources" title="Permanent link">&para;</a></h2>
+<hr />
+<h2 id="problem-need-to-monitor-training-progress">Problem: Need to Monitor Training Progress<a class="headerlink" href="#problem-need-to-monitor-training-progress" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Track training metrics and visualize progress</p>
+<h3 id="solution-1-enable-logging">Solution 1: Enable Logging<a class="headerlink" href="#solution-1-enable-logging" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use Weights &amp; Biases</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">logger</span><span class="o">=</span>wandb
+
+<span class="c1"># Use CSV logging for local development</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">logger</span><span class="o">=</span>csv
+</code></pre></div>
+<h3 id="solution-2-add-callbacks">Solution 2: Add Callbacks<a class="headerlink" href="#solution-2-add-callbacks" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/experiments/monitored_training.yaml</span>
+<span class="nt">defaults</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">/callbacks</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default</span>
+
+<span class="nt">callbacks</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">model_checkpoint</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">monitor</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;val/loss&quot;</span>
+<span class="w">    </span><span class="nt">save_top_k</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span>
+<span class="w">  </span><span class="nt">early_stopping</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">monitor</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;val/loss&quot;</span>
+<span class="w">    </span><span class="nt">patience</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<span class="w">    </span><span class="nt">min_delta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
+</code></pre></div>
+<h3 id="solution-3-custom-progress-logging">Solution 3: Custom Progress Logging<a class="headerlink" href="#solution-3-custom-progress-logging" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Increase logging frequency</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.log_every_n_steps<span class="o">=</span><span class="m">10</span>
+</code></pre></div>
+<hr />
+<h2 id="problem-hyperparameter-tuning">Problem: Hyperparameter Tuning<a class="headerlink" href="#problem-hyperparameter-tuning" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Find optimal hyperparameters systematically</p>
+<h3 id="solution-1-manual-grid-search">Solution 1: Manual Grid Search<a class="headerlink" href="#solution-1-manual-grid-search" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Test different learning rates</span>
+<span class="k">for</span><span class="w"> </span>lr<span class="w"> </span><span class="k">in</span><span class="w"> </span>1e-2<span class="w"> </span>1e-3<span class="w"> </span>1e-4<span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">    </span>python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>model.learning_rate<span class="o">=</span><span class="nv">$lr</span>
+<span class="k">done</span>
+</code></pre></div>
+<h3 id="solution-2-use-hydra-multirun">Solution 2: Use Hydra Multirun<a class="headerlink" href="#solution-2-use-hydra-multirun" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Test multiple hyperparameters simultaneously</span>
+python<span class="w"> </span>train.py<span class="w"> </span>-m<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>model.learning_rate<span class="o">=</span>1e-2,1e-3,1e-4<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.batch_size<span class="o">=</span><span class="m">32</span>,64,128
+</code></pre></div>
+<h3 id="solution-3-structured-experiment-sweeps">Solution 3: Structured Experiment Sweeps<a class="headerlink" href="#solution-3-structured-experiment-sweeps" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/experiments/sweep_transformer.yaml</span>
+<span class="c1"># @package _global_</span>
+<span class="nt">defaults</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/sequence_encoder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformer</span>
+
+<span class="c1"># Hydra sweep configuration</span>
+<span class="nt">hydra</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">mode</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">MULTIRUN</span>
+<span class="w">  </span><span class="nt">sweeper</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">params</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">model.learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-2,1e-3,1e-4</span>
+<span class="w">      </span><span class="nt">model.sequence_encoder.num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2,4,6</span>
+<span class="w">      </span><span class="nt">model.sequence_encoder.num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4,8</span>
+</code></pre></div>
+<hr />
+<h2 id="problem-reproducible-training">Problem: Reproducible Training<a class="headerlink" href="#problem-reproducible-training" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Get consistent results across training runs</p>
+<h3 id="solution-1-set-seeds-properly">Solution 1: Set Seeds Properly<a class="headerlink" href="#solution-1-set-seeds-properly" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use fixed seed</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">seed</span><span class="o">=</span><span class="m">42</span>
+
+<span class="c1"># Different experiments with different seeds</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">seed</span><span class="o">=</span><span class="m">42</span>,123,456
+</code></pre></div>
+<h3 id="solution-2-enable-deterministic-training">Solution 2: Enable Deterministic Training<a class="headerlink" href="#solution-2-enable-deterministic-training" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/trainer/deterministic.yaml</span>
+<span class="nt">deterministic</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">benchmark</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span>
+</code></pre></div>
+<h3 id="solution-3-version-control-configurations">Solution 3: Version Control Configurations<a class="headerlink" href="#solution-3-version-control-configurations" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Save exact configuration with each run</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">print_config</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div>
+<hr />
+<h2 id="problem-validating-model-performance">Problem: Validating Model Performance<a class="headerlink" href="#problem-validating-model-performance" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Properly evaluate your trained model</p>
+<h3 id="solution-1-enable-testing-phase">Solution 1: Enable Testing Phase<a class="headerlink" href="#solution-1-enable-testing-phase" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Train and test in one command</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">train</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="nv">test</span><span class="o">=</span><span class="nb">true</span>
+</code></pre></div>
+<h3 id="solution-2-test-only-mode">Solution 2: Test Only Mode<a class="headerlink" href="#solution-2-test-only-mode" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Load and test a trained model</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">train</span><span class="o">=</span><span class="nb">false</span><span class="w"> </span><span class="nv">test</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span><span class="nv">ckpt_path</span><span class="o">=</span>outputs/2024-01-01/12-00-00/.../checkpoints/last.ckpt
+</code></pre></div>
+<h3 id="solution-3-cross-validation">Solution 3: Cross-Validation<a class="headerlink" href="#solution-3-cross-validation" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Split data differently for validation</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>data.train_val_test_split<span class="o">=[</span><span class="m">0</span>.6,0.2,0.2<span class="o">]</span>
+</code></pre></div>
+<hr />
+<h2 id="problem-custom-training-configurations">Problem: Custom Training Configurations<a class="headerlink" href="#problem-custom-training-configurations" title="Permanent link">&para;</a></h2>
+<p><strong>Goal</strong>: Create reusable custom training setups</p>
+<h3 id="solution-create-your-own-experiment">Solution: Create Your Own Experiment<a class="headerlink" href="#solution-create-your-own-experiment" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/experiments/my_setup.yaml</span>
+<span class="c1"># @package _global_</span>
+<span class="nt">defaults</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_model_config</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /data</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my_data_config</span>
+
+<span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;custom&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;production&quot;</span><span class="p p-Indicator">]</span>
+
+<span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-4</span>
+<span class="w">  </span><span class="nt">weight_decay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+
+<span class="nt">trainer</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">100</span>
+<span class="w">  </span><span class="nt">gradient_clip_val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
+<span class="w">  </span><span class="nt">precision</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16-mixed</span>
+
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span>
+<span class="w">  </span><span class="nt">num_workers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+</code></pre></div>
+<p>Then use it:
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>my_setup
+</code></pre></div></p>
+<hr />
+<h2 id="quick-reference-common-training-commands">Quick Reference: Common Training Commands<a class="headerlink" href="#quick-reference-common-training-commands" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="c1"># Fast development run</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.max_epochs<span class="o">=</span><span class="m">1</span><span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">8</span>
+
+<span class="c1"># Production training</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>transformer_small<span class="w"> </span><span class="nv">logger</span><span class="o">=</span>wandb
+
+<span class="c1"># Memory-efficient training</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>trainer.precision<span class="o">=</span><span class="m">16</span>-mixed<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">32</span>
+
+<span class="c1"># Debug run</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">debug</span><span class="o">=</span><span class="nb">true</span><span class="w"> </span>trainer.limit_train_batches<span class="o">=</span><span class="m">10</span>
+
+<span class="c1"># Hyperparameter sweep</span>
+python<span class="w"> </span>train.py<span class="w"> </span>-m<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>model.learning_rate<span class="o">=</span>1e-2,1e-3,1e-4
+</code></pre></div>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
 <ul>
-<li><a href="../data-preparation/">Data Preparation</a> - Preparing your data for training</li>
-<li><a href="../evaluation/">Evaluation</a> - Evaluating your trained model</li>
-<li><a href="../../reference/api/">API Reference</a> - Detailed API documentation </li>
+<li><strong>Evaluation</strong>: <a href="../evaluation/">How to Evaluate Models</a></li>
+<li><strong>Data Issues</strong>: <a href="../data-preparation/">How to Prepare Data</a></li>
+<li><strong>Advanced</strong>: <a href="../configuring-experiments/">How to Configure Experiments</a> </li>
 </ul>
 
 
