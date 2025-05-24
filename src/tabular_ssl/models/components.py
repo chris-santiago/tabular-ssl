@@ -51,6 +51,7 @@ class AutoEncoderEventEncoder(EventEncoder):
         hidden_dims: List[int],
         latent_dim: int,
         dropout: float = 0.1,
+        activation: str = "relu",
         use_batch_norm: bool = False,
     ):
         super().__init__()
@@ -61,6 +62,7 @@ class AutoEncoderEventEncoder(EventEncoder):
             hidden_dims=hidden_dims,
             output_dim=latent_dim,
             dropout=dropout,
+            activation=activation,
             use_batch_norm=use_batch_norm,
         )
 
@@ -71,6 +73,7 @@ class AutoEncoderEventEncoder(EventEncoder):
             hidden_dims=decoder_dims,
             output_dim=input_dim,
             dropout=dropout,
+            activation=activation,
             use_batch_norm=use_batch_norm,
         )
 
@@ -99,6 +102,8 @@ class ContrastiveEventEncoder(EventEncoder):
         output_dim: int,
         temperature: float = 0.1,
         dropout: float = 0.1,
+        activation: str = "relu",
+        use_batch_norm: bool = False,
     ):
         super().__init__()
 
@@ -107,6 +112,8 @@ class ContrastiveEventEncoder(EventEncoder):
             hidden_dims=hidden_dims,
             output_dim=output_dim,
             dropout=dropout,
+            activation=activation,
+            use_batch_norm=use_batch_norm,
         )
         self.temperature = temperature
 
@@ -469,6 +476,7 @@ class ClassificationHead(PredictionHead):
         num_classes: int,
         hidden_dims: Optional[List[int]] = None,
         dropout: float = 0.1,
+        activation: str = "relu",
         use_batch_norm: bool = False,
     ):
         super().__init__()
@@ -485,6 +493,7 @@ class ClassificationHead(PredictionHead):
                 hidden_dims=hidden_dims,
                 output_dim=num_classes,
                 dropout=dropout,
+                activation=activation,
                 use_batch_norm=use_batch_norm,
             )
 

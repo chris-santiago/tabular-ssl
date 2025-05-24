@@ -324,13 +324,23 @@ class TabularFeatureEncoder(EventEncoder):
 class MLPProjectionHead(ProjectionHead):
     """MLP-based projection head."""
     
-    def __init__(self, input_dim: int, hidden_dim: int, output_dim: int, dropout: float = 0.1):
+    def __init__(
+        self, 
+        input_dim: int, 
+        hidden_dims: List[int], 
+        output_dim: int, 
+        dropout: float = 0.1,
+        activation: str = "relu",
+        use_batch_norm: bool = False
+    ):
         super().__init__()
-        self.projection = nn.Sequential(
-            nn.Linear(input_dim, hidden_dim),
-            nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(hidden_dim, output_dim)
+        self.projection = create_mlp(
+            input_dim=input_dim,
+            hidden_dims=hidden_dims,
+            output_dim=output_dim,
+            dropout=dropout,
+            activation=activation,
+            use_batch_norm=use_batch_norm,
         )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -340,12 +350,33 @@ class MLPProjectionHead(ProjectionHead):
 class MLPPredictionHead(PredictionHead):
     """MLP-based prediction head for classification."""
     
-    def __init__(self, input_dim: int, num_classes: int, dropout: float = 0.1):
+    def __init__(
+        self, 
+        input_dim: int, 
+        num_classes: int, 
+        hidden_dims: Optional[List[int]] = None,
+        dropout: float = 0.1,
+        activation: str = "relu",
+        use_batch_norm: bool = False
+    ):
         super().__init__()
-        self.classifier = nn.Sequential(
-            nn.Dropout(dropout),
-            nn.Linear(input_dim, num_classes)
-        )
+        
+        if hidden_dims is None:
+            # Simple linear classifier
+            self.classifier = nn.Sequential(
+                nn.Dropout(dropout),
+                nn.Linear(input_dim, num_classes)
+            )
+        else:
+            # MLP classifier
+            self.classifier = create_mlp(
+                input_dim=input_dim,
+                hidden_dims=hidden_dims,
+                output_dim=num_classes,
+                dropout=dropout,
+                activation=activation,
+                use_batch_norm=use_batch_norm,
+            )
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.classifier(x)

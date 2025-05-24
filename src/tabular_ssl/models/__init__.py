@@ -6,12 +6,12 @@ from .base import (
     EmbeddingLayer,
     ProjectionHead,
     PredictionHead,
-    FeatureEncoder,
+    TabularFeatureEncoder,
+    TabularEmbedding,
     create_mlp,
-    # Backward compatibility (deprecated)
-    ModelConfig,
-    TabularSSL,
-    TabularSSLConfig,
+    MLPProjectionHead,
+    MLPPredictionHead,
+    SSLModel,
 )
 
 from .components import (
@@ -24,9 +24,13 @@ from .components import (
     CategoricalEmbedding,
     MLPProjectionHead,
     ClassificationHead,
+    BaseCorruption,
     RandomMasking,
     GaussianNoise,
     SwappingCorruption,
+    ReConTabCorruption,
+    VIMECorruption,
+    SCARFCorruption,
 )
 
 __all__ = [
@@ -38,8 +42,10 @@ __all__ = [
     "EmbeddingLayer",
     "ProjectionHead",
     "PredictionHead",
-    "FeatureEncoder",
+    "TabularFeatureEncoder",
+    "TabularEmbedding",
     "create_mlp",
+    "SSLModel",
     # Event encoders
     "MLPEventEncoder",
     "AutoEncoderEventEncoder",
@@ -51,13 +57,14 @@ __all__ = [
     # Embeddings and heads
     "CategoricalEmbedding",
     "MLPProjectionHead",
+    "MLPPredictionHead",
     "ClassificationHead",
-    # Data corruption
+    # Data corruption (base and implementations)
+    "BaseCorruption",
     "RandomMasking",
     "GaussianNoise",
     "SwappingCorruption",
-    # Backward compatibility (deprecated)
-    "ModelConfig",
-    "TabularSSL",
-    "TabularSSLConfig",
+    "ReConTabCorruption",
+    "VIMECorruption",
+    "SCARFCorruption",
 ]
