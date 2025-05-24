@@ -1,3 +1,10 @@
+**This was generated using Cursor IDE w/agent chat.**  
+
+Notes:
+  - Default models (or auto) is pretty terrible.  Code quality is inconsistent; it can feel like you're working with a struggling student. At first things look good, but the code is riddled with errors.
+  - Test generation w/default models is even worse.  Most tests are not functional-- they're importing classes/funcs that don't exist in the actual source code. It quickly devolves into and endless loop for error fixes.
+  - Using the latest, "thinking" or reasoning models is a much better experience. Claude-4-sonnet cleaned up much of the mess from the "auto" models.
+
 # 🎯 Tabular SSL: Self-Supervised Learning for Tabular Data
 
 A **unified, modular framework** for self-supervised learning on tabular data with **state-of-the-art corruption strategies**, **consistent interfaces**, and **fast experimentation**.
