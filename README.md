@@ -49,7 +49,77 @@ pip install -r requirements.txt
 
 # Install the package in development mode
 pip install -e .
+
+# Set up Python path
+export PYTHONPATH=$PWD/src
 ```
+
+## 🎬 Interactive Demos
+
+### Corruption Strategies Demo
+
+Explore how VIME, SCARF, and ReConTab corruption strategies work:
+
+```bash
+python demo_corruption_strategies.py
+```
+
+This demo shows:
+- How each corruption strategy transforms data
+- Corruption rates and example outputs
+- Side-by-side comparison of all approaches
+
+### Credit Card Data Demo
+
+Work with real transaction data from IBM TabFormer:
+
+```bash
+python demo_credit_card_data.py
+```
+
+This demo:
+- Downloads real credit card transaction data
+- Shows data preprocessing and sequence creation
+- Demonstrates DataModule integration
+- Prepares you for actual training
+
+## 🧪 SSL Experiments
+
+### VIME: Value Imputation and Mask Estimation
+
+```bash
+python train.py +experiment=vime_ssl
+```
+
+**Features:**
+- Corrupts data by masking features (30% corruption rate)
+- Learns to predict which features were masked
+- Learns to reconstruct original values
+- Two complementary pretext tasks
+
+### SCARF: Contrastive Learning with Feature Corruption
+
+```bash
+python train.py +experiment=scarf_ssl
+```
+
+**Features:**
+- High corruption rate (60%) by swapping feature values
+- Contrastive learning approach with InfoNCE loss
+- Large batch sizes for effective contrastive training
+- Temperature-scaled similarity
+
+### ReConTab: Multi-task Reconstruction
+
+```bash
+python train.py +experiment=recontab_ssl
+```
+
+**Features:**
+- Multiple corruption types: masking, noise, swapping
+- Detailed corruption tracking for reconstruction targets
+- Flexible masking strategies (random, column-wise, block)
+- Combines reconstruction with contrastive learning
 
 ## Project Structure
 
@@ -145,11 +215,12 @@ component = component_cls(config)
 - `classification`: Classification head
 
 #### Corruption Strategies
-- `random_masking`: Random masking corruption
-- `gaussian_noise`: Gaussian noise corruption
-- `swapping`: Feature swapping corruption
-- `vime`: VIME-style corruption
-- `corruption_pipeline`: Pipeline of multiple corruption strategies
+- `vime`: VIME corruption (mask estimation + value imputation)
+- `scarf`: SCARF corruption (contrastive feature swapping)
+- `recontab`: ReConTab corruption (multi-task reconstruction)
+- `random_masking`: Simple random masking
+- `gaussian_noise`: Gaussian noise injection
+- `swapping`: Feature swapping between samples
 
 ## Configuration with Hydra
 
