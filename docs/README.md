@@ -1,97 +1,127 @@
 # Tabular SSL Documentation
 
-This directory contains the documentation for the Tabular SSL library. The documentation is organized following the Diátaxis framework.
+Welcome to the documentation for **Tabular SSL** - a modular library for self-supervised learning on tabular data. This documentation follows the [Diátaxis framework](https://diataxis.fr/) for clear, purpose-driven content organization.
 
-## Structure
+## Documentation Structure
 
-- **tutorials/**: Step-by-step guides for beginners
-- **how-to-guides/**: Problem-oriented guides for specific tasks
-- **reference/**: Technical documentation of the API and components
-- **explanation/**: Background information and conceptual explanations
+### 📚 [Tutorials](tutorials/)
+**Learning-oriented guides for newcomers**
 
-## Building the Documentation
+Step-by-step lessons to learn Tabular SSL fundamentals:
+- [Getting Started](tutorials/getting-started.md) - Install and run your first experiment (10 min)
+- [Basic Usage](tutorials/basic-usage.md) - Core concepts and workflows
+- [Custom Components](tutorials/custom-components.md) - Create your own components (20 min)
 
-To build the documentation locally:
+### 🛠️ [How-to Guides](how-to-guides/)
+**Problem-oriented solutions for specific tasks**
 
-1. Install the documentation requirements:
+Practical solutions to common challenges:
+- [Model Training](how-to-guides/model-training.md) - Solve training problems
+- [Data Preparation](how-to-guides/data-preparation.md) - Handle your datasets
+- [Evaluation](how-to-guides/evaluation.md) - Evaluate model performance
+- [Configuring Experiments](how-to-guides/configuring-experiments.md) - Set up custom experiments
+
+### 📖 [Reference](reference/)
+**Information-oriented technical documentation**
+
+Complete API and technical references:
+- [Models](reference/models.md) - All available components and their parameters
+- [Configuration](reference/config.md) - Configuration system reference
+- [Data](reference/data.md) - Data handling utilities
+- [API](reference/api.md) - Complete API documentation
+
+### 💡 [Explanation](explanation/)
+**Understanding-oriented discussions**
+
+Background and conceptual explanations:
+- [Architecture](explanation/architecture.md) - System design principles
+- [SSL Methods](explanation/ssl-methods.md) - Self-supervised learning approaches
+- [Performance](explanation/performance.md) - Optimization strategies
+
+## Building Documentation Locally
+
+### Prerequisites
+- Python 3.8+
+- MkDocs and dependencies
+
+### Setup
 ```bash
+# Install documentation requirements
 pip install -r docs/requirements.txt
-```
 
-2. Build the documentation:
-```bash
+# Build documentation
 cd docs
 mkdocs build
-```
 
-3. Serve the documentation locally:
-```bash
+# Serve locally with live reload
 mkdocs serve
 ```
 
-## Documentation Contents
+The documentation will be available at `http://localhost:8000`
 
-### Key Concepts
+## Documentation Standards
 
-- **Modular Components**: Tabular SSL uses a simplified modular architecture with direct component instantiation
-- **Configuration System**: Configuration is managed using Hydra with `_target_` specifications for clean component composition
-- **Self-Supervised Learning**: Multiple SSL methods are implemented for tabular data
-- **Simplified Architecture**: Direct constructor parameters instead of complex configuration classes
+### Content Guidelines
 
-### Component Types
+**Tutorials** (Learning-oriented):
+- Start with "What you'll learn"
+- Include time estimates
+- Use safe-to-fail examples
+- Provide checkpoints and validation steps
+- End with "What's next"
 
-The library includes several component types:
+**How-to Guides** (Problem-oriented):
+- Structure as "Problem: Goal → Solution"
+- Focus on practical, actionable steps
+- Include multiple solution approaches
+- Use real-world scenarios
 
-- **Event Encoders**: Encode individual events (MLP with flexible architecture)
-- **Sequence Encoders**: Encode sequences of events (RNN, LSTM, GRU, Transformer, S4)
-- **Embedding Layers**: Handle embedding of categorical features with flexible dimensions
-- **Projection Heads**: Project encoded representations to a different space
-- **Prediction Heads**: Generate predictions from encoded representations
+**Reference** (Information-oriented):
+- Complete parameter documentation
+- Working code examples
+- Accurate technical specifications
+- Consistent formatting
 
-### Configuration
+**Explanation** (Understanding-oriented):
+- Focus on "why" not "how"
+- Provide context and background
+- Discuss design decisions
+- Connect concepts together
 
-The configuration system uses Hydra with a structured directory layout:
+### Style Guidelines
 
-```
-configs/
-├── config.yaml                # Main configuration
-├── model/                     # Model configurations
-│   ├── default.yaml          # Default model assembly
-│   ├── event_encoder/        # Event encoder configs
-│   ├── sequence_encoder/     # Sequence encoder configs
-│   ├── embedding/            # Embedding configs
-│   ├── projection_head/      # Projection head configs
-│   └── prediction_head/      # Prediction head configs
-├── experiments/              # Pre-configured experiments
-├── data/                     # Data configurations
-├── trainer/                  # Training configurations
-├── callbacks/                # Callback configurations
-├── logger/                   # Logger configurations
-├── paths/                    # Path configurations
-├── hydra/                    # Hydra-specific configurations
-└── extras/                   # Extra utilities
-```
+- Use clear, concise language
+- Include working code examples
+- Add time estimates for tutorials
+- Use consistent formatting
+- Provide cross-references between sections
 
-Components are instantiated using Hydra's `_target_` mechanism:
+## Contributing to Documentation
 
-```yaml
-# configs/model/event_encoder/mlp.yaml
-_target_: tabular_ssl.models.components.MLPEventEncoder
-input_dim: 64
-hidden_dims: [128, 256]
-output_dim: 512
-dropout: 0.1
-```
+### Quick Contribution
+1. Fork the repository
+2. Edit documentation files in `docs/`
+3. Test locally with `mkdocs serve`
+4. Submit pull request
 
-## Contributing to the Documentation
+### Major Changes
+1. Follow the Diátaxis framework principles
+2. Update navigation in `docs/index.md` if needed
+3. Ensure all links work
+4. Test with different scenarios
 
-Contributions to the documentation are welcome! Please follow these guidelines:
+### File Organization
+- Keep examples working and up-to-date
+- Use relative links between docs
+- Place images in `docs/assets/`
+- Follow existing naming conventions
 
-1. Follow the Diátaxis framework organization
-2. Maintain a consistent style and tone
-3. Include code examples where appropriate
-4. Update documentation when making changes to the codebase
+## Getting Help
+
+- 📖 **Documentation Issues**: [GitHub Issues](https://github.com/yourusername/tabular-ssl/issues)
+- 💬 **Content Questions**: [GitHub Discussions](https://github.com/yourusername/tabular-ssl/discussions)
+- ✨ **Improvements**: Submit pull requests with specific changes
 
 ## License
 
-The documentation is licensed under the same license as the Tabular SSL library. 
+Documentation is licensed under the same license as the Tabular SSL library. 

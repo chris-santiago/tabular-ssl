@@ -1,127 +1,106 @@
 # Welcome to Tabular SSL Documentation
 
-Welcome to the official documentation for the Tabular SSL library. This documentation is organized following the Diátaxis framework to provide you with the most effective learning and reference experience.
+Welcome to the documentation for **Tabular SSL**, a modular library for self-supervised learning on tabular data. This documentation follows the [Diátaxis framework](https://diataxis.fr/) to provide you with the most effective learning and reference experience.
 
-## Documentation Sections
+## Getting Started
 
-### Tutorials
-Learn how to use Tabular SSL through step-by-step guides. Start here if you're new to the library.
+New to Tabular SSL? Start with our [Getting Started tutorial](tutorials/getting-started.md) to learn the basics in just a few minutes.
 
-- [Getting Started](tutorials/getting-started.md)
-- [Basic Usage](tutorials/basic-usage.md)
-- [Creating Custom Components](tutorials/custom-components.md)
+```bash
+# Quick start
+python train.py +experiment=simple_mlp
+```
 
-### How-to Guides
-Find practical solutions to specific problems and tasks.
+## Documentation Structure
 
-- [Data Preparation](how-to-guides/data-preparation.md)
-- [Model Training](how-to-guides/model-training.md)
-- [Evaluation](how-to-guides/evaluation.md)
-- [Configuring Experiments](how-to-guides/configuring-experiments.md)
+### 📚 [Tutorials](tutorials/)
+**Learning-oriented guides for newcomers**
 
-### Reference
-Detailed technical documentation of the library's components.
+Step-by-step lessons to help you learn Tabular SSL fundamentals. Start here if you're new to the library.
 
-- [API Reference](reference/api.md)
-- [Models](reference/models.md)
-- [Data Utilities](reference/data.md)
-- [Utility Functions](reference/utils.md)
-- [Configuration](reference/config.md)
+- [Getting Started](tutorials/getting-started.md) - Your first steps with Tabular SSL
+- [Basic Usage](tutorials/basic-usage.md) - Core concepts and workflows
+- [Custom Components](tutorials/custom-components.md) - Creating your own components
 
-### Explanation
-Understand the concepts and design decisions behind Tabular SSL.
+### 🛠️ [How-to Guides](how-to-guides/)
+**Problem-oriented solutions for specific tasks**
 
-- [Architecture Overview](explanation/architecture.md)
-- [SSL Methods](explanation/ssl-methods.md)
-- [Performance Considerations](explanation/performance.md)
+Practical guides for accomplishing specific goals and solving real problems.
 
-## Quick Start
+- [Data Preparation](how-to-guides/data-preparation.md) - Prepare your datasets
+- [Model Training](how-to-guides/model-training.md) - Train models effectively
+- [Evaluation](how-to-guides/evaluation.md) - Evaluate model performance
+- [Configuring Experiments](how-to-guides/configuring-experiments.md) - Set up experiments
 
-```python
-import hydra
-from omegaconf import DictConfig
+### 📖 [Reference](reference/)
+**Information-oriented technical documentation**
 
-@hydra.main(config_path="../configs", config_name="config", version_base=None)
-def main(config: DictConfig):
-    # Create data module
-    datamodule = hydra.utils.instantiate(config.data)
-    
-    # Create model with Hydra instantiation
-    model = hydra.utils.instantiate(config.model)
-    
-    # Create trainer
-    trainer = hydra.utils.instantiate(config.trainer)
-    
-    # Train model
-    trainer.fit(model, datamodule=datamodule)
-    
-    # Test model
-    trainer.test(model, datamodule=datamodule)
+Complete and accurate technical reference for the library's components and APIs.
 
-if __name__ == "__main__":
-    main()
+- [API Reference](reference/api.md) - Complete API documentation
+- [Models](reference/models.md) - Available model components
+- [Data](reference/data.md) - Data handling utilities
+- [Configuration](reference/config.md) - Configuration system
+- [Utilities](reference/utils.md) - Helper functions
+
+### 💡 [Explanation](explanation/)
+**Understanding-oriented discussions of key topics**
+
+Background information and conceptual explanations to help you understand the library's design and principles.
+
+- [Architecture Overview](explanation/architecture.md) - System design and principles
+- [SSL Methods](explanation/ssl-methods.md) - Self-supervised learning approaches
+- [Performance](explanation/performance.md) - Optimization and best practices
+
+## Quick Examples
+
+### Run Pre-configured Experiments
+```bash
+# Simple MLP baseline
+python train.py +experiment=simple_mlp
+
+# Transformer for sequences
+python train.py +experiment=transformer_small
+
+# Efficient S4 model
+python train.py +experiment=s4_large
+```
+
+### Custom Configuration
+```bash
+# Mix and match components
+python train.py model/sequence_encoder=rnn model/event_encoder=mlp
+
+# Adjust hyperparameters
+python train.py model.learning_rate=1e-3 data.batch_size=64
 ```
 
 ## Installation
 
 ```bash
-# Clone the repository
 git clone https://github.com/yourusername/tabular-ssl.git
 cd tabular-ssl
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Install the package in development mode
 pip install -e .
-
-# Set PYTHONPATH for imports
 export PYTHONPATH=$PWD/src
 ```
 
 ## Key Features
 
-- **Simplified Architecture**: Direct component instantiation with constructor parameters
-- **Hydra Configuration**: Clean configuration management with `_target_` specifications
-- **Self-Supervised Learning**: Multiple SSL methods for tabular data
-- **Flexible Components**: Mix and match components for custom models
-- **Experiment Management**: Pre-configured experiments for common architectures
-- **Modular Design**: Easy to extend and customize
-
-## Quick Examples
-
-### Running Pre-configured Experiments
-
-```bash
-# MLP-only baseline
-python train.py +experiment=simple_mlp
-
-# Small transformer model
-python train.py +experiment=transformer_small
-
-# Large S4 sequence model
-python train.py +experiment=s4_large
-
-# RNN baseline
-python train.py +experiment=rnn_baseline
-```
-
-### Custom Component Combinations
-
-```bash
-# Use specific components
-python train.py model/sequence_encoder=transformer model/event_encoder=mlp
-
-# MLP-only (no sequence processing)
-python train.py model/sequence_encoder=null
-
-# Custom parameters
-python train.py model.learning_rate=1e-4 data.batch_size=128
-```
+- **🧩 Modular Architecture** - Mix and match components for custom models
+- **⚙️ Hydra Configuration** - Flexible, hierarchical configuration management
+- **🔄 Self-Supervised Learning** - Multiple SSL methods for tabular data
+- **🚀 Pre-configured Experiments** - Ready-to-use model configurations
+- **📊 PyTorch Lightning** - Robust training and evaluation framework
 
 ## Contributing
 
-We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on how to get involved.
+
+## Support
+
+- 📝 [GitHub Issues](https://github.com/yourusername/tabular-ssl/issues) - Bug reports and feature requests
+- 💬 [Discussions](https://github.com/yourusername/tabular-ssl/discussions) - Questions and community support
+- 📧 [Contact](mailto:support@tabular-ssl.org) - Direct support
 
 ## License
 

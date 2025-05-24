@@ -1,237 +1,146 @@
 # Getting Started with Tabular SSL
 
-This tutorial will guide you through the process of setting up and using the Tabular SSL library for self-supervised learning on tabular data.
+**Time to complete: 10 minutes**
 
-## Installation
+Welcome! This tutorial will get you up and running with Tabular SSL in just a few minutes. You'll learn how to install the library, run your first experiment, and understand the basic concepts.
 
-First, clone and install the library:
+## What You'll Learn
+
+- How to install and set up Tabular SSL
+- How to run a pre-configured experiment
+- How to modify basic settings
+- Basic concepts of the library
+
+## Prerequisites
+
+- Python 3.8+ 
+- Basic familiarity with command line
+
+## Step 1: Installation
+
+Let's start by installing Tabular SSL:
 
 ```bash
 # Clone the repository
 git clone https://github.com/yourusername/tabular-ssl.git
 cd tabular-ssl
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Install in development mode
+# Install the package
 pip install -e .
 
-# Set PYTHONPATH for imports
+# Set up the Python path
 export PYTHONPATH=$PWD/src
 ```
 
-## Basic Usage
+✅ **Checkpoint**: Verify your installation works:
+```bash
+python -c "import tabular_ssl; print('✅ Installation successful!')"
+```
 
-Here's a simple example using pre-configured experiments:
+## Step 2: Your First Experiment
+
+Now let's run your first experiment using a pre-configured setup:
 
 ```bash
-# Run MLP-only baseline
 python train.py +experiment=simple_mlp
-
-# Run transformer experiment
-python train.py +experiment=transformer_small
-
-# Run with different data configuration
-python train.py +experiment=simple_mlp data=simple
-
-# Run with logging
-python train.py +experiment=simple_mlp logger=wandb
 ```
 
-## Step-by-Step Guide
+This command:
+- Runs a simple MLP (Multi-Layer Perceptron) model
+- Uses default data and training settings
+- Should complete in a few minutes
 
-### 1. Understanding the Configuration System
+✅ **What to expect**: You should see training progress logs and the model will save results to an `outputs/` directory.
 
-Tabular SSL uses Hydra for configuration management. The main config structure is:
+## Step 3: Understanding What Happened
 
-```yaml
-# configs/config.yaml
-defaults:
-  - data: default
-  - model: default  
-  - trainer: default
-  - logger: null
+The experiment you just ran used several key components:
 
-# Training settings
-train: true
-test: false
-seed: 42
-```
+- **Event Encoder**: A neural network that processes individual data points
+- **Data Module**: Handles loading and preprocessing your data
+- **Trainer**: Manages the training process using PyTorch Lightning
 
-### 2. Data Configuration
+The configuration was loaded from `configs/experiments/simple_mlp.yaml`, which specified all the settings.
 
-Configure your data module:
+## Step 4: Try Different Models
 
-```yaml
-# configs/data/default.yaml
-_target_: tabular_ssl.data.datamodule.TabularDataModule
-
-data_dir: ${paths.data_dir}
-dataset_name: sample_dataset
-batch_size: 64
-sequence_length: 32
-
-feature_config:
-  categorical_features:
-    - name: category_1
-      num_categories: 10
-  numerical_features:
-    - name: value_1
-      mean: 0.0
-      std: 1.0
-```
-
-### 3. Model Configuration
-
-The model is composed of modular components:
-
-```yaml
-# configs/model/default.yaml
-defaults:
-  - event_encoder: mlp
-  - sequence_encoder: transformer
-  - projection_head: mlp
-  - prediction_head: classification
-
-_target_: tabular_ssl.models.base.BaseModel
-
-learning_rate: 1.0e-4
-weight_decay: 0.01
-optimizer_type: adamw
-```
-
-### 4. Running Experiments
-
-Use pre-configured experiments:
+Let's experiment with different model types:
 
 ```bash
-# Simple MLP baseline
-python train.py +experiment=simple_mlp
-
-# Transformer for sequence modeling
+# Try a transformer-based model
 python train.py +experiment=transformer_small
 
-# S4 for long sequences
-python train.py +experiment=s4_large
-
-# RNN baseline
+# Try an RNN-based model  
 python train.py +experiment=rnn_baseline
 ```
 
-### 5. Custom Configurations
+Each experiment uses a different neural network architecture for processing sequences of tabular data.
 
-Override specific components:
+## Step 5: Modify Basic Settings
 
-```bash
-# Use RNN instead of transformer
-python train.py model/sequence_encoder=rnn
-
-# No sequence encoder (MLP only)
-python train.py model/sequence_encoder=null
-
-# Custom learning rate
-python train.py model.learning_rate=1e-3
-
-# Different batch size
-python train.py data.batch_size=128
-```
-
-### 6. Creating Custom Training Script
-
-```python
-# train.py
-import hydra
-from omegaconf import DictConfig
-import pytorch_lightning as pl
-
-@hydra.main(config_path="configs", config_name="config", version_base=None)
-def main(config: DictConfig):
-    # Set seed
-    pl.seed_everything(config.seed)
-    
-    # Create data module
-    datamodule = hydra.utils.instantiate(config.data)
-    
-    # Create model
-    model = hydra.utils.instantiate(config.model)
-    
-    # Create trainer
-    trainer = hydra.utils.instantiate(config.trainer)
-    
-    # Train
-    if config.train:
-        trainer.fit(model, datamodule=datamodule)
-    
-    # Test
-    if config.test:
-        trainer.test(model, datamodule=datamodule)
-
-if __name__ == "__main__":
-    main()
-```
-
-## Available Components
-
-### Event Encoders
-- **MLP**: Multi-layer perceptron with configurable architecture
-
-### Sequence Encoders
-- **Transformer**: Self-attention based sequence modeling
-- **S4**: Structured state space model for long sequences
-- **RNN**: LSTM/GRU for sequential processing
-- **null**: No sequence processing (MLP-only)
-
-### Other Components
-- **Embedding**: Categorical feature embeddings with flexible dimensions
-- **Projection Head**: MLP for representation projection
-- **Prediction Head**: Classification/regression head
-
-## Next Steps
-
-- Check out the [Basic Usage](basic-usage.md) tutorial for more advanced examples
-- Explore the [API Reference](../reference/api.md) for detailed documentation
-- Learn about different [SSL Methods](../explanation/ssl-methods.md) you can use
-
-## Common Issues and Solutions
-
-### Import Errors
-
-Make sure PYTHONPATH is set correctly:
+You can easily modify settings using Hydra's override syntax:
 
 ```bash
-export PYTHONPATH=/path/to/tabular-ssl/src
+# Change the batch size
+python train.py +experiment=simple_mlp data.batch_size=32
+
+# Change the learning rate
+python train.py +experiment=simple_mlp model.learning_rate=1e-3
+
+# Use a different data configuration
+python train.py +experiment=simple_mlp data=simple
 ```
 
-### Configuration Errors
+## Step 6: Check Your Results
 
-Validate your configuration:
+After running experiments, you'll find results in the `outputs/` directory:
 
 ```bash
-# Print configuration without running
-python train.py --print-config
-
-# Test specific experiment
-python train.py +experiment=simple_mlp --print-config
+ls outputs/  # See your experiment runs
 ```
 
-### Memory Issues
+Each run creates a timestamped folder with:
+- Configuration files
+- Training logs
+- Model checkpoints
+- Metrics and plots
 
-Use smaller models or batch sizes:
+## Core Concepts Summary
 
+**Experiments**: Pre-configured combinations of models, data, and training settings
+- Located in `configs/experiments/`
+- Use `+experiment=name` to run them
+
+**Components**: Modular building blocks
+- Event encoders (process individual data points)
+- Sequence encoders (process sequences)  
+- Projection heads (transform representations)
+
+**Configuration**: Uses Hydra for flexible settings
+- Override with `key=value` syntax
+- Hierarchical structure with defaults
+
+## What's Next?
+
+🎯 **Ready for more?** Continue with:
+- [Basic Usage](basic-usage.md) - Learn about data preparation and model customization
+- [How-to: Model Training](../how-to-guides/model-training.md) - Detailed training guidance
+- [Reference: Models](../reference/models.md) - Complete component documentation
+
+## Troubleshooting
+
+**Import errors?** Make sure PYTHONPATH is set:
 ```bash
-# Smaller batch size
-python train.py data.batch_size=32
-
-# Simple MLP (no sequence processing)
-python train.py model/sequence_encoder=null
-
-# Use simple data configuration
-python train.py data=simple
+export PYTHONPATH=$PWD/src
 ```
 
-## Additional Resources
+**CUDA out of memory?** Try smaller batch sizes:
+```bash
+python train.py +experiment=simple_mlp data.batch_size=16
+```
 
-- [GitHub Repository](https://github.com/yourusername/tabular-ssl)
-- [Issue Tracker](https://github.com/yourusername/tabular-ssl/issues)
-- [Contributing Guide](../CONTRIBUTING.md) 
+**Need help?** Check our [support resources](../index.md#support) or open an issue on GitHub.
+
+---
+
+**Congratulations!** 🎉 You've successfully run your first Tabular SSL experiments. You're now ready to explore more advanced features and customize the library for your specific needs. 
