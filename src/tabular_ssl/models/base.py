@@ -257,17 +257,3 @@ class BaseModel(pl.LightningModule):
                 "monitor": "val_loss"
             }
         }
-
-
-# Backward compatibility placeholders (to be removed in future versions)
-class ModelConfig:
-    """Deprecated - use direct parameters instead."""
-    pass
-
-class TabularSSL(BaseModel):
-    """Deprecated - use BaseModel instead."""
-    pass
-
-class TabularSSLConfig:
-    """Deprecated - use direct parameters instead."""
-    pass
