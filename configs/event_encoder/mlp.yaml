@@ -1,3 +1,6 @@
+# MLP Event Encoder Configuration
+# Multi-layer perceptron for encoding tabular events
+
 _target_: tabular_ssl.models.components.MLPEventEncoder
 
 input_dim: 64

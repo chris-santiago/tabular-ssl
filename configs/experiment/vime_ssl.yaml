@@ -1,0 +1,42 @@
+# @package _global_
+
+# VIME SSL Experiment
+# Value Imputation and Mask Estimation for tabular self-supervised learning
+
+defaults:
+  - override /model: ssl_vime
+  - override /data: sample_data  
+  - override /trainer: default
+  - override /logger: wandb
+  - override /callbacks: default
+
+# Experiment metadata
+tags: ["vime", "ssl", "tabular"]
+experiment_name: "vime_ssl"
+
+# Data configuration
+data:
+  batch_size: 64
+  sequence_length: 32
+  
+# Model configuration (corruption_type auto-detected from corruption module)
+model:
+  mask_estimation_weight: 1.0
+  value_imputation_weight: 1.0
+  learning_rate: 1.0e-4
+
+# Training configuration
+trainer:
+  max_epochs: 100
+  precision: "16-mixed"
+  gradient_clip_val: 1.0
+  
+# Logging
+logger:
+  wandb:
+    project: "tabular-ssl"
+    name: "vime_ssl_${now:%Y-%m-%d_%H-%M-%S}"
+    tags: ${tags}
+
+# Seed for reproducibility
+seed: 42 

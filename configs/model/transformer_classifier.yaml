@@ -1,0 +1,17 @@
+# Transformer Classifier Configuration
+# Transformer-based sequence model for classification
+
+defaults:
+  - /event_encoder: mlp
+  - /sequence_encoder: transformer
+  - /projection_head: mlp
+  - /prediction_head: classification
+  - /embedding: null
+
+_target_: tabular_ssl.models.base.BaseModel
+
+# Training parameters
+learning_rate: 5.0e-4
+weight_decay: 1.0e-4
+optimizer_type: "adamw"
+scheduler_type: "cosine" 

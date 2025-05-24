@@ -1,0 +1,4 @@
+# Null Prediction Head Configuration
+# No prediction head (for representation learning)
+
+_target_: null 

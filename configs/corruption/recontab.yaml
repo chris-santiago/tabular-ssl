@@ -1,22 +1,25 @@
+# ReConTab Corruption Strategy Configuration
+# Multi-task reconstruction-based learning
+
 _target_: tabular_ssl.models.components.ReConTabCorruption
 
-# ReConTab corruption settings
+# Base corruption rate for masking
 corruption_rate: 0.15
 
-# Feature type indices (will be auto-detected if not specified)
+# Feature type specification (auto-detected if null)
 categorical_indices: null
 numerical_indices: null
 
-# Multiple corruption strategies
+# Types of corruption to apply
 corruption_types: ["masking", "noise", "swapping"]
 
-# Masking strategy options
-masking_strategy: "random"  # "random", "column_wise", "block"
+# Masking strategy: "random", "column_wise", or "block"
+masking_strategy: "random"
 
-# Noise corruption parameters
+# Noise injection parameters
 noise_std: 0.1
 
-# Feature swapping parameters  
+# Feature swapping parameters
 swap_probability: 0.1
 
 # Reconstruction loss weights

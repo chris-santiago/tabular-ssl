@@ -1,0 +1,24 @@
+# VIME SSL Model Configuration
+# Uses value imputation and mask estimation for self-supervised learning
+
+defaults:
+  - /event_encoder: mlp
+  - /sequence_encoder: transformer
+  - /corruption: vime
+  - /projection_head: null
+  - /prediction_head: null
+  - /embedding: null
+
+_target_: tabular_ssl.models.base.SSLModel
+
+# SSL-specific parameters (corruption_type auto-detected from corruption module)
+mask_estimation_weight: 1.0
+value_imputation_weight: 1.0
+
+# Training parameters
+learning_rate: 1.0e-4
+weight_decay: 0.01
+optimizer_type: "adamw"
+scheduler_type: "cosine"
+
+# Component dimensions are automatically inferred from component configs 

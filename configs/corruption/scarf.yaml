@@ -1,10 +1,13 @@
+# SCARF Corruption Strategy Configuration
+# Self-Supervised Contrastive Learning using Random Feature Corruption
+
 _target_: tabular_ssl.models.components.SCARFCorruption
 
-# SCARF corruption settings
+# Corruption parameters
 corruption_rate: 0.6
 
-# Corruption strategy for feature replacement
-corruption_strategy: "random_swap"  # "random_swap" or "marginal_sampling"
+# Corruption strategy: "random_swap" or "marginal_sampling"
+corruption_strategy: "random_swap"
 
 # Contrastive learning parameters
 temperature: 0.1  # Temperature for contrastive loss

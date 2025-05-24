@@ -2,6 +2,7 @@
 
 defaults:
   - _self_
+  - paths: default
 
 # Data generation parameters
 n_entities: 1000

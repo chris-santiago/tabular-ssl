@@ -1,0 +1,26 @@
+# ReConTab SSL Model Configuration
+# Uses multi-task reconstruction with different corruption types
+
+defaults:
+  - /event_encoder: mlp
+  - /sequence_encoder: transformer
+  - /corruption: recontab
+  - /projection_head: null
+  - /prediction_head: null
+  - /embedding: null
+
+_target_: tabular_ssl.models.base.SSLModel
+
+# SSL-specific parameters (corruption_type auto-detected from corruption module)
+reconstruction_weights:
+  masked: 1.0
+  denoising: 1.0
+  unswapping: 1.0
+
+# Training parameters
+learning_rate: 1.0e-4
+weight_decay: 0.01
+optimizer_type: "adamw"
+scheduler_type: "cosine"
+
+# Component dimensions are automatically inferred from component configs 

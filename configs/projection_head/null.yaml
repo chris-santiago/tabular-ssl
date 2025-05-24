@@ -1,0 +1,4 @@
+# Null Projection Head Configuration
+# No projection (identity operation)
+
+_target_: null 

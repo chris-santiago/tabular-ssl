@@ -1,0 +1,6 @@
+# Feature Swapping Corruption Strategy
+# Randomly swap features between samples
+
+_target_: tabular_ssl.models.components.SwappingCorruption
+
+swap_prob: 0.15 

@@ -1,0 +1,6 @@
+# Random Masking Corruption Strategy
+# Simple random feature masking
+
+_target_: tabular_ssl.models.components.RandomMasking
+
+corruption_rate: 0.15 

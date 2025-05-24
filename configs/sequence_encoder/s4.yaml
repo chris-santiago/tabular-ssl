@@ -1,0 +1,12 @@
+# S4 Sequence Encoder Configuration
+# Structured State Space sequence encoder for long sequences
+
+_target_: tabular_ssl.models.components.S4SequenceEncoder
+
+input_dim: 512
+hidden_dim: 256
+num_layers: 4
+dropout: 0.1
+bidirectional: false
+max_sequence_length: 2048
+output_dim: null  # defaults to hidden_dim 

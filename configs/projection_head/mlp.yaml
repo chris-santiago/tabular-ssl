@@ -1,0 +1,11 @@
+# MLP Projection Head Configuration
+# Multi-layer perceptron for projecting representations
+
+_target_: tabular_ssl.models.components.MLPProjectionHead
+
+input_dim: 512
+hidden_dims: [256, 128]
+output_dim: 64
+dropout: 0.1
+activation: relu
+use_batch_norm: false 

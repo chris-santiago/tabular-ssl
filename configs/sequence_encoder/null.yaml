@@ -1,0 +1,4 @@
+# Null Sequence Encoder Configuration
+# No sequence encoding (identity operation)
+
+_target_: null 

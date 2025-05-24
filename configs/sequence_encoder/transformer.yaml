@@ -1,3 +1,6 @@
+# Transformer Sequence Encoder Configuration
+# Transformer-based sequence encoding with self-attention
+
 _target_: tabular_ssl.models.components.TransformerSequenceEncoder
 
 input_dim: 512

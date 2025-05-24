@@ -1,0 +1,23 @@
+# SCARF SSL Model Configuration  
+# Uses contrastive learning with feature corruption
+
+defaults:
+  - /event_encoder: mlp
+  - /sequence_encoder: transformer
+  - /corruption: scarf
+  - /projection_head: null
+  - /prediction_head: null
+  - /embedding: null
+
+_target_: tabular_ssl.models.base.SSLModel
+
+# SSL-specific parameters (corruption_type auto-detected from corruption module)
+contrastive_temperature: 0.1
+
+# Training parameters (SCARF benefits from larger batch sizes)
+learning_rate: 5.0e-4
+weight_decay: 0.01
+optimizer_type: "adamw"
+scheduler_type: "cosine"
+
+# Component dimensions are automatically inferred from component configs 

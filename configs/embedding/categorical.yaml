@@ -1,9 +1,14 @@
+# Categorical Embedding Configuration
+# Embedding layer for categorical features
+
 _target_: tabular_ssl.models.components.CategoricalEmbedding
 
 # Example configuration - should be overridden by datamodule
 vocab_sizes:
-  feature_1: 10
+  feature_0: 10
+  feature_1: 5
   feature_2: 20
 embedding_dims:
-  feature_1: 32
-  feature_2: 64 
+  feature_0: 8
+  feature_1: 4
+  feature_2: 16 

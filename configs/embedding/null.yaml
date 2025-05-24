@@ -1,0 +1,4 @@
+# Null Embedding Configuration
+# No embedding layer (for numerical-only data)
+
+_target_: null 

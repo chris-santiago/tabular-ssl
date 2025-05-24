@@ -1,14 +1,19 @@
+# VIME Corruption Strategy Configuration
+# Value Imputation and Mask Estimation
+
 _target_: tabular_ssl.models.components.VIMECorruption
 
-# VIME corruption settings
+# Corruption parameters
 corruption_rate: 0.3
 
-# Feature type indices (will be auto-detected if not specified)
+# Feature type specification (auto-detected if null)
 categorical_indices: null
 numerical_indices: null
 
-# Feature distributions (will be auto-computed if not specified)
+# Vocabulary sizes for categorical features (auto-detected if null)
 categorical_vocab_sizes: null
+
+# Statistical distributions for numerical features (auto-detected if null)  
 numerical_distributions: null
 
 # VIME-specific parameters

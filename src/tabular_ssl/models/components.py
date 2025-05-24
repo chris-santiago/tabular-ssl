@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from abc import abstractmethod
 from typing import List, Optional, Dict, Tuple
 from .base import (
+    BaseComponent,
     EventEncoder,
     SequenceEncoder,
     EmbeddingLayer,
@@ -25,6 +27,8 @@ class MLPEventEncoder(EventEncoder):
         use_batch_norm: bool = False,
     ):
         super().__init__()
+        self.input_dim = input_dim
+        self.output_dim = output_dim
         self.mlp = create_mlp(
             input_dim=input_dim,
             hidden_dims=hidden_dims,
@@ -142,6 +146,7 @@ class TransformerSequenceEncoder(SequenceEncoder):
 
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
+        self.output_dim = hidden_dim  # Output dimension is same as hidden dimension
         self.max_seq_length = max_seq_length
 
         # Input projection if needed
@@ -203,6 +208,7 @@ class RNNSequenceEncoder(SequenceEncoder):
         super().__init__()
 
         self.hidden_dim = hidden_dim
+        self.output_dim = hidden_dim * (2 if bidirectional else 1)
         self.num_layers = num_layers
         self.bidirectional = bidirectional
 
@@ -486,49 +492,106 @@ class ClassificationHead(PredictionHead):
         return self.classifier(x)
 
 
-# Data corruption strategies for self-supervised learning
-class RandomMasking(nn.Module):
+# Base class for corruption strategies
+class BaseCorruption(BaseComponent):
+    """Base class for corruption strategies used in self-supervised learning.
+    
+    All corruption strategies should inherit from this class and implement
+    the standardized interface for consistent integration with SSL models.
+    """
+    
+    def __init__(self, corruption_rate: float = 0.15, **kwargs):
+        super().__init__(**kwargs)
+        self.corruption_rate = corruption_rate
+    
+    @abstractmethod
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
+        """Apply corruption to input tensor.
+        
+        Args:
+            x: Input tensor of shape (batch_size, seq_len, num_features)
+            
+        Returns:
+            Dictionary containing:
+            - 'corrupted': Corrupted input tensor
+            - 'targets': Targets for reconstruction (optional)
+            - 'mask': Corruption mask (optional)
+            - 'metadata': Additional corruption metadata (optional)
+        """
+        pass
+    
+    def get_loss_components(self, output: Dict[str, torch.Tensor], original: torch.Tensor) -> Dict[str, torch.Tensor]:
+        """Extract loss components from corruption output.
+        
+        Args:
+            output: Output from forward() method
+            original: Original uncorrupted input
+            
+        Returns:
+            Dictionary of loss components for this corruption strategy
+        """
+        return {}
+
+
+# Simple corruption strategies
+class RandomMasking(BaseCorruption):
     """Random masking corruption strategy."""
 
-    def __init__(self, corruption_rate: float = 0.15):
-        super().__init__()
-        self.corruption_rate = corruption_rate
+    def __init__(self, corruption_rate: float = 0.15, **kwargs):
+        super().__init__(corruption_rate=corruption_rate, **kwargs)
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Apply random masking to input tensor."""
         mask = torch.rand_like(x) > self.corruption_rate
-        return x * mask.float()
+        corrupted = x * mask.float()
+        
+        return {
+            'corrupted': corrupted,
+            'mask': (1 - mask.float()),  # 1 where corrupted, 0 where original
+            'targets': x,  # Reconstruction target is original
+        }
 
 
-class GaussianNoise(nn.Module):
+class GaussianNoise(BaseCorruption):
     """Gaussian noise corruption strategy."""
 
-    def __init__(self, noise_std: float = 0.1):
-        super().__init__()
+    def __init__(self, noise_std: float = 0.1, **kwargs):
+        super().__init__(**kwargs)
         self.noise_std = noise_std
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Add Gaussian noise to input tensor."""
         if self.training:
             noise = torch.randn_like(x) * self.noise_std
-            return x + noise
-        return x
+            corrupted = x + noise
+        else:
+            corrupted = x
+            
+        return {
+            'corrupted': corrupted,
+            'targets': x,  # Clean version for denoising
+            'metadata': {'noise_std': self.noise_std}
+        }
 
 
-class SwappingCorruption(nn.Module):
+class SwappingCorruption(BaseCorruption):
     """Feature swapping corruption strategy."""
 
-    def __init__(self, swap_prob: float = 0.15):
-        super().__init__()
+    def __init__(self, swap_prob: float = 0.15, **kwargs):
+        super().__init__(**kwargs)
         self.swap_prob = swap_prob
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Randomly swap features between samples."""
         if not self.training:
-            return x
+            return {
+                'corrupted': x,
+                'targets': x
+            }
 
         batch_size, seq_len, num_features = x.shape
         x_corrupted = x.clone()
+        swap_mask = torch.zeros_like(x)
 
         # For each feature, randomly swap between samples
         for feat_idx in range(num_features):
@@ -536,11 +599,16 @@ class SwappingCorruption(nn.Module):
                 # Random permutation of batch indices
                 perm_indices = torch.randperm(batch_size, device=x.device)
                 x_corrupted[:, :, feat_idx] = x[perm_indices, :, feat_idx]
+                swap_mask[:, :, feat_idx] = 1.0
 
-        return x_corrupted
+        return {
+            'corrupted': x_corrupted,
+            'targets': x,  # Original for unswapping
+            'mask': swap_mask,  # Which features were swapped
+        }
 
 
-class VIMECorruption(nn.Module):
+class VIMECorruption(BaseCorruption):
     """
     VIME (Value Imputation and Mask Estimation) corruption strategy.
 
@@ -561,15 +629,15 @@ class VIMECorruption(nn.Module):
         numerical_indices: Optional[List[int]] = None,
         categorical_vocab_sizes: Optional[Dict[int, int]] = None,
         numerical_distributions: Optional[Dict[int, Tuple[float, float]]] = None,
+        **kwargs
     ):
-        super().__init__()
-        self.corruption_rate = corruption_rate
+        super().__init__(corruption_rate=corruption_rate, **kwargs)
         self.categorical_indices = categorical_indices or []
         self.numerical_indices = numerical_indices or []
         self.categorical_vocab_sizes = categorical_vocab_sizes or {}
         self.numerical_distributions = numerical_distributions or {}
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """
         Apply VIME corruption.
 
@@ -577,12 +645,17 @@ class VIMECorruption(nn.Module):
             x: Input tensor of shape (batch_size, seq_len, num_features)
 
         Returns:
-            Tuple of (corrupted_x, mask) where:
-            - corrupted_x: Corrupted input with same shape as x
-            - mask: Binary mask indicating corrupted positions (1=corrupted, 0=original)
+            Dictionary containing:
+            - 'corrupted': Corrupted input with same shape as x
+            - 'mask': Binary mask indicating corrupted positions (1=corrupted, 0=original)
+            - 'targets': Original tensor for value imputation
         """
         if not self.training:
-            return x, torch.zeros_like(x)
+            return {
+                'corrupted': x,
+                'mask': torch.zeros_like(x),
+                'targets': x
+            }
 
         batch_size, seq_len, num_features = x.shape
         device = x.device
@@ -628,7 +701,11 @@ class VIMECorruption(nn.Module):
                     )
                     x_corrupted[:, :, feat_idx][mask_positions] = random_values
 
-        return x_corrupted, mask
+        return {
+            'corrupted': x_corrupted,
+            'mask': mask,
+            'targets': x,  # Original values for imputation
+        }
 
     def set_feature_distributions(
         self,
@@ -655,7 +732,7 @@ class VIMECorruption(nn.Module):
                 self.numerical_distributions[feat_idx] = (mean, std)
 
 
-class SCARFCorruption(nn.Module):
+class SCARFCorruption(BaseCorruption):
     """
     SCARF (Self-Supervised Contrastive Learning using Random Feature Corruption) corruption strategy.
 
@@ -670,12 +747,12 @@ class SCARFCorruption(nn.Module):
         self,
         corruption_rate: float = 0.6,
         corruption_strategy: str = "random_swap",  # "random_swap", "marginal_sampling"
+        **kwargs
     ):
-        super().__init__()
-        self.corruption_rate = corruption_rate
+        super().__init__(corruption_rate=corruption_rate, **kwargs)
         self.corruption_strategy = corruption_strategy
 
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """
         Apply SCARF corruption by randomly replacing features with values from other samples.
 
@@ -683,10 +760,15 @@ class SCARFCorruption(nn.Module):
             x: Input tensor of shape (batch_size, seq_len, num_features)
 
         Returns:
-            Corrupted tensor with same shape as input
+            Dictionary containing:
+            - 'corrupted': Corrupted tensor with same shape as input
+            - 'targets': Original tensor (for contrastive learning)
         """
         if not self.training:
-            return x
+            return {
+                'corrupted': x,
+                'targets': x
+            }
 
         batch_size, seq_len, num_features = x.shape
         device = x.device
@@ -715,7 +797,10 @@ class SCARFCorruption(nn.Module):
                     )
                     x_corrupted[:, :, feat_idx] = feature_values[sample_indices]
 
-        return x_corrupted
+        return {
+            'corrupted': x_corrupted,
+            'targets': x,  # Original for contrastive learning
+        }
 
     def create_contrastive_pairs(
         self, x: torch.Tensor
@@ -729,12 +814,12 @@ class SCARFCorruption(nn.Module):
         Returns:
             Tuple of (view1, view2) - two differently corrupted versions
         """
-        view1 = self.forward(x)
-        view2 = self.forward(x)
-        return view1, view2
+        output1 = self.forward(x)
+        output2 = self.forward(x)
+        return output1['corrupted'], output2['corrupted']
 
 
-class ReConTabCorruption(nn.Module):
+class ReConTabCorruption(BaseCorruption):
     """
     ReConTab (Reconstruction-based Contrastive Learning for Tabular Data) corruption strategy.
 
@@ -751,9 +836,9 @@ class ReConTabCorruption(nn.Module):
         masking_strategy: str = "random",  # "random", "column_wise", "block"
         noise_std: float = 0.1,
         swap_probability: float = 0.1,
+        **kwargs
     ):
-        super().__init__()
-        self.corruption_rate = corruption_rate
+        super().__init__(corruption_rate=corruption_rate, **kwargs)
         self.categorical_indices = categorical_indices or []
         self.numerical_indices = numerical_indices or []
         self.corruption_types = corruption_types
@@ -761,7 +846,7 @@ class ReConTabCorruption(nn.Module):
         self.noise_std = noise_std
         self.swap_probability = swap_probability
 
-    def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """
         Apply ReConTab corruption with multiple strategies.
 
@@ -769,12 +854,17 @@ class ReConTabCorruption(nn.Module):
             x: Input tensor of shape (batch_size, seq_len, num_features)
 
         Returns:
-            Tuple of (corrupted_x, corruption_info) where:
-            - corrupted_x: Corrupted input with same shape as x
-            - corruption_info: Information about applied corruptions for reconstruction
+            Dictionary containing:
+            - 'corrupted': Corrupted input with same shape as x
+            - 'metadata': Information about applied corruptions for reconstruction
+            - 'targets': Original tensor for reconstruction
         """
         if not self.training:
-            return x, torch.zeros_like(x)
+            return {
+                'corrupted': x,
+                'metadata': torch.zeros_like(x),
+                'targets': x
+            }
 
         batch_size, seq_len, num_features = x.shape
         device = x.device
@@ -826,7 +916,11 @@ class ReConTabCorruption(nn.Module):
                         ]
                         corruption_info[:, :, feat_idx] = 3
 
-        return x_corrupted, corruption_info
+        return {
+            'corrupted': x_corrupted,
+            'metadata': corruption_info,  # For reconstruction_targets method
+            'targets': x,  # Original for reconstruction
+        }
 
     def _generate_mask(self, x: torch.Tensor, strategy: str = "random") -> torch.Tensor:
         """Generate corruption mask based on strategy."""

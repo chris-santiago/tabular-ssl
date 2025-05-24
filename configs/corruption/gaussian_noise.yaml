@@ -1,0 +1,6 @@
+# Gaussian Noise Corruption Strategy
+# Add random noise to features
+
+_target_: tabular_ssl.models.components.GaussianNoise
+
+noise_std: 0.1 

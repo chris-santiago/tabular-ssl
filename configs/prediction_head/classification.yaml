@@ -1,0 +1,10 @@
+# Classification Prediction Head Configuration
+# Classification head for supervised learning
+
+_target_: tabular_ssl.models.components.ClassificationHead
+
+input_dim: 64
+num_classes: 10
+hidden_dims: null  # Simple linear classifier
+dropout: 0.1
+use_batch_norm: false 

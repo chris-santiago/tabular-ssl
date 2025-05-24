@@ -1,0 +1,17 @@
+# Base MLP Model Configuration
+# Simple MLP without sequence encoding or SSL
+
+defaults:
+  - /event_encoder: mlp
+  - /sequence_encoder: null
+  - /projection_head: null
+  - /prediction_head: classification
+  - /embedding: null
+
+_target_: tabular_ssl.models.base.BaseModel
+
+# Training parameters
+learning_rate: 1.0e-3
+weight_decay: 1.0e-4
+optimizer_type: "adamw"
+scheduler_type: "cosine" 
