@@ -412,9 +412,9 @@ python -m pytest tests/
 ## 📖 **Documentation**
 
 - **🎯 [Design Summary](DESIGN_SUMMARY.md)**: Complete design overview
-- **📚 [API Reference](docs/api/)**: Detailed API documentation  
-- **🧪 [Experiments Guide](docs/experiments/)**: How to create experiments
-- **🔧 [Custom Components](docs/components/)**: Adding new components
+- **📚 [API Reference](docs/reference/api.md)**: Detailed API documentation  
+- **🧪 [Experiments Guide](docs/how-to-guides/configuring-experiments.md)**: How to create experiments
+- **🔧 [Custom Components](docs/tutorials/custom-components.md)**: Adding new components
 
 ---
 
