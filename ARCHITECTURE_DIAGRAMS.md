@@ -368,98 +368,21 @@ graph TB
 ## 9. Performance Impact (Lines of Code)
 
 ```mermaid
-%%{init: {'theme':'base', 'themeVariables': { 'primaryColor': '#ff0000'}}}%%
-graph TB
-    subgraph "Lines of Code Comparison"
-        subgraph "Original Design (Complex)"
-            O1["Model Classes: 1,293 lines"]
-            O2["Component Classes: 1,568 lines"] 
-            O3["Config Files: 650 lines"]
-            O4["SSL Logic: 400 lines"]
-            O5["Total: 3,911 lines"]
-        end
-        
-        subgraph "Simplified Design"
-            S1["Model Classes: 326 lines"]
-            S2["Component Classes: 422 lines"]
-            S3["Config Files: 200 lines"] 
-            S4["SSL Logic: 150 lines"]
-            S5["Total: 1,098 lines"]
-        end
-        
-        subgraph "Reduction"
-            R1["↓ 75% fewer model lines"]
-            R2["↓ 73% fewer component lines"]
-            R3["↓ 69% fewer config lines"]
-            R4["↓ 63% fewer SSL lines"]
-            R5["↓ 72% total reduction"]
-        end
-    end
-    
-    style O1 fill:#ffcccc
-    style O2 fill:#ffcccc
-    style O3 fill:#ffcccc
-    style O4 fill:#ffcccc
-    style O5 fill:#ffcccc
-    style S1 fill:#ccffcc
-    style S2 fill:#ccffcc
-    style S3 fill:#ccffcc
-    style S4 fill:#ccffcc
-    style S5 fill:#ccffcc
-    style R1 fill:#ffffcc
-    style R2 fill:#ffffcc
-    style R3 fill:#ffffcc
-    style R4 fill:#ffffcc
-    style R5 fill:#ffffcc
+xychart-beta
+    title "Code Reduction by Component"
+    x-axis ["Model Classes", "Component Classes", "Config Files", "SSL Logic", "Total"]
+    y-axis "Lines of Code" 0 --> 3000
+    bar [1293, 1568, 650, 400, 3911]
+    bar [326, 422, 200, 150, 1098]
 ```
 
 ## 10. Configuration Complexity Reduction
 
 ```mermaid
-graph TB
-    subgraph "Configuration File Changes"
-        subgraph "Original: 13 Directories + Files"
-            ORIG["📁 model/ (6 subdirs)"]
-            ORIG2["📁 training/ (3 subdirs)"]
-            ORIG3["📁 experiment/ (files)"]
-            ORIG4["📁 data/ (files)"]
-            ORIG5["📁 + 9 more directories"]
-            TOTAL_ORIG["Total: ~50+ config files"]
-        end
-        
-        subgraph "Simplified: 4 Files"
-            SIMP1["📄 simplified_config.yaml"]
-            SIMP2["📄 model/simplified_default.yaml"]
-            SIMP3["📄 training/simplified_default.yaml"]
-            SIMP4["📄 experiment/simplified_*.yaml"]
-            TOTAL_SIMP["Total: 4 main files"]
-        end
-        
-        subgraph "Benefits"
-            B1["✅ 92% file reduction"]
-            B2["✅ Single source of truth"]
-            B3["✅ Easy to understand"]
-            B4["✅ No duplication"]
-            B5["✅ Faster configuration"]
-        end
-    end
-    
-    style ORIG fill:#ffcccc
-    style ORIG2 fill:#ffcccc
-    style ORIG3 fill:#ffcccc
-    style ORIG4 fill:#ffcccc
-    style ORIG5 fill:#ffcccc
-    style TOTAL_ORIG fill:#ffcccc
-    style SIMP1 fill:#ccffcc
-    style SIMP2 fill:#ccffcc
-    style SIMP3 fill:#ccffcc
-    style SIMP4 fill:#ccffcc
-    style TOTAL_SIMP fill:#ccffcc
-    style B1 fill:#ffffcc
-    style B2 fill:#ffffcc
-    style B3 fill:#ffffcc
-    style B4 fill:#ffffcc
-    style B5 fill:#ffffcc
+pie title Configuration Complexity Reduction
+    "Removed Files" : 75
+    "Simplified Files" : 20
+    "Remaining Files" : 5
 ```
 
 ## Summary
