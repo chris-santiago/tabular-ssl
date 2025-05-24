@@ -521,45 +521,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-your-first-experiment" class="md-nav__link">
+  <a href="#step-2-explore-corruption-strategies-interactive-demo" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 2: Your First Experiment
+      Step 2: Explore Corruption Strategies (Interactive Demo)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-understanding-what-happened" class="md-nav__link">
+  <a href="#step-3-try-real-data-credit-card-demo" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3: Understanding What Happened
+      Step 3: Try Real Data (Credit Card Demo)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-try-different-models" class="md-nav__link">
+  <a href="#step-4-your-first-ssl-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 4: Try Different Models
+      Step 4: Your First SSL Training
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-modify-basic-settings" class="md-nav__link">
+  <a href="#step-5-try-different-ssl-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 5: Modify Basic Settings
+      Step 5: Try Different SSL Methods
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-check-your-results" class="md-nav__link">
+  <a href="#step-6-customize-ssl-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 6: Check Your Results
+      Step 6: Customize SSL Training
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-check-your-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 7: Check Your Results
     </span>
   </a>
   
@@ -1140,45 +1149,54 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-your-first-experiment" class="md-nav__link">
+  <a href="#step-2-explore-corruption-strategies-interactive-demo" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 2: Your First Experiment
+      Step 2: Explore Corruption Strategies (Interactive Demo)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-understanding-what-happened" class="md-nav__link">
+  <a href="#step-3-try-real-data-credit-card-demo" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3: Understanding What Happened
+      Step 3: Try Real Data (Credit Card Demo)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-try-different-models" class="md-nav__link">
+  <a href="#step-4-your-first-ssl-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 4: Try Different Models
+      Step 4: Your First SSL Training
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-modify-basic-settings" class="md-nav__link">
+  <a href="#step-5-try-different-ssl-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 5: Modify Basic Settings
+      Step 5: Try Different SSL Methods
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-6-check-your-results" class="md-nav__link">
+  <a href="#step-6-customize-ssl-training" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 6: Check Your Results
+      Step 6: Customize SSL Training
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-7-check-your-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 7: Check Your Results
     </span>
   </a>
   
@@ -1229,13 +1247,14 @@
 
 <h1 id="getting-started-with-tabular-ssl">Getting Started with Tabular SSL<a class="headerlink" href="#getting-started-with-tabular-ssl" title="Permanent link">&para;</a></h1>
 <p><strong>Time to complete: 10 minutes</strong></p>
-<p>Welcome! This tutorial will get you up and running with Tabular SSL in just a few minutes. You'll learn how to install the library, run your first experiment, and understand the basic concepts.</p>
+<p>Welcome! This tutorial will get you up and running with Tabular SSL in just a few minutes. You'll explore our interactive demos, understand state-of-the-art corruption strategies, and run your first self-supervised learning experiment.</p>
 <h2 id="what-youll-learn">What You'll Learn<a class="headerlink" href="#what-youll-learn" title="Permanent link">&para;</a></h2>
 <ul>
 <li>How to install and set up Tabular SSL</li>
-<li>How to run a pre-configured experiment</li>
-<li>How to modify basic settings</li>
-<li>Basic concepts of the library</li>
+<li>How to explore corruption strategies with interactive demos</li>
+<li>How to train with real credit card transaction data</li>
+<li>How to run state-of-the-art SSL experiments (VIME, SCARF, ReConTab)</li>
+<li>Basic concepts of tabular self-supervised learning</li>
 </ul>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1257,67 +1276,95 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 <p>✅ <strong>Checkpoint</strong>: Verify your installation works:
 <div class="highlight"><pre><span></span><code>python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import tabular_ssl; print(&#39;✅ Installation successful!&#39;)&quot;</span>
 </code></pre></div></p>
-<h2 id="step-2-your-first-experiment">Step 2: Your First Experiment<a class="headerlink" href="#step-2-your-first-experiment" title="Permanent link">&para;</a></h2>
-<p>Now let's run your first experiment using a pre-configured setup:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp
+<h2 id="step-2-explore-corruption-strategies-interactive-demo">Step 2: Explore Corruption Strategies (Interactive Demo)<a class="headerlink" href="#step-2-explore-corruption-strategies-interactive-demo" title="Permanent link">&para;</a></h2>
+<p>Before diving into training, let's understand how tabular self-supervised learning works through our interactive demo:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>demo_corruption_strategies.py
 </code></pre></div>
-<p>This command:
-- Runs a simple MLP (Multi-Layer Perceptron) model
-- Uses default data and training settings
-- Should complete in a few minutes</p>
-<p>✅ <strong>What to expect</strong>: You should see training progress logs and the model will save results to an <code>outputs/</code> directory.</p>
-<h2 id="step-3-understanding-what-happened">Step 3: Understanding What Happened<a class="headerlink" href="#step-3-understanding-what-happened" title="Permanent link">&para;</a></h2>
-<p>The experiment you just ran used several key components:</p>
-<ul>
-<li><strong>Event Encoder</strong>: A neural network that processes individual data points</li>
-<li><strong>Data Module</strong>: Handles loading and preprocessing your data</li>
-<li><strong>Trainer</strong>: Manages the training process using PyTorch Lightning</li>
-</ul>
-<p>The configuration was loaded from <code>configs/experiments/simple_mlp.yaml</code>, which specified all the settings.</p>
-<h2 id="step-4-try-different-models">Step 4: Try Different Models<a class="headerlink" href="#step-4-try-different-models" title="Permanent link">&para;</a></h2>
-<p>Let's experiment with different model types:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Try a transformer-based model</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>transformer_small
-
-<span class="c1"># Try an RNN-based model  </span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>rnn_baseline
+<p>This demo shows you:
+- <strong>VIME corruption</strong>: Value imputation and mask estimation
+- <strong>SCARF corruption</strong>: Contrastive learning with feature swapping
+- <strong>ReConTab corruption</strong>: Multi-task reconstruction
+- Side-by-side comparison of all approaches</p>
+<p>✅ <strong>What to expect</strong>: You'll see how each corruption strategy transforms data, corruption rates, and example outputs.</p>
+<h2 id="step-3-try-real-data-credit-card-demo">Step 3: Try Real Data (Credit Card Demo)<a class="headerlink" href="#step-3-try-real-data-credit-card-demo" title="Permanent link">&para;</a></h2>
+<p>Now let's work with real transaction data:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>demo_credit_card_data.py
 </code></pre></div>
-<p>Each experiment uses a different neural network architecture for processing sequences of tabular data.</p>
-<h2 id="step-5-modify-basic-settings">Step 5: Modify Basic Settings<a class="headerlink" href="#step-5-modify-basic-settings" title="Permanent link">&para;</a></h2>
-<p>You can easily modify settings using Hydra's override syntax:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Change the batch size</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">32</span>
-
-<span class="c1"># Change the learning rate</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span>model.learning_rate<span class="o">=</span>1e-3
-
-<span class="c1"># Use a different data configuration</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp<span class="w"> </span><span class="nv">data</span><span class="o">=</span>simple
+<p>This demo:
+- Downloads real credit card transaction data from IBM TabFormer
+- Shows data preprocessing and sequence creation
+- Demonstrates DataModule integration
+- Prepares you for actual training</p>
+<p>✅ <strong>What to expect</strong>: Download progress, data statistics, and confirmation that everything is ready for training.</p>
+<h2 id="step-4-your-first-ssl-training">Step 4: Your First SSL Training<a class="headerlink" href="#step-4-your-first-ssl-training" title="Permanent link">&para;</a></h2>
+<p>Now let's train a state-of-the-art self-supervised model:</p>
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>vime_ssl
 </code></pre></div>
-<h2 id="step-6-check-your-results">Step 6: Check Your Results<a class="headerlink" href="#step-6-check-your-results" title="Permanent link">&para;</a></h2>
+<p>This experiment uses <strong>VIME</strong> (Value Imputation and Mask Estimation):
+- Corrupts transaction data by masking features
+- Learns to predict which features were masked (mask estimation)
+- Learns to reconstruct original values (value imputation)
+- Creates powerful representations for downstream tasks</p>
+<p>✅ <strong>What to expect</strong>: Training progress with mask estimation and reconstruction losses, checkpoints saved to <code>outputs/</code>.</p>
+<h2 id="step-5-try-different-ssl-methods">Step 5: Try Different SSL Methods<a class="headerlink" href="#step-5-try-different-ssl-methods" title="Permanent link">&para;</a></h2>
+<p>Let's experiment with other state-of-the-art approaches:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># SCARF: Contrastive learning with feature corruption</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>scarf_ssl
+
+<span class="c1"># ReConTab: Multi-task reconstruction</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>recontab_ssl
+</code></pre></div>
+<p>Each approach uses different corruption strategies:
+- <strong>SCARF</strong>: Replaces features with values from other samples (contrastive learning)
+- <strong>ReConTab</strong>: Combines masking, noise, and swapping (multi-task reconstruction)</p>
+<h2 id="step-6-customize-ssl-training">Step 6: Customize SSL Training<a class="headerlink" href="#step-6-customize-ssl-training" title="Permanent link">&para;</a></h2>
+<p>You can easily modify SSL experiments using Hydra's override syntax:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Adjust corruption rate for VIME</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>vime_ssl<span class="w"> </span>model/corruption.corruption_rate<span class="o">=</span><span class="m">0</span>.5
+
+<span class="c1"># Change SCARF corruption strategy</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>scarf_ssl<span class="w"> </span>model/corruption.corruption_strategy<span class="o">=</span>marginal_sampling
+
+<span class="c1"># Use different sequence length</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>recontab_ssl<span class="w"> </span>data.sequence_length<span class="o">=</span><span class="m">64</span>
+
+<span class="c1"># Adjust learning rate and batch size</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>vime_ssl<span class="w"> </span>model.learning_rate<span class="o">=</span>5e-4<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">32</span>
+</code></pre></div>
+<h2 id="step-7-check-your-results">Step 7: Check Your Results<a class="headerlink" href="#step-7-check-your-results" title="Permanent link">&para;</a></h2>
 <p>After running experiments, you'll find results in the <code>outputs/</code> directory:</p>
 <div class="highlight"><pre><span></span><code>ls<span class="w"> </span>outputs/<span class="w">  </span><span class="c1"># See your experiment runs</span>
 </code></pre></div>
 <p>Each run creates a timestamped folder with:
-- Configuration files
-- Training logs
-- Model checkpoints
-- Metrics and plots</p>
+- Configuration files (reproducing exact settings)
+- Training logs (TensorBoard, WandB compatible)
+- Model checkpoints (best performing models)
+- Metrics and plots (loss curves, validation metrics)</p>
+<p>For SSL experiments, you'll see specific losses:
+- <strong>VIME</strong>: <code>mask_estimation_loss</code>, <code>value_imputation_loss</code>
+- <strong>SCARF</strong>: <code>contrastive_loss</code>
+- <strong>ReConTab</strong>: <code>masked_reconstruction</code>, <code>denoising</code>, <code>unswapping</code> losses</p>
 <h2 id="core-concepts-summary">Core Concepts Summary<a class="headerlink" href="#core-concepts-summary" title="Permanent link">&para;</a></h2>
-<p><strong>Experiments</strong>: Pre-configured combinations of models, data, and training settings
+<p><strong>Corruption Strategies</strong>: Core of self-supervised learning
+- <strong>VIME</strong>: Masks features, learns to predict masks and values
+- <strong>SCARF</strong>: Swaps features between samples for contrastive learning<br />
+- <strong>ReConTab</strong>: Multi-task corruption (masking + noise + swapping)</p>
+<p><strong>SSL Experiments</strong>: Pre-configured state-of-the-art approaches
 - Located in <code>configs/experiments/</code>
-- Use <code>+experiment=name</code> to run them</p>
-<p><strong>Components</strong>: Modular building blocks
-- Event encoders (process individual data points)
-- Sequence encoders (process sequences)<br />
-- Projection heads (transform representations)</p>
-<p><strong>Configuration</strong>: Uses Hydra for flexible settings
-- Override with <code>key=value</code> syntax
-- Hierarchical structure with defaults</p>
+- Use <code>+experiment=vime_ssl</code> (or scarf_ssl, recontab_ssl) to run them</p>
+<p><strong>Model Components</strong>: Modular architecture
+- Event encoders (process individual transactions)
+- Sequence encoders (model temporal patterns)
+- Corruption modules (transform data for SSL)
+- Task-specific heads (reconstruction, classification)</p>
+<p><strong>Configuration</strong>: Hydra-based flexible settings
+- Override corruption rates: <code>model/corruption.corruption_rate=0.5</code>
+- Mix components: <code>model/sequence_encoder=rnn model/corruption=scarf</code></p>
 <h2 id="whats-next">What's Next?<a class="headerlink" href="#whats-next" title="Permanent link">&para;</a></h2>
 <p>🎯 <strong>Ready for more?</strong> Continue with:
-- <a href="../basic-usage/">Basic Usage</a> - Learn about data preparation and model customization
-- <a href="../../how-to-guides/model-training/">How-to: Model Training</a> - Detailed training guidance
+- <a href="../custom-components/">Custom Components Tutorial</a> - Create your own corruption strategies
+- <a href="../../how-to-guides/ssl-training/">How-to: SSL Training</a> - Advanced self-supervised learning
+- <a href="../../reference/corruption-strategies/">Reference: Corruption Strategies</a> - Technical documentation
 - <a href="../../reference/models/">Reference: Models</a> - Complete component documentation</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <p><strong>Import errors?</strong> Make sure PYTHONPATH is set:

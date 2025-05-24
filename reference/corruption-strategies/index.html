@@ -1,0 +1,1817 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for the Tabular SSL library">
+      
+      
+      
+      
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Corruption Strategies Reference - Tabular SSL Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#corruption-strategies-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="Tabular SSL Documentation" class="md-header__button md-logo" aria-label="Tabular SSL Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Tabular SSL Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Corruption Strategies Reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+          <a href="javascript:void(0)" class="md-search__icon md-icon" title="Share" aria-label="Share" data-clipboard data-clipboard-text="" data-md-component="search-share" tabindex="-1">
+            
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9a3 3 0 0 0-3 3 3 3 0 0 0 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.15c-.05.21-.08.43-.08.66 0 1.61 1.31 2.91 2.92 2.91s2.92-1.3 2.92-2.91A2.92 2.92 0 0 0 18 16.08"/></svg>
+          </a>
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../tutorials/" class="md-tabs__link">
+          
+  
+  
+  Tutorials
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../how-to-guides/" class="md-tabs__link">
+          
+  
+  
+  How-to Guides
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../" class="md-tabs__link">
+          
+  
+  
+  Reference
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../explanation/" class="md-tabs__link">
+          
+  
+  
+  Explanation
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="Tabular SSL Documentation" class="md-nav__button md-logo" aria-label="Tabular SSL Documentation" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    Tabular SSL Documentation
+  </label>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Home
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Tutorials
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tutorials
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started with Tabular SSL
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tutorials/basic-usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Basic Usage
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    How-to Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            How-to Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How-to Guides
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/data-preparation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Preparation Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/model-training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to Train Models Effectively
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../how-to-guides/evaluation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Model Evaluation Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Reference
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Reference
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Reference Documentation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../api/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    API Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Models Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Data Utilities Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../utils/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Utility Functions Reference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Explanation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            Explanation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../explanation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Explanation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../explanation/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../explanation/ssl-methods/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Self-Supervised Learning Methods
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../explanation/performance/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Performance Considerations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Available Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Available Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vime-corruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIME Corruption
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="VIME Corruption">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose" class="md-nav__link">
+    <span class="md-ellipsis">
+      Purpose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outputs" class="md-nav__link">
+    <span class="md-ellipsis">
+      Outputs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#feature-corruption-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Feature Corruption Logic
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scarf-corruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCARF Corruption
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SCARF Corruption">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#purpose_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Purpose
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#implementation_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corruption Strategies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recontab-corruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReConTab Corruption
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ReConTab Corruption">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#implementation_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#parameters_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Parameters
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corruption-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corruption Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#masking-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Masking Strategies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#outputs_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Outputs
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reconstruction-targets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reconstruction Targets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#simple-corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Simple Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#random-masking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Random Masking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussian-noise" class="md-nav__link">
+    <span class="md-ellipsis">
+      Gaussian Noise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swapping-corruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      Swapping Corruption
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage-in-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      Usage in Training
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Usage in Training">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vime-training-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIME Training Loop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scarf-training-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCARF Training Loop
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recontab-training-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReConTab Training Loop
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#choosing-corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Choosing Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Choosing Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vime" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIME
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scarf" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCARF
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recontab" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReConTab
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#performance-tips" class="md-nav__link">
+    <span class="md-ellipsis">
+      Performance Tips
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#demo-scripts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Demo Scripts
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paper-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      Paper References
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+
+<h1 id="corruption-strategies-reference">Corruption Strategies Reference<a class="headerlink" href="#corruption-strategies-reference" title="Permanent link">&para;</a></h1>
+<p>This reference documents the corruption strategies implemented in Tabular SSL for self-supervised learning on tabular data.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<p>Corruption strategies are the foundation of self-supervised learning for tabular data. They create pretext tasks by transforming input data in specific ways, allowing models to learn meaningful representations without labeled data.</p>
+<h2 id="available-strategies">Available Strategies<a class="headerlink" href="#available-strategies" title="Permanent link">&para;</a></h2>
+<h3 id="vime-corruption">VIME Corruption<a class="headerlink" href="#vime-corruption" title="Permanent link">&para;</a></h3>
+<p><strong>Paper</strong>: <a href="https://arxiv.org/abs/2006.06775">"VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain"</a> (NeurIPS 2020)</p>
+<h4 id="purpose">Purpose<a class="headerlink" href="#purpose" title="Permanent link">&para;</a></h4>
+<p>VIME creates two complementary pretext tasks:
+1. <strong>Mask Estimation</strong>: Predict which features were corrupted
+2. <strong>Value Imputation</strong>: Reconstruct original feature values</p>
+<h4 id="implementation">Implementation<a class="headerlink" href="#implementation" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">VIMECorruption</span>
+
+<span class="n">corruption</span> <span class="o">=</span> <span class="n">VIMECorruption</span><span class="p">(</span>
+    <span class="n">corruption_rate</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span>
+    <span class="n">categorical_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">numerical_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+    <span class="n">categorical_vocab_sizes</span><span class="o">=</span><span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="mi">20</span><span class="p">},</span>
+    <span class="n">numerical_distributions</span><span class="o">=</span><span class="p">{</span><span class="mi">3</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">),</span> <span class="mi">4</span><span class="p">:</span> <span class="p">(</span><span class="mf">10.0</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)}</span>
+<span class="p">)</span>
+
+<span class="c1"># Apply corruption</span>
+<span class="n">corrupted_data</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">corruption</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="parameters">Parameters<a class="headerlink" href="#parameters" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>corruption_rate</code></td>
+<td>float</td>
+<td>0.15</td>
+<td>Fraction of features to corrupt</td>
+</tr>
+<tr>
+<td><code>categorical_indices</code></td>
+<td>List[int]</td>
+<td>None</td>
+<td>Indices of categorical features</td>
+</tr>
+<tr>
+<td><code>numerical_indices</code></td>
+<td>List[int]</td>
+<td>None</td>
+<td>Indices of numerical features</td>
+</tr>
+<tr>
+<td><code>categorical_vocab_sizes</code></td>
+<td>Dict[int, int]</td>
+<td>None</td>
+<td>Vocabulary sizes for categorical features</td>
+</tr>
+<tr>
+<td><code>numerical_distributions</code></td>
+<td>Dict[int, Tuple[float, float]]</td>
+<td>None</td>
+<td>(mean, std) for numerical features</td>
+</tr>
+</tbody>
+</table>
+<h4 id="outputs">Outputs<a class="headerlink" href="#outputs" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>corrupted_data</strong>: Input data with some features corrupted</li>
+<li><strong>mask</strong>: Binary tensor indicating corrupted positions (1=corrupted, 0=original)</li>
+</ul>
+<h4 id="feature-corruption-logic">Feature Corruption Logic<a class="headerlink" href="#feature-corruption-logic" title="Permanent link">&para;</a></h4>
+<p><strong>Categorical Features</strong>: Replace with random value from vocabulary
+<div class="highlight"><pre><span></span><code><span class="n">random_categories</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Numerical Features</strong>: Replace with random value from feature distribution
+<div class="highlight"><pre><span></span><code><span class="n">random_values</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">std</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+</code></pre></div></p>
+<h4 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/model/corruption/vime.yaml</span>
+<span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.VIMECorruption</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<span class="nt">categorical_indices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">  </span><span class="c1"># Auto-detected</span>
+<span class="nt">numerical_indices</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">null</span><span class="w">    </span><span class="c1"># Auto-detected</span>
+</code></pre></div>
+<h3 id="scarf-corruption">SCARF Corruption<a class="headerlink" href="#scarf-corruption" title="Permanent link">&para;</a></h3>
+<p><strong>Paper</strong>: <a href="https://arxiv.org/abs/2106.15147">"SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption"</a> (arXiv 2021)</p>
+<h4 id="purpose_1">Purpose<a class="headerlink" href="#purpose_1" title="Permanent link">&para;</a></h4>
+<p>SCARF optimizes representations for contrastive learning by corrupting features through replacement with values from other samples in the batch.</p>
+<h4 id="implementation_1">Implementation<a class="headerlink" href="#implementation_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCARFCorruption</span>
+
+<span class="n">corruption</span> <span class="o">=</span> <span class="n">SCARFCorruption</span><span class="p">(</span>
+    <span class="n">corruption_rate</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+    <span class="n">corruption_strategy</span><span class="o">=</span><span class="s2">&quot;random_swap&quot;</span>  <span class="c1"># or &quot;marginal_sampling&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># Single corruption</span>
+<span class="n">corrupted_data</span> <span class="o">=</span> <span class="n">corruption</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Contrastive pairs</span>
+<span class="n">view1</span><span class="p">,</span> <span class="n">view2</span> <span class="o">=</span> <span class="n">corruption</span><span class="o">.</span><span class="n">create_contrastive_pairs</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="parameters_1">Parameters<a class="headerlink" href="#parameters_1" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>corruption_rate</code></td>
+<td>float</td>
+<td>0.6</td>
+<td>Fraction of features to corrupt</td>
+</tr>
+<tr>
+<td><code>corruption_strategy</code></td>
+<td>str</td>
+<td>"random_swap"</td>
+<td>"random_swap" or "marginal_sampling"</td>
+</tr>
+</tbody>
+</table>
+<h4 id="corruption-strategies">Corruption Strategies<a class="headerlink" href="#corruption-strategies" title="Permanent link">&para;</a></h4>
+<p><strong>Random Swap</strong>: Randomly permute feature values across samples
+<div class="highlight"><pre><span></span><code><span class="n">feature_values</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">feat_idx</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">perm_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">feature_values</span><span class="p">))</span>
+<span class="n">shuffled_values</span> <span class="o">=</span> <span class="n">feature_values</span><span class="p">[</span><span class="n">perm_indices</span><span class="p">]</span>
+</code></pre></div></p>
+<p><strong>Marginal Sampling</strong>: Sample from marginal distribution of each feature
+<div class="highlight"><pre><span></span><code><span class="n">feature_values</span> <span class="o">=</span> <span class="n">x</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">feat_idx</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+<span class="n">sample_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">feature_values</span><span class="p">),</span> <span class="n">shape</span><span class="p">)</span>
+<span class="n">sampled_values</span> <span class="o">=</span> <span class="n">feature_values</span><span class="p">[</span><span class="n">sample_indices</span><span class="p">]</span>
+</code></pre></div></p>
+<h4 id="configuration_1">Configuration<a class="headerlink" href="#configuration_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/model/corruption/scarf.yaml</span>
+<span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.SCARFCorruption</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.6</span>
+<span class="nt">corruption_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;random_swap&quot;</span>
+<span class="nt">temperature</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span><span class="w">  </span><span class="c1"># For contrastive loss</span>
+</code></pre></div>
+<h3 id="recontab-corruption">ReConTab Corruption<a class="headerlink" href="#recontab-corruption" title="Permanent link">&para;</a></h3>
+<p><strong>Purpose</strong>: Multi-task reconstruction-based learning combining multiple corruption types with detailed tracking for reconstruction targets.</p>
+<h4 id="implementation_2">Implementation<a class="headerlink" href="#implementation_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReConTabCorruption</span>
+
+<span class="n">corruption</span> <span class="o">=</span> <span class="n">ReConTabCorruption</span><span class="p">(</span>
+    <span class="n">corruption_rate</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span>
+    <span class="n">categorical_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="n">numerical_indices</span><span class="o">=</span><span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+    <span class="n">corruption_types</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;masking&quot;</span><span class="p">,</span> <span class="s2">&quot;noise&quot;</span><span class="p">,</span> <span class="s2">&quot;swapping&quot;</span><span class="p">],</span>
+    <span class="n">masking_strategy</span><span class="o">=</span><span class="s2">&quot;random&quot;</span><span class="p">,</span>
+    <span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">swap_probability</span><span class="o">=</span><span class="mf">0.1</span>
+<span class="p">)</span>
+
+<span class="c1"># Apply corruption</span>
+<span class="n">corrupted_data</span><span class="p">,</span> <span class="n">corruption_info</span> <span class="o">=</span> <span class="n">corruption</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+<span class="c1"># Get reconstruction targets</span>
+<span class="n">targets</span> <span class="o">=</span> <span class="n">corruption</span><span class="o">.</span><span class="n">reconstruction_targets</span><span class="p">(</span><span class="n">original_data</span><span class="p">,</span> <span class="n">corrupted_data</span><span class="p">,</span> <span class="n">corruption_info</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="parameters_2">Parameters<a class="headerlink" href="#parameters_2" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>corruption_rate</code></td>
+<td>float</td>
+<td>0.15</td>
+<td>Base corruption rate for masking</td>
+</tr>
+<tr>
+<td><code>categorical_indices</code></td>
+<td>List[int]</td>
+<td>None</td>
+<td>Indices of categorical features</td>
+</tr>
+<tr>
+<td><code>numerical_indices</code></td>
+<td>List[int]</td>
+<td>None</td>
+<td>Indices of numerical features</td>
+</tr>
+<tr>
+<td><code>corruption_types</code></td>
+<td>List[str]</td>
+<td>["masking", "noise", "swapping"]</td>
+<td>Types of corruption to apply</td>
+</tr>
+<tr>
+<td><code>masking_strategy</code></td>
+<td>str</td>
+<td>"random"</td>
+<td>"random", "column_wise", or "block"</td>
+</tr>
+<tr>
+<td><code>noise_std</code></td>
+<td>float</td>
+<td>0.1</td>
+<td>Standard deviation for Gaussian noise</td>
+</tr>
+<tr>
+<td><code>swap_probability</code></td>
+<td>float</td>
+<td>0.1</td>
+<td>Probability of swapping each feature</td>
+</tr>
+</tbody>
+</table>
+<h4 id="corruption-types">Corruption Types<a class="headerlink" href="#corruption-types" title="Permanent link">&para;</a></h4>
+<p><strong>Masking</strong>: Zero out selected features
+<div class="highlight"><pre><span></span><code><span class="n">mask</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bernoulli</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">corruption_rate</span><span class="p">))</span>
+<span class="n">x_corrupted</span> <span class="o">=</span> <span class="n">x</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">mask</span><span class="p">)</span>
+</code></pre></div></p>
+<p><strong>Noise Injection</strong>: Add Gaussian noise to numerical features
+<div class="highlight"><pre><span></span><code><span class="n">noise</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn_like</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">*</span> <span class="n">noise_std</span>
+<span class="n">x_corrupted</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="n">noise</span>
+</code></pre></div></p>
+<p><strong>Feature Swapping</strong>: Randomly permute features across samples
+<div class="highlight"><pre><span></span><code><span class="n">perm_indices</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randperm</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+<span class="n">x_corrupted</span><span class="p">[:,</span> <span class="p">:,</span> <span class="n">feat_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">perm_indices</span><span class="p">,</span> <span class="p">:,</span> <span class="n">feat_idx</span><span class="p">]</span>
+</code></pre></div></p>
+<h4 id="masking-strategies">Masking Strategies<a class="headerlink" href="#masking-strategies" title="Permanent link">&para;</a></h4>
+<p><strong>Random</strong>: Randomly mask individual elements
+<strong>Column-wise</strong>: Mask entire features (columns)
+<strong>Block</strong>: Mask contiguous temporal blocks</p>
+<h4 id="outputs_1">Outputs<a class="headerlink" href="#outputs_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li><strong>corrupted_data</strong>: Input data with applied corruptions</li>
+<li><strong>corruption_info</strong>: Tensor indicating corruption type for each element</li>
+<li>0: Original (no corruption)</li>
+<li>1: Masked</li>
+<li>2: Noise added</li>
+<li>3: Swapped</li>
+</ul>
+<h4 id="reconstruction-targets">Reconstruction Targets<a class="headerlink" href="#reconstruction-targets" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="n">targets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;masked_values&quot;</span><span class="p">:</span> <span class="n">original</span><span class="p">[</span><span class="n">mask_positions</span><span class="p">],</span>
+    <span class="s2">&quot;mask_positions&quot;</span><span class="p">:</span> <span class="n">mask_positions</span><span class="p">,</span>
+    <span class="s2">&quot;denoised_values&quot;</span><span class="p">:</span> <span class="n">original</span><span class="p">[</span><span class="n">noise_positions</span><span class="p">],</span>
+    <span class="s2">&quot;noise_positions&quot;</span><span class="p">:</span> <span class="n">noise_positions</span><span class="p">,</span>
+    <span class="s2">&quot;unswapped_values&quot;</span><span class="p">:</span> <span class="n">original</span><span class="p">[</span><span class="n">swap_positions</span><span class="p">],</span>
+    <span class="s2">&quot;swap_positions&quot;</span><span class="p">:</span> <span class="n">swap_positions</span>
+<span class="p">}</span>
+</code></pre></div>
+<h4 id="configuration_2">Configuration<a class="headerlink" href="#configuration_2" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/model/corruption/recontab.yaml</span>
+<span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.ReConTabCorruption</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.15</span>
+<span class="nt">corruption_types</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;masking&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;noise&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;swapping&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">masking_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;random&quot;</span>
+<span class="nt">noise_std</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">swap_probability</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</code></pre></div>
+<h2 id="simple-corruption-strategies">Simple Corruption Strategies<a class="headerlink" href="#simple-corruption-strategies" title="Permanent link">&para;</a></h2>
+<h3 id="random-masking">Random Masking<a class="headerlink" href="#random-masking" title="Permanent link">&para;</a></h3>
+<p>Basic random feature masking:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomMasking</span>
+
+<span class="n">masking</span> <span class="o">=</span> <span class="n">RandomMasking</span><span class="p">(</span><span class="n">corruption_rate</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">masked_data</span> <span class="o">=</span> <span class="n">masking</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="gaussian-noise">Gaussian Noise<a class="headerlink" href="#gaussian-noise" title="Permanent link">&para;</a></h3>
+<p>Add Gaussian noise to numerical features:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianNoise</span>
+
+<span class="n">noise</span> <span class="o">=</span> <span class="n">GaussianNoise</span><span class="p">(</span><span class="n">noise_std</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+<span class="n">noisy_data</span> <span class="o">=</span> <span class="n">noise</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+<h3 id="swapping-corruption">Swapping Corruption<a class="headerlink" href="#swapping-corruption" title="Permanent link">&para;</a></h3>
+<p>Random feature swapping between samples:</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">SwappingCorruption</span>
+
+<span class="n">swapping</span> <span class="o">=</span> <span class="n">SwappingCorruption</span><span class="p">(</span><span class="n">swap_prob</span><span class="o">=</span><span class="mf">0.15</span><span class="p">)</span>
+<span class="n">swapped_data</span> <span class="o">=</span> <span class="n">swapping</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="usage-in-training">Usage in Training<a class="headerlink" href="#usage-in-training" title="Permanent link">&para;</a></h2>
+<h3 id="vime-training-loop">VIME Training Loop<a class="headerlink" href="#vime-training-loop" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">vime_training_step</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="c1"># Apply VIME corruption</span>
+    <span class="n">corrupted_data</span><span class="p">,</span> <span class="n">mask</span> <span class="o">=</span> <span class="n">vime_corruption</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+
+    <span class="c1"># Forward pass</span>
+    <span class="n">representations</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">corrupted_data</span><span class="p">)</span>
+
+    <span class="c1"># VIME-specific heads</span>
+    <span class="n">mask_pred</span> <span class="o">=</span> <span class="n">mask_estimation_head</span><span class="p">(</span><span class="n">representations</span><span class="p">)</span>
+    <span class="n">reconstructed</span> <span class="o">=</span> <span class="n">value_imputation_head</span><span class="p">(</span><span class="n">representations</span><span class="p">)</span>
+
+    <span class="c1"># Compute losses</span>
+    <span class="n">mask_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">binary_cross_entropy_with_logits</span><span class="p">(</span><span class="n">mask_pred</span><span class="p">,</span> <span class="n">mask</span><span class="p">)</span>
+    <span class="n">recon_loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">reconstructed</span><span class="p">,</span> <span class="n">batch</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mask_loss</span> <span class="o">+</span> <span class="n">recon_loss</span>
+</code></pre></div>
+<h3 id="scarf-training-loop">SCARF Training Loop<a class="headerlink" href="#scarf-training-loop" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">scarf_training_step</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="c1"># Create contrastive pairs</span>
+    <span class="n">view1</span><span class="p">,</span> <span class="n">view2</span> <span class="o">=</span> <span class="n">scarf_corruption</span><span class="o">.</span><span class="n">create_contrastive_pairs</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+
+    <span class="c1"># Get representations</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">view1</span><span class="p">)</span>
+    <span class="n">z2</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">view2</span><span class="p">)</span>
+
+    <span class="c1"># Contrastive loss</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="n">contrastive_loss</span><span class="p">(</span><span class="n">z1</span><span class="p">,</span> <span class="n">z2</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">loss</span>
+</code></pre></div>
+<h3 id="recontab-training-loop">ReConTab Training Loop<a class="headerlink" href="#recontab-training-loop" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="nf">recontab_training_step</span><span class="p">(</span><span class="n">batch</span><span class="p">):</span>
+    <span class="c1"># Apply multi-corruption</span>
+    <span class="n">corrupted_data</span><span class="p">,</span> <span class="n">corruption_info</span> <span class="o">=</span> <span class="n">recontab_corruption</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
+
+    <span class="c1"># Forward pass</span>
+    <span class="n">representations</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">corrupted_data</span><span class="p">)</span>
+
+    <span class="c1"># Get reconstruction targets</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">recontab_corruption</span><span class="o">.</span><span class="n">reconstruction_targets</span><span class="p">(</span>
+        <span class="n">batch</span><span class="p">,</span> <span class="n">corrupted_data</span><span class="p">,</span> <span class="n">corruption_info</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Multi-task reconstruction</span>
+    <span class="n">losses</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="s2">&quot;masked_values&quot;</span> <span class="ow">in</span> <span class="n">targets</span><span class="p">:</span>
+        <span class="n">pred</span> <span class="o">=</span> <span class="n">masked_reconstruction_head</span><span class="p">(</span><span class="n">representations</span><span class="p">)</span>
+        <span class="n">losses</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">pred</span><span class="p">[</span><span class="n">targets</span><span class="p">[</span><span class="s2">&quot;mask_positions&quot;</span><span class="p">]],</span> 
+                                   <span class="n">targets</span><span class="p">[</span><span class="s2">&quot;masked_values&quot;</span><span class="p">])</span>
+
+    <span class="c1"># ... similar for denoising and unswapping</span>
+
+    <span class="k">return</span> <span class="nb">sum</span><span class="p">(</span><span class="n">losses</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+</code></pre></div>
+<h2 id="choosing-corruption-strategies">Choosing Corruption Strategies<a class="headerlink" href="#choosing-corruption-strategies" title="Permanent link">&para;</a></h2>
+<h3 id="vime">VIME<a class="headerlink" href="#vime" title="Permanent link">&para;</a></h3>
+<p><strong>Best for</strong>: 
+- Mixed categorical/numerical tabular data
+- When you want explicit mask prediction capability
+- Interpretable pretext tasks</p>
+<p><strong>Typical corruption rate</strong>: 0.3</p>
+<h3 id="scarf">SCARF<a class="headerlink" href="#scarf" title="Permanent link">&para;</a></h3>
+<p><strong>Best for</strong>:
+- Large datasets with diverse feature distributions
+- When contrastive learning is preferred
+- High-dimensional tabular data</p>
+<p><strong>Typical corruption rate</strong>: 0.6+</p>
+<h3 id="recontab">ReConTab<a class="headerlink" href="#recontab" title="Permanent link">&para;</a></h3>
+<p><strong>Best for</strong>:
+- Complex multi-task scenarios
+- When you want fine-grained corruption control
+- Combining reconstruction with other objectives</p>
+<p><strong>Typical corruption rate</strong>: 0.15 (base rate, actual varies by corruption type)</p>
+<h2 id="performance-tips">Performance Tips<a class="headerlink" href="#performance-tips" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>Corruption Rate</strong>: Start with paper defaults, then tune based on validation performance</li>
+<li><strong>Feature Types</strong>: Ensure correct categorical/numerical feature specification</li>
+<li><strong>Batch Size</strong>: SCARF benefits from larger batch sizes (128+) for effective contrastive learning</li>
+<li><strong>Mixed Precision</strong>: All strategies support <code>precision: 16-mixed</code> for faster training</li>
+<li><strong>Distribution Estimation</strong>: For VIME, set feature distributions from training data for best results</li>
+</ol>
+<h2 id="demo-scripts">Demo Scripts<a class="headerlink" href="#demo-scripts" title="Permanent link">&para;</a></h2>
+<p>Run interactive demos to understand each strategy:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Compare all strategies interactively</span>
+python<span class="w"> </span>demo_corruption_strategies.py
+
+<span class="c1"># Real data demo</span>
+python<span class="w"> </span>demo_credit_card_data.py
+</code></pre></div>
+<h2 id="paper-references">Paper References<a class="headerlink" href="#paper-references" title="Permanent link">&para;</a></h2>
+<ul>
+<li>
+<p><strong>VIME</strong>: Yoon, J., Zhang, Y., Jordon, J., &amp; van der Schaar, M. (2020). VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain. <em>NeurIPS 2020</em>.</p>
+</li>
+<li>
+<p><strong>SCARF</strong>: Bahri, D., Jiang, H., Tay, Y., &amp; Metzler, D. (2021). SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption for Representation Learning. <em>arXiv:2106.15147</em>. </p>
+</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.sections", "navigation.expand", "navigation.top", "search.highlight", "search.share", "search.suggest"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+    
+  </body>
+</html>

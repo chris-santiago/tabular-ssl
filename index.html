@@ -399,9 +399,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
+  <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
-      Getting Started
+      🚀 Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎭 New: Corruption Strategies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      🏦 Sample Data
     </span>
   </a>
   
@@ -469,9 +487,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#run-pre-configured-experiments" class="md-nav__link">
+  <a href="#demo-scripts" class="md-nav__link">
     <span class="md-ellipsis">
-      Run Pre-configured Experiments
+      🎭 Demo Scripts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ssl-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 SSL Experiments
     </span>
   </a>
   
@@ -480,7 +507,7 @@
           <li class="md-nav__item">
   <a href="#custom-configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      Custom Configuration
+      🔧 Custom Configuration
     </span>
   </a>
   
@@ -1147,9 +1174,27 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#getting-started" class="md-nav__link">
+  <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
-      Getting Started
+      🚀 Quick Start
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#new-corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      🎭 New: Corruption Strategies
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sample-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      🏦 Sample Data
     </span>
   </a>
   
@@ -1217,9 +1262,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#run-pre-configured-experiments" class="md-nav__link">
+  <a href="#demo-scripts" class="md-nav__link">
     <span class="md-ellipsis">
-      Run Pre-configured Experiments
+      🎭 Demo Scripts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ssl-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      🧪 SSL Experiments
     </span>
   </a>
   
@@ -1228,7 +1282,7 @@
           <li class="md-nav__item">
   <a href="#custom-configuration" class="md-nav__link">
     <span class="md-ellipsis">
-      Custom Configuration
+      🔧 Custom Configuration
     </span>
   </a>
   
@@ -1301,12 +1355,29 @@
 
 
 <h1 id="welcome-to-tabular-ssl-documentation">Welcome to Tabular SSL Documentation<a class="headerlink" href="#welcome-to-tabular-ssl-documentation" title="Permanent link">&para;</a></h1>
-<p>Welcome to the documentation for <strong>Tabular SSL</strong>, a modular library for self-supervised learning on tabular data. This documentation follows the <a href="https://diataxis.fr/">Diátaxis framework</a> to provide you with the most effective learning and reference experience.</p>
-<h2 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h2>
-<p>New to Tabular SSL? Start with our <a href="tutorials/getting-started/">Getting Started tutorial</a> to learn the basics in just a few minutes.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Quick start</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp
+<p>Welcome to the documentation for <strong>Tabular SSL</strong>, a modular library for self-supervised learning on tabular data with state-of-the-art corruption strategies. This documentation follows the <a href="https://diataxis.fr/">Diátaxis framework</a> to provide you with the most effective learning and reference experience.</p>
+<h2 id="quick-start">🚀 Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
+<p>New to Tabular SSL? Try our <strong>interactive demos</strong> to see the library in action:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Demo corruption strategies (VIME, SCARF, ReConTab)</span>
+python<span class="w"> </span>demo_corruption_strategies.py
+
+<span class="c1"># Demo with real credit card transaction data</span>
+python<span class="w"> </span>demo_credit_card_data.py
+
+<span class="c1"># Train with state-of-the-art SSL methods</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>vime_ssl<span class="w">     </span><span class="c1"># VIME approach</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>scarf_ssl<span class="w">    </span><span class="c1"># SCARF approach  </span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>recontab_ssl<span class="w"> </span><span class="c1"># ReConTab approach</span>
 </code></pre></div>
+<h2 id="new-corruption-strategies">🎭 New: Corruption Strategies<a class="headerlink" href="#new-corruption-strategies" title="Permanent link">&para;</a></h2>
+<p>We've implemented corruption strategies from leading tabular SSL papers:</p>
+<ul>
+<li><strong>🎯 VIME</strong> - Value imputation and mask estimation (<a href="https://arxiv.org/abs/2006.06775">NeurIPS 2020</a>)</li>
+<li><strong>🌟 SCARF</strong> - Contrastive learning with feature corruption (<a href="https://arxiv.org/abs/2106.15147">arXiv 2021</a>)</li>
+<li><strong>🔧 ReConTab</strong> - Multi-task reconstruction-based learning</li>
+</ul>
+<h2 id="sample-data">🏦 Sample Data<a class="headerlink" href="#sample-data" title="Permanent link">&para;</a></h2>
+<p>Get started immediately with real transaction data from the <a href="https://github.com/IBM/TabFormer">IBM TabFormer</a> project - no data preparation needed!</p>
 <h2 id="documentation-structure">Documentation Structure<a class="headerlink" href="#documentation-structure" title="Permanent link">&para;</a></h2>
 <h3 id="tutorials">📚 <a href="tutorials/">Tutorials</a><a class="headerlink" href="#tutorials" title="Permanent link">&para;</a></h3>
 <p><strong>Learning-oriented guides for newcomers</strong></p>
@@ -1344,19 +1415,29 @@ python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span c
 <li><a href="explanation/performance/">Performance</a> - Optimization and best practices</li>
 </ul>
 <h2 id="quick-examples">Quick Examples<a class="headerlink" href="#quick-examples" title="Permanent link">&para;</a></h2>
-<h3 id="run-pre-configured-experiments">Run Pre-configured Experiments<a class="headerlink" href="#run-pre-configured-experiments" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="c1"># Simple MLP baseline</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp
+<h3 id="demo-scripts">🎭 Demo Scripts<a class="headerlink" href="#demo-scripts" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Interactive corruption strategies demo</span>
+python<span class="w"> </span>demo_corruption_strategies.py
 
-<span class="c1"># Transformer for sequences</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>transformer_small
-
-<span class="c1"># Efficient S4 model</span>
-python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>s4_large
+<span class="c1"># Real data demo with credit card transactions</span>
+python<span class="w"> </span>demo_credit_card_data.py
 </code></pre></div>
-<h3 id="custom-configuration">Custom Configuration<a class="headerlink" href="#custom-configuration" title="Permanent link">&para;</a></h3>
+<h3 id="ssl-experiments">🧪 SSL Experiments<a class="headerlink" href="#ssl-experiments" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># VIME: Value imputation + mask estimation</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>vime_ssl
+
+<span class="c1"># SCARF: Contrastive learning with feature corruption</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>scarf_ssl
+
+<span class="c1"># ReConTab: Multi-task reconstruction</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>recontab_ssl
+</code></pre></div>
+<h3 id="custom-configuration">🔧 Custom Configuration<a class="headerlink" href="#custom-configuration" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><span class="c1"># Mix and match components</span>
 python<span class="w"> </span>train.py<span class="w"> </span>model/sequence_encoder<span class="o">=</span>rnn<span class="w"> </span>model/event_encoder<span class="o">=</span>mlp
+
+<span class="c1"># Use different corruption strategies</span>
+python<span class="w"> </span>train.py<span class="w"> </span>model/corruption<span class="o">=</span>vime<span class="w"> </span>model/corruption.corruption_rate<span class="o">=</span><span class="m">0</span>.5
 
 <span class="c1"># Adjust hyperparameters</span>
 python<span class="w"> </span>train.py<span class="w"> </span>model.learning_rate<span class="o">=</span>1e-3<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">64</span>
@@ -1369,10 +1450,12 @@ pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </s
 </code></pre></div>
 <h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
 <ul>
+<li><strong>🎭 State-of-the-Art Corruption Strategies</strong> - VIME, SCARF, and ReConTab implementations</li>
+<li><strong>🏦 Ready-to-Use Sample Data</strong> - IBM TabFormer credit card transaction dataset</li>
 <li><strong>🧩 Modular Architecture</strong> - Mix and match components for custom models</li>
 <li><strong>⚙️ Hydra Configuration</strong> - Flexible, hierarchical configuration management</li>
-<li><strong>🔄 Self-Supervised Learning</strong> - Multiple SSL methods for tabular data</li>
-<li><strong>🚀 Pre-configured Experiments</strong> - Ready-to-use model configurations</li>
+<li><strong>🧪 Pre-configured SSL Experiments</strong> - VIME, SCARF, and ReConTab ready to run</li>
+<li><strong>🎬 Interactive Demos</strong> - See corruption strategies in action</li>
 <li><strong>📊 PyTorch Lightning</strong> - Robust training and evaluation framework</li>
 </ul>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>

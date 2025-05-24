@@ -1037,6 +1037,90 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vimecorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIMECorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scarfcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCARFCorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recontabcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReConTabCorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simple-corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Simple Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#randommasking" class="md-nav__link">
+    <span class="md-ellipsis">
+      RandomMasking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussiannoise" class="md-nav__link">
+    <span class="md-ellipsis">
+      GaussianNoise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swappingcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwappingCorruption
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#utility-functions" class="md-nav__link">
     <span class="md-ellipsis">
       Utility Functions
@@ -1668,6 +1752,90 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#vimecorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIMECorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#scarfcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SCARFCorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#recontabcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReConTabCorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#simple-corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Simple Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Simple Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#randommasking" class="md-nav__link">
+    <span class="md-ellipsis">
+      RandomMasking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussiannoise" class="md-nav__link">
+    <span class="md-ellipsis">
+      GaussianNoise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swappingcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwappingCorruption
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#utility-functions" class="md-nav__link">
     <span class="md-ellipsis">
       Utility Functions
@@ -2020,6 +2188,68 @@
 - <code>num_classes</code> (int): Number of output classes
 - <code>hidden_dims</code> (List[int]): Optional hidden layers
 - <code>dropout</code> (float): Dropout rate</p>
+<h2 id="corruption-strategies">Corruption Strategies<a class="headerlink" href="#corruption-strategies" title="Permanent link">&para;</a></h2>
+<p>Corruption strategies are essential components for self-supervised learning on tabular data. They create pretext tasks by transforming input data.</p>
+<h3 id="vimecorruption"><code>VIMECorruption</code><a class="headerlink" href="#vimecorruption" title="Permanent link">&para;</a></h3>
+<p>VIME (Value Imputation and Mask Estimation) corruption strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">VIMECorruption</span>
+</code></pre></div>
+<p><strong>Constructor Parameters:</strong>
+- <code>corruption_rate</code> (float): Fraction of features to corrupt (default: 0.15)
+- <code>categorical_indices</code> (List[int]): Indices of categorical features
+- <code>numerical_indices</code> (List[int]): Indices of numerical features
+- <code>categorical_vocab_sizes</code> (Dict[int, int]): Vocabulary sizes per categorical feature
+- <code>numerical_distributions</code> (Dict[int, Tuple[float, float]]): (mean, std) per numerical feature</p>
+<p><strong>Example Configuration:</strong>
+<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.VIMECorruption</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.3</span>
+<span class="nt">categorical_indices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">0</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
+<span class="nt">numerical_indices</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">6</span><span class="p p-Indicator">]</span>
+</code></pre></div></p>
+<h3 id="scarfcorruption"><code>SCARFCorruption</code><a class="headerlink" href="#scarfcorruption" title="Permanent link">&para;</a></h3>
+<p>SCARF (Self-Supervised Contrastive Learning using Random Feature Corruption) strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">SCARFCorruption</span>
+</code></pre></div>
+<p><strong>Constructor Parameters:</strong>
+- <code>corruption_rate</code> (float): Fraction of features to corrupt (default: 0.6)
+- <code>corruption_strategy</code> (str): "random_swap" or "marginal_sampling"</p>
+<p><strong>Example Configuration:</strong>
+<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.SCARFCorruption</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.6</span>
+<span class="nt">corruption_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;random_swap&quot;</span>
+</code></pre></div></p>
+<h3 id="recontabcorruption"><code>ReConTabCorruption</code><a class="headerlink" href="#recontabcorruption" title="Permanent link">&para;</a></h3>
+<p>Multi-task reconstruction-based corruption strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">ReConTabCorruption</span>
+</code></pre></div>
+<p><strong>Constructor Parameters:</strong>
+- <code>corruption_rate</code> (float): Base corruption rate for masking (default: 0.15)
+- <code>categorical_indices</code> (List[int]): Indices of categorical features
+- <code>numerical_indices</code> (List[int]): Indices of numerical features
+- <code>corruption_types</code> (List[str]): Types of corruption to apply
+- <code>masking_strategy</code> (str): "random", "column_wise", or "block"
+- <code>noise_std</code> (float): Standard deviation for noise corruption
+- <code>swap_probability</code> (float): Probability of feature swapping</p>
+<p><strong>Example Configuration:</strong>
+<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.ReConTabCorruption</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.15</span>
+<span class="nt">corruption_types</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;masking&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;noise&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;swapping&quot;</span><span class="p p-Indicator">]</span>
+<span class="nt">masking_strategy</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;random&quot;</span>
+<span class="nt">noise_std</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</code></pre></div></p>
+<h3 id="simple-corruption-strategies">Simple Corruption Strategies<a class="headerlink" href="#simple-corruption-strategies" title="Permanent link">&para;</a></h3>
+<h4 id="randommasking"><code>RandomMasking</code><a class="headerlink" href="#randommasking" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.RandomMasking</span>
+<span class="nt">corruption_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.15</span>
+</code></pre></div>
+<h4 id="gaussiannoise"><code>GaussianNoise</code><a class="headerlink" href="#gaussiannoise" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.GaussianNoise</span>
+<span class="nt">noise_std</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+</code></pre></div>
+<h4 id="swappingcorruption"><code>SwappingCorruption</code><a class="headerlink" href="#swappingcorruption" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.components.SwappingCorruption</span>
+<span class="nt">swap_prob</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.15</span>
+</code></pre></div>
 <h2 id="utility-functions">Utility Functions<a class="headerlink" href="#utility-functions" title="Permanent link">&para;</a></h2>
 <h3 id="create_mlp"><code>create_mlp</code><a class="headerlink" href="#create_mlp" title="Permanent link">&para;</a></h3>
 <p>Utility function for creating MLP layers.</p>
