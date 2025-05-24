@@ -1,66 +1,85 @@
 # Tabular SSL Documentation
 
-This directory contains the documentation for the Tabular SSL library, built using MkDocs Material and following the Diátaxis framework.
+This directory contains the documentation for the Tabular SSL library. The documentation is organized following the Diátaxis framework.
 
 ## Structure
 
-The documentation is organized into four main sections:
-
-1. **Tutorials**: Step-by-step guides for getting started
-2. **How-to Guides**: Practical solutions for specific tasks
-3. **Reference**: Technical API documentation
-4. **Explanation**: Background information and concepts
+- **tutorials/**: Step-by-step guides for beginners
+- **how-to-guides/**: Problem-oriented guides for specific tasks
+- **reference/**: Technical documentation of the API and components
+- **explanation/**: Background information and conceptual explanations
 
 ## Building the Documentation
 
-### Prerequisites
+To build the documentation locally:
 
-- Python 3.8 or higher
-- pip
-
-### Installation
-
-1. Install the required packages:
-
+1. Install the documentation requirements:
 ```bash
-pip install -r requirements.txt
+pip install -r docs/requirements.txt
 ```
 
-### Building Locally
+2. Build the documentation:
+```bash
+cd docs
+mkdocs build
+```
 
-To build and serve the documentation locally:
-
+3. Serve the documentation locally:
 ```bash
 mkdocs serve
 ```
 
-This will start a local server at `http://127.0.0.1:8000` where you can preview the documentation.
+## Documentation Contents
 
-### Building for Production
+### Key Concepts
 
-To build the documentation for production:
+- **Component Registry**: Tabular SSL uses a component registry pattern to enable modular and extensible components
+- **Configuration System**: Configuration is managed using Hydra, allowing for hierarchical composition
+- **Self-Supervised Learning**: Multiple SSL methods are implemented for tabular data
+- **Type Safety**: Configuration validation is performed using Pydantic
 
-```bash
-mkdocs build
+### Component Types
+
+The library includes several component types:
+
+- **Event Encoders**: Encode individual events (MLP, Autoencoder, Contrastive)
+- **Sequence Encoders**: Encode sequences of events (RNN, LSTM, GRU, Transformer, S4)
+- **Embedding Layers**: Handle embedding of categorical features
+- **Projection Heads**: Project encoded representations to a different space
+- **Prediction Heads**: Generate predictions from encoded representations
+
+### Configuration
+
+The configuration system uses Hydra with a structured directory layout:
+
+```
+configs/
+├── config.yaml                # Main configuration
+├── model/                     # Model configurations
+│   ├── default.yaml          # Default model config
+│   ├── event_encoder/        # Event encoder configs
+│   ├── sequence_encoder/     # Sequence encoder configs
+│   ├── embedding/            # Embedding configs
+│   ├── projection_head/      # Projection head configs
+│   └── prediction_head/      # Prediction head configs
+├── data/                     # Data configurations
+├── trainer/                  # Training configurations
+├── callbacks/                # Callback configurations
+├── logger/                   # Logger configurations
+├── experiment/               # Experiment configurations
+├── hydra/                    # Hydra-specific configurations
+└── paths/                    # Path configurations
 ```
 
-This will create a `site` directory with the built documentation.
+## Contributing to the Documentation
 
-## Contributing to Documentation
+Contributions to the documentation are welcome! Please follow these guidelines:
 
-1. Make your changes in the appropriate section
-2. Test locally using `mkdocs serve`
-3. Submit a pull request
-
-## Documentation Guidelines
-
-- Follow the Diátaxis framework structure
-- Use clear and concise language
-- Include code examples where appropriate
-- Keep code examples up to date
-- Use proper Markdown formatting
-- Include cross-references to related sections
+1. Follow the Diátaxis framework organization
+2. Maintain a consistent style and tone
+3. Include code examples where appropriate
+4. Update documentation when making changes to the codebase
 
 ## License
 
-The documentation is licensed under the same license as the main project. 
+The documentation is licensed under the same license as the Tabular SSL library. 

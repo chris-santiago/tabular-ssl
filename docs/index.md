@@ -9,6 +9,7 @@ Learn how to use Tabular SSL through step-by-step guides. Start here if you're n
 
 - [Getting Started](tutorials/getting-started.md)
 - [Basic Usage](tutorials/basic-usage.md)
+- [Creating Custom Components](tutorials/custom-components.md)
 
 ### How-to Guides
 Find practical solutions to specific problems and tasks.
@@ -16,6 +17,7 @@ Find practical solutions to specific problems and tasks.
 - [Data Preparation](how-to-guides/data-preparation.md)
 - [Model Training](how-to-guides/model-training.md)
 - [Evaluation](how-to-guides/evaluation.md)
+- [Configuring Experiments](how-to-guides/configuring-experiments.md)
 
 ### Reference
 Detailed technical documentation of the library's components.
@@ -24,34 +26,61 @@ Detailed technical documentation of the library's components.
 - [Models](reference/models.md)
 - [Data Utilities](reference/data.md)
 - [Utility Functions](reference/utils.md)
+- [Configuration](reference/config.md)
 
 ### Explanation
 Understand the concepts and design decisions behind Tabular SSL.
 
 - [Architecture Overview](explanation/architecture.md)
+- [Component Registry](explanation/component-registry.md)
 - [SSL Methods](explanation/ssl-methods.md)
 - [Performance Considerations](explanation/performance.md)
 
 ## Quick Start
 
 ```python
-from tabular_ssl import TabularSSL
+import hydra
+from omegaconf import DictConfig
 
-# Initialize the model
-model = TabularSSL()
+@hydra.main(config_path="../configs", config_name="config")
+def main(config: DictConfig):
+    # Create model from configuration
+    from tabular_ssl.models.base import BaseModel
+    model = BaseModel(config)
+    
+    # Train model with given config
+    trainer = hydra.utils.instantiate(config.trainer)
+    trainer.fit(model, datamodule=hydra.utils.instantiate(config.data))
+    
+    # Make predictions
+    trainer.test(model, datamodule=hydra.utils.instantiate(config.data))
 
-# Train the model
-model.train(data)
-
-# Make predictions
-predictions = model.predict(new_data)
+if __name__ == "__main__":
+    main()
 ```
 
 ## Installation
 
 ```bash
-pip install tabular-ssl
+# Clone the repository
+git clone https://github.com/yourusername/tabular-ssl.git
+cd tabular-ssl
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install the package in development mode
+pip install -e .
 ```
+
+## Key Features
+
+- **Component Registry**: Modular design with type-safe component registration
+- **Configuration Management**: Hierarchical configuration with Hydra
+- **Self-Supervised Learning**: Multiple SSL methods for tabular data
+- **Flexible Architecture**: Mix and match components for custom models
+- **Experiment Management**: Easy experiment configuration and tracking
+- **Type Safety**: Pydantic-based configuration validation
 
 ## Contributing
 

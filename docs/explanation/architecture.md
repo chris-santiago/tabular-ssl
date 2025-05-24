@@ -14,8 +14,9 @@ The Tabular SSL system consists of several key components:
    - Data augmentation
 
 2. **Model Layer**
+   - Component Registry for modular design
    - Feature embedding
-   - Encoder components (Transformer, RNN, LSTM, etc.)
+   - Encoder components (Transformer, RNN, LSTM, S4, etc.)
    - Task-specific heads
 
 3. **Training Layer**
@@ -23,176 +24,309 @@ The Tabular SSL system consists of several key components:
    - Optimization
    - Monitoring
 
-4. **Evaluation Layer**
-   - Metrics computation
-   - Model interpretation
-   - Performance analysis
+4. **Configuration Layer**
+   - Hydra configuration management
+   - Experiment tracking
+   - Parameter validation
+
+## Component Registry
+
+One of the core architectural features of Tabular SSL is the Component Registry pattern, which enables a highly modular and extensible design.
+
+### Registry Design
+
+The Component Registry is a central repository that maps component names to their implementations:
+
+```python
+class ComponentRegistry:
+    """Registry for model components."""
+    
+    _components: ClassVar[Dict[str, Type['BaseComponent']]] = {}
+    
+    @classmethod
+    def register(cls, name: str) -> Type[T]:
+        """Register a component class."""
+        def decorator(component_cls: Type[T]) -> Type[T]:
+            cls._components[name] = component_cls
+            return component_cls
+        return decorator
+    
+    @classmethod
+    def get(cls, name: str) -> Type['BaseComponent']:
+        """Get a component class by name."""
+        if name not in cls._components:
+            raise KeyError(f"Component {name} not found in registry")
+        return cls._components[name]
+```
+
+### Component Configuration
+
+Each component has its own configuration class that inherits from `ComponentConfig`:
+
+```python
+class ComponentConfig(PydanticBaseModel):
+    """Base configuration for components."""
+    
+    name: str = Field(..., description="Name of the component")
+    type: str = Field(..., description="Type of the component")
+    
+    @validator('type')
+    def validate_type(cls, v: str) -> str:
+        """Validate that the component type exists in the registry."""
+        if v not in ComponentRegistry._components:
+            raise ValueError(f"Component type {v} not found in registry")
+        return v
+```
+
+### Component Initialization
+
+Components are initialized using their configuration:
+
+```python
+def _init_component(self, config: ComponentConfig) -> BaseComponent:
+    """Initialize a component from its configuration."""
+    component_cls = ComponentRegistry.get(config.type)
+    return component_cls(config)
+```
+
+### Benefits of the Registry Pattern
+
+1. **Modularity**: Components can be added, removed, or replaced independently
+2. **Validation**: Configuration is validated before components are initialized
+3. **Extensibility**: New components can be added without modifying existing code
+4. **Dynamic Loading**: Components are loaded at runtime based on configuration
+5. **Type Safety**: Component types are checked during initialization
 
 ## Component Details
 
-### Data Processing
+### Base Components
 
-#### Feature Embedding
-- Handles mixed data types (numerical and categorical)
-- Learns feature representations
-- Supports variable-length sequences
+Tabular SSL defines several base component types:
 
-#### Data Augmentation
-- Feature masking
-- Noise injection
-- Synthetic sample generation
+1. **EventEncoder**: Encodes individual events or timesteps
+2. **SequenceEncoder**: Encodes sequences of events
+3. **EmbeddingLayer**: Handles embedding of categorical features
+4. **ProjectionHead**: Projects encoded representations to a different space
+5. **PredictionHead**: Generates predictions from encoded representations
 
-### Model Architecture
+Each component type has multiple implementations that can be selected via configuration.
 
-#### Encoder Components
-The system supports multiple encoder types through Hydra's configuration system:
+### Available Components
 
-1. **Transformer Encoder**
-   - Multi-head self-attention
-   - Feed-forward networks
-   - Layer normalization
-   - Residual connections
+#### Event Encoders
+- `mlp_event_encoder`: MLP-based event encoder
+- `autoencoder`: Autoencoder-based event encoder
+- `contrastive`: Contrastive learning event encoder
 
-2. **RNN-based Encoders**
-   - RNN, LSTM, and GRU variants
-   - Bidirectional processing
-   - Variable sequence lengths
+#### Sequence Encoders
+- `rnn`: Basic RNN encoder
+- `lstm`: LSTM encoder
+- `gru`: GRU encoder
+- `transformer`: Transformer encoder
+- `s4`: Diagonal State Space Model (S4) encoder
 
-3. **State Space Models**
-   - SSM and S4 implementations
-   - Efficient sequence modeling
-   - Long-range dependencies
+#### Embedding Layers
+- `categorical_embedding`: Embedding layer for categorical variables
 
-#### Task Heads
-- Feature reconstruction
-- Contrastive learning
-- Predictive tasks
+#### Projection Heads
+- `mlp_projection`: MLP-based projection head
 
-### Configuration System
+#### Prediction Heads
+- `classification`: Classification head
 
-The system uses Hydra's configuration system with the `_target_` pattern for flexible component instantiation:
+#### Corruption Strategies
+- `random_masking`: Random masking corruption
+- `gaussian_noise`: Gaussian noise corruption
+- `swapping`: Feature swapping corruption
+- `vime`: VIME-style corruption
+- `corruption_pipeline`: Pipeline of multiple corruption strategies
 
-```yaml
-# Example configuration
-_target_: tabular_ssl.models.TabularSSL
+## Configuration System
 
-sequence_encoder:
-  _target_: tabular_ssl.models.encoders.TransformerEncoder
-  input_dim: 16
-  hidden_dim: 32
-  num_layers: 2
-  num_heads: 4
+The system uses Hydra's configuration system with structured configuration files:
+
+```
+configs/
+├── config.yaml                # Main configuration
+├── model/                     # Model configurations
+│   ├── default.yaml          # Default model config
+│   ├── event_encoder/        # Event encoder configs
+│   ├── sequence_encoder/     # Sequence encoder configs
+│   ├── embedding/            # Embedding configs
+│   ├── projection_head/      # Projection head configs
+│   └── prediction_head/      # Prediction head configs
+├── data/                     # Data configurations
+├── trainer/                  # Training configurations
+├── callbacks/                # Callback configurations
+├── logger/                   # Logger configurations
+├── experiment/               # Experiment configurations
+├── hydra/                    # Hydra-specific configurations
+└── paths/                    # Path configurations
 ```
 
-Benefits of this approach:
-1. **Type Safety**: Hydra validates class existence and parameters
-2. **Flexibility**: Easy to add new components without code changes
-3. **Composition**: Components can be nested and composed
-4. **IDE Support**: Better autocomplete and type checking
+### Configuration Composition
 
-### Training System
+Configurations are composed hierarchically:
 
-#### Self-Supervised Learning
-- Masked feature prediction
-- Contrastive learning
-- Feature reconstruction
+```yaml
+# configs/model/default.yaml
+defaults:
+  - _self_
+  - event_encoder: mlp.yaml
+  - sequence_encoder: transformer.yaml
+  - embedding: categorical.yaml
+  - projection_head: mlp.yaml
+  - prediction_head: classification.yaml
 
-#### Optimization
-- Adam optimizer
-- Learning rate scheduling
-- Gradient clipping
+_target_: tabular_ssl.models.base.BaseModel
+
+model:
+  name: tabular_ssl_model
+  type: base
+  event_encoder: ${event_encoder}
+  sequence_encoder: ${sequence_encoder}
+  embedding: ${embedding}
+  projection_head: ${projection_head}
+  prediction_head: ${prediction_head}
+```
+
+### Experiment Configuration
+
+Experiments override specific parts of the configuration:
+
+```yaml
+# configs/experiment/s4_sequence.yaml
+# @package _global_
+
+defaults:
+  - override /model/sequence_encoder: s4.yaml
+  - override /trainer: default.yaml
+  - override /model: default.yaml
+  - override /callbacks: default.yaml
+  - _self_
+
+tags: ["s4", "sequence"]
+
+trainer:
+  max_epochs: 50
+  gradient_clip_val: 0.5
+
+model:
+  optimizer:
+    lr: 5.0e-4
+    weight_decay: 0.05
+```
+
+### Hydra-to-Component Integration
+
+The system translates Hydra configurations to component configurations:
+
+```python
+# Convert Hydra configs to ComponentConfigs
+self.event_encoder_config = ComponentConfig.from_hydra(config.model.event_encoder)
+self.sequence_encoder_config = ComponentConfig.from_hydra(config.model.sequence_encoder)
+
+# Initialize components
+self.event_encoder = self._init_component(self.event_encoder_config)
+self.sequence_encoder = self._init_component(self.sequence_encoder_config)
+```
 
 ## Design Decisions
 
+### Why Component Registry?
+
+The Component Registry pattern was chosen for several reasons:
+
+1. **Separation of Concerns**
+   - Components focus on their specific functionality
+   - Registry handles component discovery and initialization
+   - Configuration handles component parameters
+
+2. **Extensibility**
+   - New components can be added without modifying existing code
+   - Custom components can be registered by users
+   - Experiments can mix and match components
+
+3. **Validation**
+   - Component types are validated during initialization
+   - Configuration parameters are validated using Pydantic
+   - Better error messages for misconfiguration
+
 ### Why Hydra Configuration?
 
-The system uses Hydra's configuration system for several reasons:
+Hydra provides several benefits for configuration management:
 
-1. **Flexibility**
-   - Easy to add new components
-   - Runtime configuration changes
-   - Experiment management
+1. **Hierarchical Configuration**
+   - Configurations are organized into groups
+   - Defaults can be overridden selectively
+   - Parameters can be composed from multiple sources
 
-2. **Type Safety**
-   - Parameter validation
-   - Class existence checking
-   - Better error messages
+2. **Command-line Overrides**
+   - Parameters can be changed at runtime
+   - No need to modify configuration files
+   - Experiment parameters are explicit
 
-3. **Composition**
-   - Nested configurations
-   - Component reuse
-   - Modular design
-
-### Why Self-Supervised Learning?
-
-Self-supervised learning offers several advantages:
-
-1. **Data Efficiency**
-   - Learn from unlabeled data
-   - Reduce annotation costs
-   - Better generalization
-
-2. **Representation Learning**
-   - Learn robust features
-   - Capture data structure
-   - Transfer knowledge
-
-3. **Flexibility**
-   - Multiple learning tasks
-   - Adapt to data types
-   - Custom objectives
+3. **Multirun Capabilities**
+   - Parameter sweeps for experimentation
+   - Parallel execution of multiple runs
+   - Organized output directories
 
 ## Implementation Details
 
 ### Code Organization
 
 ```
-tabular_ssl/
-├── models/
-│   ├── encoders/
-│   │   ├── transformer.py
-│   │   ├── rnn.py
-│   │   ├── lstm.py
-│   │   ├── gru.py
-│   │   ├── ssm.py
-│   │   └── s4.py
-│   ├── embeddings/
-│   │   └── feature_embedding.py
-│   ├── heads/
-│   │   ├── projection.py
-│   │   └── prediction.py
-│   └── base.py
-├── data/
-│   ├── loader.py
-│   ├── transformers.py
-│   └── augmentation.py
-├── utils/
-│   ├── evaluation.py
-│   ├── visualization.py
-│   └── training.py
-└── examples/
-    ├── basic_usage.py
-    └── advanced_usage.py
+src/
+├── tabular_ssl/              # Core package
+│   ├── data/                # Data loading and processing
+│   ├── models/              # Model implementations
+│   │   ├── base.py         # Base model and component registry
+│   │   ├── components.py   # Model components
+│   │   └── s4.py           # S4 implementation
+│   └── utils/              # Utility functions
+└── train.py                 # Training script
 ```
 
 ### Key Classes
 
-#### TabularSSL
+#### ComponentRegistry
+- Central registry for all components
+- Handles component registration and retrieval
+- Ensures type safety
+
+#### BaseComponent
+- Abstract base class for all components
+- Handles configuration validation
+- Defines common interface
+
+#### BaseModel
 - Main model class
+- Composes components based on configuration
 - Handles training and inference
-- Uses Hydra for component instantiation
 
-#### DataLoader
-- Data loading and preprocessing
-- Feature engineering
-- Data validation
-
-#### TrainingManager
-- Training loop
-- Optimization
-- Monitoring
+#### ComponentConfig
+- Base configuration class
+- Uses Pydantic for validation
+- Integrates with Hydra configuration
 
 ## Performance Considerations
+
+### Component Design
+
+1. **Lazy Initialization**
+   - Components are only initialized when needed
+   - Configuration is validated early
+   - Resources are allocated efficiently
+
+2. **Configuration Caching**
+   - Configurations are parsed once
+   - Common configurations are reused
+   - Reduces memory overhead
+
+3. **Dynamic Component Selection**
+   - Only required components are initialized
+   - Custom components can be more efficient
+   - Allows for hardware-specific optimizations
 
 ### Memory Efficiency
 
