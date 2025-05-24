@@ -407,18 +407,18 @@ def __init__(self, config: DictConfig):
     self.config = config
     
     # Convert Hydra configs to ComponentConfigs
-    self.event_encoder_config = ComponentConfig.from_hydra(config.model.event_encoder)
-    self.sequence_encoder_config = ComponentConfig.from_hydra(config.model.sequence_encoder) if config.model.sequence_encoder else None
-    self.embedding_config = ComponentConfig.from_hydra(config.model.embedding) if config.model.embedding else None
-    self.projection_head_config = ComponentConfig.from_hydra(config.model.projection_head) if config.model.projection_head else None
-    self.prediction_head_config = ComponentConfig.from_hydra(config.model.prediction_head) if config.model.prediction_head else None
+    self.component_configs = {
+        name: ComponentConfig.from_hydra(cfg)
+        for name, cfg in config.model.items() if cfg is not None
+    }
     
     # Initialize components
-    self.event_encoder = self._init_component(self.event_encoder_config)
-    self.sequence_encoder = self._init_component(self.sequence_encoder_config) if self.sequence_encoder_config else None
-    self.embedding_layer = self._init_component(self.embedding_config) if self.embedding_config else None
-    self.projection_head = self._init_component(self.projection_head_config) if self.projection_head_config else None
-    self.prediction_head = self._init_component(self.prediction_head_config) if self.prediction_head_config else None
+    self.components = {
+        name: self._init_component(cfg)
+        for name, cfg in self.component_configs.items()
+    }
+    
+    self.save_hyperparameters(OmegaConf.to_container(config, resolve=True))
 ```
 
 #### Methods
@@ -448,7 +448,7 @@ Configure optimizers.
 ### Event Encoder Configuration
 
 ```yaml
-# configs/model/event_encoder/mlp.yaml
+# Example configuration for an MLP event encoder
 name: mlp_encoder
 type: mlp_event_encoder
 input_dim: 64
@@ -461,7 +461,7 @@ use_batch_norm: true
 ### Sequence Encoder Configuration
 
 ```yaml
-# configs/model/sequence_encoder/transformer.yaml
+# Example configuration for a Transformer sequence encoder
 name: transformer_encoder
 type: transformer
 input_dim: 512
@@ -476,23 +476,34 @@ bidirectional: true
 ### Model Configuration
 
 ```yaml
-# configs/model/default.yaml
-defaults:
-  - _self_
-  - event_encoder: mlp.yaml
-  - sequence_encoder: transformer.yaml
-  - embedding: categorical.yaml
-  - projection_head: mlp.yaml
-  - prediction_head: classification.yaml
-
-_target_: tabular_ssl.models.base.BaseModel
-
+# Example model configuration
 model:
-  name: tabular_ssl_model
-  type: base
-  event_encoder: ${event_encoder}
-  sequence_encoder: ${sequence_encoder}
-  embedding: ${embedding}
-  projection_head: ${projection_head}
-  prediction_head: ${prediction_head}
+  event_encoder:
+    name: mlp_event_encoder
+    type: mlp_event_encoder
+    input_dim: 64
+    hidden_dims: [128, 256]
+    output_dim: 512
+    dropout: 0.1
+    use_batch_norm: true
+  sequence_encoder:
+    name: s4
+    type: s4
+    input_dim: 512
+    hidden_dim: 64
+    num_layers: 2
+    dropout: 0.1
+    bidirectional: true
+    max_sequence_length: 2048
+  projection_head:
+    name: mlp_projection
+    type: mlp_projection
+    input_dim: 512
+    hidden_dims: [256]
+    output_dim: 128
+    dropout: 0.1
+    use_batch_norm: true
+optimizer:
+  _target_: torch.optim.Adam
+  lr: 0.001
 ``` 
