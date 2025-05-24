@@ -234,17 +234,21 @@ The project uses [Hydra](https://hydra.cc/) for configuration management, allowi
 ### Basic Usage
 
 ```bash
-# Train with default configuration
-python src/train.py
+# Try interactive demos first
+python demo_corruption_strategies.py
+python demo_credit_card_data.py
+
+# Train with SSL experiments
+python train.py +experiment=vime_ssl
+python train.py +experiment=scarf_ssl
+python train.py +experiment=recontab_ssl
 
 # Override specific parameters
-python src/train.py model.optimizer.lr=0.001 data.batch_size=32
+python train.py +experiment=vime_ssl model/corruption.corruption_rate=0.5
+python train.py +experiment=scarf_ssl data.batch_size=256
 
-# Use a specific experiment configuration
-python src/train.py experiment=s4_sequence
-
-# Run in debug mode
-python src/train.py debug=true
+# Customize corruption strategies
+python train.py model/corruption=vime model/corruption.corruption_rate=0.4
 ```
 
 ### Example: Creating a Custom Component

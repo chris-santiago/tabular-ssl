@@ -59,6 +59,7 @@ Complete and accurate technical reference for the library's components and APIs.
 
 - [API Reference](reference/api.md) - Complete API documentation
 - [Models](reference/models.md) - Available model components
+- [Corruption Strategies](reference/corruption-strategies.md) - VIME, SCARF, and ReConTab implementations
 - [Data](reference/data.md) - Data handling utilities
 - [Configuration](reference/config.md) - Configuration system
 - [Utilities](reference/utils.md) - Helper functions
