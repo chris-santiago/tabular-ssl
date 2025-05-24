@@ -28,7 +28,6 @@ dev = [
     "polars>=0.20.0",
     "scikit-learn>=1.4.0",
     "matplotlib>=3.8.0",
-    "shap>=0.44.0"
 ]
 
 [tool.setuptools]
