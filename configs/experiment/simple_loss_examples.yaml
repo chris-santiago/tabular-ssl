@@ -1,0 +1,70 @@
+# Simplified examples for using arbitrary loss functions
+# Shows the unified interface that works with ANY loss function
+
+# @package _global_
+defaults:
+  - /model: simplified_default
+  - /training: simplified_default
+  - /data: sample_data
+  - _self_
+
+# Override model configuration for simple loss examples
+model:
+  _target_: tabular_ssl.models.simplified_base.TabularSSLModel
+  
+  # Required components
+  event_encoder:
+    _target_: tabular_ssl.models.simplified_components.MLPEncoder
+    input_dim: 10
+    hidden_dims: [32]
+    output_dim: 64
+    
+  # SSL corruption
+  corruption:
+    _target_: tabular_ssl.models.simplified_components.VIMECorruption
+    corruption_rate: 0.3
+    
+  # ANY loss function works with the unified interface!
+  # Simple losses (automatically fallback to 2-parameter call):
+  custom_loss_fn:
+    _target_: torch.nn.MSELoss
+    # _target_: torch.nn.L1Loss  
+    # _target_: torch.nn.SmoothL1Loss
+    # _target_: torchmetrics.MeanSquaredError  # if available
+    
+  # Complex SSL losses (use full signature):
+  # custom_loss_fn:
+  #   _target_: my_module.custom_vime_loss
+  #   _target_: my_module.contrastive_ssl_loss
+  #   _target_: my_module.multi_task_ssl_loss
+    
+  # Built-in SSL methods (no custom_loss_fn needed):
+  # Just set corruption and omit custom_loss_fn for VIME/SCARF/ReConTab
+    
+  # Training params
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+  optimizer_type: adamw
+  ssl_loss_weights:
+    mask_estimation: 1.0
+    value_imputation: 1.0
+
+# Training configuration  
+training:
+  _target_: pytorch_lightning.Trainer
+  max_epochs: 10
+  accelerator: auto
+  devices: 1
+  
+# Usage examples:
+# 1. Simple PyTorch loss:
+#    python train.py experiment=simple_loss_examples model.custom_loss_fn._target_=torch.nn.L1Loss
+#
+# 2. TorchMetrics loss: 
+#    python train.py experiment=simple_loss_examples model.custom_loss_fn._target_=torchmetrics.MeanAbsoluteError
+#
+# 3. Built-in SSL method (no custom loss needed):
+#    python train.py experiment=simple_loss_examples model.corruption._target_=tabular_ssl.models.simplified_components.SCARFCorruption model.corruption.corruption_rate=0.6 +model.custom_loss_fn=null
+#
+# 4. Custom complex SSL loss:
+#    python train.py experiment=simple_loss_examples model.custom_loss_fn._target_=my_module.my_ssl_loss_function 

@@ -73,6 +73,7 @@ class TabularSSLModel(pl.LightningModule):
         
         # SSL components (auto-creates heads based on corruption type)
         corruption: Optional[nn.Module] = None,
+        custom_loss_fn: Optional[Callable] = None,
         
         # Training parameters
         learning_rate: float = 1e-3,
@@ -91,7 +92,7 @@ class TabularSSLModel(pl.LightningModule):
         # Save hyperparameters for automatic logging
         self.save_hyperparameters(ignore=['event_encoder', 'sequence_encoder', 
                                          'projection_head', 'prediction_head', 
-                                         'embedding_layer', 'corruption'])
+                                         'embedding_layer', 'corruption', 'custom_loss_fn'])
         
         # Core components
         self.event_encoder = event_encoder
@@ -102,51 +103,10 @@ class TabularSSLModel(pl.LightningModule):
         
         # SSL components
         self.corruption = corruption
+        self.custom_loss_fn = custom_loss_fn
         self.is_ssl = corruption is not None
         self.ssl_loss_weights = ssl_loss_weights or {}
         self.contrastive_temperature = contrastive_temperature
-        
-        # Initialize SSL heads if needed
-        if self.is_ssl:
-            self._init_ssl_heads()
-
-    def _init_ssl_heads(self) -> None:
-        """Initialize SSL-specific heads based on corruption type."""
-        if not self.corruption:
-            return
-            
-        corruption_name = self.corruption.__class__.__name__.lower()
-        repr_dim = self._get_representation_dim()
-        
-        # Simple SSL head initialization based on corruption type
-        if "vime" in corruption_name:
-            self.mask_head = nn.Linear(repr_dim, 1)
-            self.value_head = nn.Linear(repr_dim, repr_dim)
-        elif "recontab" in corruption_name:
-            self.reconstruction_head = nn.Linear(repr_dim, repr_dim)
-        # SCARF uses projection_head directly
-
-    def _get_representation_dim(self) -> int:
-        """Get the output dimension of the encoder pipeline."""
-        # Start with event encoder output
-        if hasattr(self.event_encoder, 'output_dim'):
-            dim = self.event_encoder.output_dim
-        elif hasattr(self.event_encoder, 'hidden_dim'):
-            dim = self.event_encoder.hidden_dim
-        else:
-            # Fallback: inspect the last layer
-            for layer in reversed(list(self.event_encoder.modules())):
-                if isinstance(layer, nn.Linear):
-                    dim = layer.out_features
-                    break
-            else:
-                dim = 128  # Default fallback
-        
-        # Adjust for sequence encoder if present
-        if self.sequence_encoder and hasattr(self.sequence_encoder, 'output_dim'):
-            dim = self.sequence_encoder.output_dim
-            
-        return dim
 
     def encode(self, x: Union[torch.Tensor, Dict[str, torch.Tensor]]) -> torch.Tensor:
         """Encode input through the encoder pipeline."""
@@ -186,32 +146,87 @@ class TabularSSLModel(pl.LightningModule):
             return self._standard_training_step(batch)
 
     def _ssl_training_step(self, batch: Union[torch.Tensor, Dict[str, torch.Tensor]]) -> torch.Tensor:
-        """SSL training step with corruption and appropriate loss."""
+        """SSL training step with corruption and loss computation."""
         x = batch['features'] if isinstance(batch, dict) else batch
         
-        # Apply corruption
+        # Apply corruption and get representations
         corrupted_data = self.corruption(x)
-        x_corrupted = corrupted_data['corrupted']
+        representations = self.encode(corrupted_data['corrupted'])
         
-        # Get representations from corrupted data
-        representations = self.encode(x_corrupted)
-        
-        # Compute SSL loss based on corruption type
-        corruption_name = self.corruption.__class__.__name__.lower()
-        
-        if "vime" in corruption_name:
-            loss = self._compute_vime_loss(representations, x, corrupted_data)
-        elif "scarf" in corruption_name:
-            loss = self._compute_scarf_loss(representations, x, corrupted_data)
-        elif "recontab" in corruption_name:
-            loss = self._compute_recontab_loss(representations, x, corrupted_data)
+        # Compute loss using custom function or auto-detection
+        if self.custom_loss_fn is not None:
+            loss = self._compute_custom_loss(representations, x, corrupted_data)
         else:
-            # Generic SSL loss (reconstruction)
-            reconstructed = self.reconstruction_head(representations)
-            loss = F.mse_loss(reconstructed, x)
+            loss = self._compute_builtin_loss(representations, x, corrupted_data)
         
         self.log('train/ssl_loss', loss, on_step=True, on_epoch=True)
         return loss
+
+    def _compute_custom_loss(self, representations: torch.Tensor, targets: torch.Tensor, 
+                           corrupted_data: Dict[str, torch.Tensor]) -> torch.Tensor:
+        """Compute loss using custom loss function with unified interface."""
+        # Try full signature first
+        try:
+            return self.custom_loss_fn(
+                predictions=representations,
+                targets=targets,
+                model=self,
+                corrupted_data=corrupted_data,
+                ssl_loss_weights=self.ssl_loss_weights
+            )
+        except TypeError:
+            # Fallback to simple (predictions, targets) signature
+            predictions = self._create_predictions(representations, targets)
+            return self.custom_loss_fn(predictions, targets)
+
+    def _compute_builtin_loss(self, representations: torch.Tensor, targets: torch.Tensor,
+                            corrupted_data: Dict[str, torch.Tensor]) -> torch.Tensor:
+        """Compute loss using built-in SSL methods."""
+        # Auto-detection mapping
+        builtin_losses = {
+            'vime': vime_loss_fn,
+            'scarf': scarf_loss_fn,
+            'recontab': recontab_loss_fn
+        }
+        
+        corruption_name = self.corruption.__class__.__name__.lower()
+        
+        # Find matching built-in loss function
+        for name, loss_fn in builtin_losses.items():
+            if name in corruption_name:
+                return loss_fn(self, representations, targets, corrupted_data, self.ssl_loss_weights)
+        
+        # Generic reconstruction loss for unknown corruptions
+        return self._generic_reconstruction_loss(representations, targets)
+
+    def _create_predictions(self, representations: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """Create predictions from representations for simple loss functions."""
+        # Create reconstruction head if needed
+        if not hasattr(self, 'simple_head'):
+            repr_dim = representations.size(-1)
+            target_dim = targets.size(-1)
+            self.simple_head = nn.Linear(repr_dim, target_dim).to(representations.device)
+        
+        predictions = self.simple_head(representations)
+        
+        # Handle tensor dimension mismatches
+        if predictions.dim() != targets.dim():
+            if predictions.dim() == 3 and targets.dim() == 2:
+                predictions = predictions.mean(dim=1)
+            elif predictions.dim() == 2 and targets.dim() == 3:
+                predictions = predictions.unsqueeze(1).expand(-1, targets.size(1), -1)
+        
+        return predictions
+
+    def _generic_reconstruction_loss(self, representations: torch.Tensor, targets: torch.Tensor) -> torch.Tensor:
+        """Generic reconstruction loss for unknown corruption types."""
+        if not hasattr(self, 'reconstruction_head'):
+            repr_dim = representations.size(-1)
+            target_dim = targets.size(-1)
+            self.reconstruction_head = nn.Linear(repr_dim, target_dim).to(representations.device)
+        
+        reconstructed = self.reconstruction_head(representations)
+        return F.mse_loss(reconstructed, targets)
 
     def _standard_training_step(self, batch: Union[torch.Tensor, Dict[str, torch.Tensor]]) -> torch.Tensor:
         """Standard training step for supervised learning."""
@@ -225,63 +240,6 @@ class TabularSSLModel(pl.LightningModule):
         
         self.log('train/loss', loss, on_step=True, on_epoch=True)
         return loss
-
-    def _compute_vime_loss(self, representations: torch.Tensor, 
-                          original: torch.Tensor, corrupted_data: Dict[str, torch.Tensor]) -> torch.Tensor:
-        """Compute VIME loss (mask estimation + value imputation)."""
-        mask_pred = torch.sigmoid(self.mask_head(representations))
-        value_pred = self.value_head(representations)
-        
-        # Get weights from ssl_loss_weights or use defaults
-        mask_weight = self.ssl_loss_weights.get('mask_estimation', 1.0)
-        value_weight = self.ssl_loss_weights.get('value_imputation', 1.0)
-        
-        mask_loss = F.binary_cross_entropy(mask_pred.squeeze(), 
-                                         corrupted_data['mask'].float())
-        value_loss = F.mse_loss(value_pred, original)
-        
-        return mask_weight * mask_loss + value_weight * value_loss
-
-    def _compute_scarf_loss(self, representations: torch.Tensor,
-                           original: torch.Tensor, corrupted_data: Dict[str, torch.Tensor]) -> torch.Tensor:
-        """Compute SCARF contrastive loss."""
-        if self.projection_head is None:
-            raise ValueError("SCARF requires a projection head for contrastive learning")
-            
-        # Get positive and negative pairs from corruption
-        anchor = self.projection_head(representations)
-        positive = self.projection_head(self.encode(corrupted_data.get('positive', original)))
-        
-        # Simple InfoNCE loss implementation
-        batch_size = anchor.size(0)
-        
-        # Compute similarities
-        pos_sim = F.cosine_similarity(anchor, positive, dim=1) / self.contrastive_temperature
-        neg_sim = torch.matmul(anchor, anchor.t()) / self.contrastive_temperature
-        
-        # Remove self-similarities from negatives
-        mask = torch.eye(batch_size, device=anchor.device, dtype=torch.bool)
-        neg_sim = neg_sim.masked_fill(mask, float('-inf'))
-        
-        # InfoNCE loss
-        logits = torch.cat([pos_sim.unsqueeze(1), neg_sim], dim=1)
-        labels = torch.zeros(batch_size, device=anchor.device, dtype=torch.long)
-        
-        return F.cross_entropy(logits, labels)
-
-    def _compute_recontab_loss(self, representations: torch.Tensor,
-                              original: torch.Tensor, corrupted_data: Dict[str, torch.Tensor]) -> torch.Tensor:
-        """Compute ReConTab reconstruction loss."""
-        reconstructed = self.reconstruction_head(representations)
-        
-        # Multi-task reconstruction with optional weights
-        reconstruction_loss = F.mse_loss(reconstructed, original)
-        
-        # Apply weights if specified
-        total_weight = sum(self.ssl_loss_weights.get(k, 1.0) 
-                          for k in ['masked', 'denoising', 'unswapping'])
-        
-        return reconstruction_loss * total_weight
 
     def validation_step(self, batch: Union[torch.Tensor, Dict[str, torch.Tensor]], batch_idx: int) -> torch.Tensor:
         """Validation step."""
@@ -323,4 +281,224 @@ class TabularSSLModel(pl.LightningModule):
             )
             return [optimizer], [scheduler]
         else:
-            return optimizer 
+            return optimizer
+
+
+# =============================================================================
+# STANDALONE SSL LOSS FUNCTIONS
+# =============================================================================
+
+def vime_loss_fn(
+    model: TabularSSLModel,
+    representations: torch.Tensor,
+    original: torch.Tensor,
+    corrupted_data: Dict[str, torch.Tensor],
+    ssl_loss_weights: Dict[str, float]
+) -> torch.Tensor:
+    """Standalone VIME loss function.
+    
+    Args:
+        model: The TabularSSLModel instance
+        representations: Encoded representations from corrupted data
+        original: Original uncorrupted data
+        corrupted_data: Dictionary containing corruption results
+        ssl_loss_weights: Dictionary of loss component weights
+        
+    Returns:
+        Combined VIME loss (mask estimation + value imputation)
+    """
+    # Ensure model has required heads - use same logic as _init_ssl_heads
+    if not hasattr(model, 'mask_head'):
+        repr_dim = representations.size(-1)
+        model.mask_head = nn.Linear(repr_dim, 1).to(representations.device)
+    if not hasattr(model, 'value_head'):
+        repr_dim = representations.size(-1)
+        # Use same logic as _init_ssl_heads for consistency
+        input_dim = model.event_encoder.input_dim if hasattr(model.event_encoder, 'input_dim') else original.size(-1)
+        model.value_head = nn.Linear(repr_dim, input_dim).to(representations.device)
+    
+    # Predictions
+    mask_pred = torch.sigmoid(model.mask_head(representations))
+    value_pred = model.value_head(representations)
+    
+    # Get weights
+    mask_weight = ssl_loss_weights.get('mask_estimation', 1.0)
+    value_weight = ssl_loss_weights.get('value_imputation', 1.0)
+    
+    # Losses - handle tensor dimensions properly
+    mask_true = corrupted_data['mask'].float()
+    if mask_true.dim() == 3:  # (batch, seq, features)
+        mask_true = mask_true.mean(dim=-1)  # Average over features: (batch, seq)
+    if mask_pred.dim() == 3:  # (batch, seq, 1)
+        mask_pred = mask_pred.squeeze(-1)  # Remove last dim: (batch, seq)
+    
+    mask_loss = F.binary_cross_entropy(mask_pred, mask_true)
+    value_loss = F.mse_loss(value_pred, original)
+    
+    return mask_weight * mask_loss + value_weight * value_loss
+
+
+def scarf_loss_fn(
+    model: TabularSSLModel,
+    representations: torch.Tensor,
+    original: torch.Tensor,
+    corrupted_data: Dict[str, torch.Tensor],
+    ssl_loss_weights: Dict[str, float]
+) -> torch.Tensor:
+    """Standalone SCARF contrastive loss function.
+    
+    Args:
+        model: The TabularSSLModel instance
+        representations: Encoded representations from corrupted data
+        original: Original uncorrupted data
+        corrupted_data: Dictionary containing corruption results
+        ssl_loss_weights: Dictionary of loss component weights
+        
+    Returns:
+        SCARF contrastive loss
+    """
+    if model.projection_head is None:
+        raise ValueError("SCARF requires a projection head for contrastive learning")
+        
+    # Get positive and negative pairs from corruption
+    anchor = model.projection_head(representations)
+    positive = model.projection_head(model.encode(corrupted_data.get('positive', original)))
+    
+    # Flatten to 2D for matrix operations if needed
+    if anchor.dim() == 3:  # (batch, seq, features)
+        batch_size, seq_len, feature_dim = anchor.shape
+        anchor = anchor.view(batch_size * seq_len, feature_dim)
+        positive = positive.view(batch_size * seq_len, feature_dim)
+    
+    batch_size = anchor.size(0)
+    
+    # Compute similarities
+    pos_sim = F.cosine_similarity(anchor, positive, dim=1) / model.contrastive_temperature
+    neg_sim = torch.matmul(anchor, anchor.t()) / model.contrastive_temperature
+    
+    # Remove self-similarities from negatives
+    mask = torch.eye(batch_size, device=anchor.device, dtype=torch.bool)
+    neg_sim = neg_sim.masked_fill(mask, float('-inf'))
+    
+    # InfoNCE loss
+    logits = torch.cat([pos_sim.unsqueeze(1), neg_sim], dim=1)
+    labels = torch.zeros(batch_size, device=anchor.device, dtype=torch.long)
+    
+    contrastive_weight = ssl_loss_weights.get('contrastive', 1.0)
+    return contrastive_weight * F.cross_entropy(logits, labels)
+
+
+def recontab_loss_fn(
+    model: TabularSSLModel,
+    representations: torch.Tensor,
+    original: torch.Tensor,
+    corrupted_data: Dict[str, torch.Tensor],
+    ssl_loss_weights: Dict[str, float]
+) -> torch.Tensor:
+    """Standalone ReConTab reconstruction loss function.
+    
+    Args:
+        model: The TabularSSLModel instance
+        representations: Encoded representations from corrupted data
+        original: Original uncorrupted data
+        corrupted_data: Dictionary containing corruption results
+        ssl_loss_weights: Dictionary of loss component weights
+        
+    Returns:
+        ReConTab reconstruction loss
+    """
+    # Ensure model has reconstruction head - use same logic as _init_ssl_heads
+    if not hasattr(model, 'reconstruction_head'):
+        repr_dim = representations.size(-1)
+        # Use same logic as _init_ssl_heads for consistency
+        input_dim = model.event_encoder.input_dim if hasattr(model.event_encoder, 'input_dim') else original.size(-1)
+        model.reconstruction_head = nn.Linear(repr_dim, input_dim).to(representations.device)
+    
+    reconstructed = model.reconstruction_head(representations)
+    
+    # Multi-task reconstruction with optional weights
+    reconstruction_loss = F.mse_loss(reconstructed, original)
+    
+    # Apply weights if specified
+    total_weight = sum(ssl_loss_weights.get(k, 1.0) 
+                      for k in ['masked', 'denoising', 'unswapping'])
+    
+    return reconstruction_loss * total_weight
+
+
+def custom_mixup_loss_fn(
+    model: TabularSSLModel,
+    representations: torch.Tensor,
+    original: torch.Tensor,
+    corrupted_data: Dict[str, torch.Tensor],
+    ssl_loss_weights: Dict[str, float]
+) -> torch.Tensor:
+    """Example custom loss function for Mixup-based SSL.
+    
+    Args:
+        model: The TabularSSLModel instance
+        representations: Encoded representations from corrupted data
+        original: Original uncorrupted data
+        corrupted_data: Dictionary containing corruption results
+        ssl_loss_weights: Dictionary of loss component weights
+        
+    Returns:
+        Custom Mixup SSL loss
+    """
+    # Create reconstruction head if needed
+    if not hasattr(model, 'mixup_head'):
+        repr_dim = representations.size(-1)
+        model.mixup_head = nn.Linear(repr_dim, repr_dim).to(representations.device)
+    
+    # Predict mixed representations
+    pred_mixed = model.mixup_head(representations)
+    
+    # Get mixup components from corruption
+    mixup_targets = corrupted_data.get('mixup_targets', original)
+    mixup_lambdas = corrupted_data.get('mixup_lambdas', torch.ones_like(original[:, :1, :1]))
+    
+    # Mixup target
+    target_mixed = mixup_lambdas * original + (1 - mixup_lambdas) * mixup_targets
+    
+    # Main mixup loss
+    mixup_loss = F.mse_loss(pred_mixed, target_mixed)
+    
+    # Optional lambda prediction loss
+    lambda_weight = ssl_loss_weights.get('mixup_lambda', 0.1)
+    if lambda_weight > 0:
+        lambda_pred = torch.sigmoid(model.mixup_head(representations).mean(dim=-1, keepdim=True))
+        lambda_loss = F.mse_loss(lambda_pred, mixup_lambdas)
+        mixup_loss += lambda_weight * lambda_loss
+    
+    return mixup_loss
+
+
+# =============================================================================
+# LOSS FUNCTION REGISTRY
+# =============================================================================
+
+SSL_LOSS_FUNCTIONS = {
+    'vime': vime_loss_fn,
+    'scarf': scarf_loss_fn, 
+    'recontab': recontab_loss_fn,
+    'mixup': custom_mixup_loss_fn,
+}
+
+
+def get_ssl_loss_function(name: str) -> Callable:
+    """Get a predefined SSL loss function by name.
+    
+    Args:
+        name: Name of the loss function ('vime', 'scarf', 'recontab', 'mixup')
+        
+    Returns:
+        The corresponding loss function
+        
+    Raises:
+        ValueError: If the loss function name is not found
+    """
+    if name not in SSL_LOSS_FUNCTIONS:
+        available = list(SSL_LOSS_FUNCTIONS.keys())
+        raise ValueError(f"Unknown SSL loss function '{name}'. Available: {available}")
+    
+    return SSL_LOSS_FUNCTIONS[name] 
