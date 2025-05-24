@@ -782,47 +782,86 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#tabularssl" class="md-nav__link">
+  <a href="#component-registry" class="md-nav__link">
     <span class="md-ellipsis">
-      TabularSSL
+      Component Registry
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="TabularSSL">
+    <nav class="md-nav" aria-label="Component Registry">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
+  <a href="#registry-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Architecture
+      Registry Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Registry Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#registername-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      register(name: str)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#getname-str-typebasecomponent" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#example-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Example Configuration
+      get(name: str) -&gt; Type[BaseComponent]
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#available-encoders" class="md-nav__link">
+  <a href="#list_components-dictstr-typebasecomponent" class="md-nav__link">
     <span class="md-ellipsis">
-      Available Encoders
+      list_components() -&gt; Dict[str, Type[BaseComponent]]
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#base-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Base Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Base Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basecomponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseComponent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseComponent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
     </span>
   </a>
   
@@ -839,36 +878,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#traindata-batch_size32-epochs100-learning_rate1e-4" class="md-nav__link">
+  <a href="#_validate_config-none" class="md-nav__link">
     <span class="md-ellipsis">
-      train(data, batch_size=32, epochs=100, learning_rate=1e-4)
+      _validate_config() -&gt; None
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#predictdata" class="md-nav__link">
+  <a href="#forwardx-torchtensor-torchtensor" class="md-nav__link">
     <span class="md-ellipsis">
-      predict(data)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#savepath" class="md-nav__link">
-    <span class="md-ellipsis">
-      save(path)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#loadpath" class="md-nav__link">
-    <span class="md-ellipsis">
-      load(path)
+      forward(x: torch.Tensor) -&gt; torch.Tensor
     </span>
   </a>
   
@@ -881,6 +902,51 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequenceencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      SequenceEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embeddinglayer" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmbeddingLayer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projectionhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      ProjectionHead
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predictionhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      PredictionHead
+    </span>
+  </a>
   
 </li>
         
@@ -890,70 +956,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#model-components" class="md-nav__link">
+  <a href="#component-configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      Model Components
+      Component Configurations
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Model Components">
+    <nav class="md-nav" aria-label="Component Configurations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#feature-embedding" class="md-nav__link">
+  <a href="#componentconfig" class="md-nav__link">
     <span class="md-ellipsis">
-      Feature Embedding
+      ComponentConfig
     </span>
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#transformer-encoder" class="md-nav__link">
-    <span class="md-ellipsis">
-      Transformer Encoder
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#task-heads" class="md-nav__link">
-    <span class="md-ellipsis">
-      Task Heads
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#model-variants" class="md-nav__link">
-    <span class="md-ellipsis">
-      Model Variants
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Model Variants">
+    <nav class="md-nav" aria-label="ComponentConfig">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tabularssl-large" class="md-nav__link">
+  <a href="#fields" class="md-nav__link">
     <span class="md-ellipsis">
-      TabularSSL-Large
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tabularssl-small" class="md-nav__link">
-    <span class="md-ellipsis">
-      TabularSSL-Small
+      Fields
     </span>
   </a>
   
@@ -963,13 +988,624 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#related-resources" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#mlpconfig" class="md-nav__link">
     <span class="md-ellipsis">
-      Related Resources
+      MLPConfig
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="MLPConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequencemodelconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      SequenceModelConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SequenceModelConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformerconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformerConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TransformerConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s4config" class="md-nav__link">
+    <span class="md-ellipsis">
+      S4Config
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S4Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embeddingconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmbeddingConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EmbeddingConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projectionheadconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      ProjectionHeadConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ProjectionHeadConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predictionheadconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      PredictionHeadConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PredictionHeadConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Component Implementations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Component Implementations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#event-encoders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Encoders
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event Encoders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mlpeventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLPEventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoencodereventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AutoEncoderEventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decodez-torchtensor-torchtensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      decode(z: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reconstruction_lossx-torchtensor-torchtensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      reconstruction_loss(x: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contrastiveeventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContrastiveEventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contrastive_lossz1-torchtensor-z2-torchtensor-torchtensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      contrastive_loss(z1: torch.Tensor, z2: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequence-encoders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sequence Encoders
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sequence Encoders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rnnsequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      RNNSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lstmsequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      LSTMSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grusequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      GRUSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformersequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformerSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s4model" class="md-nav__link">
+    <span class="md-ellipsis">
+      S4Model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embedding-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Embedding Layers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Embedding Layers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#categoricalembedding" class="md-nav__link">
+    <span class="md-ellipsis">
+      CategoricalEmbedding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projection-heads" class="md-nav__link">
+    <span class="md-ellipsis">
+      Projection Heads
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Projection Heads">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mlpprojectionhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLPProjectionHead
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prediction-heads" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prediction Heads
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prediction Heads">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#classificationhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClassificationHead
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#randommasking" class="md-nav__link">
+    <span class="md-ellipsis">
+      RandomMasking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussiannoise" class="md-nav__link">
+    <span class="md-ellipsis">
+      GaussianNoise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swappingcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwappingCorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vimecorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIMECorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corruptionpipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      CorruptionPipeline
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#base-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Base Model
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Base Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseModel
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_init_componentconfig-componentconfig-basecomponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      _init_component(config: ComponentConfig) -&gt; BaseComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forwardx-torchtensor-torchtensor_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      forward(x: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training_stepbatch-batch_idx" class="md-nav__link">
+    <span class="md-ellipsis">
+      training_step(batch, batch_idx)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation_stepbatch-batch_idx" class="md-nav__link">
+    <span class="md-ellipsis">
+      validation_step(batch, batch_idx)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure_optimizers" class="md-nav__link">
+    <span class="md-ellipsis">
+      configure_optimizers()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#event-encoder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Encoder Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequence-encoder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sequence Encoder Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1206,47 +1842,86 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#tabularssl" class="md-nav__link">
+  <a href="#component-registry" class="md-nav__link">
     <span class="md-ellipsis">
-      TabularSSL
+      Component Registry
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="TabularSSL">
+    <nav class="md-nav" aria-label="Component Registry">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#architecture" class="md-nav__link">
+  <a href="#registry-methods" class="md-nav__link">
     <span class="md-ellipsis">
-      Architecture
+      Registry Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Registry Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#registername-str" class="md-nav__link">
+    <span class="md-ellipsis">
+      register(name: str)
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#configuration" class="md-nav__link">
+  <a href="#getname-str-typebasecomponent" class="md-nav__link">
     <span class="md-ellipsis">
-      Configuration
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#example-configuration" class="md-nav__link">
-    <span class="md-ellipsis">
-      Example Configuration
+      get(name: str) -&gt; Type[BaseComponent]
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#available-encoders" class="md-nav__link">
+  <a href="#list_components-dictstr-typebasecomponent" class="md-nav__link">
     <span class="md-ellipsis">
-      Available Encoders
+      list_components() -&gt; Dict[str, Type[BaseComponent]]
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#base-components" class="md-nav__link">
+    <span class="md-ellipsis">
+      Base Components
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Base Components">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basecomponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseComponent
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseComponent">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
     </span>
   </a>
   
@@ -1263,36 +1938,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#traindata-batch_size32-epochs100-learning_rate1e-4" class="md-nav__link">
+  <a href="#_validate_config-none" class="md-nav__link">
     <span class="md-ellipsis">
-      train(data, batch_size=32, epochs=100, learning_rate=1e-4)
+      _validate_config() -&gt; None
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#predictdata" class="md-nav__link">
+  <a href="#forwardx-torchtensor-torchtensor" class="md-nav__link">
     <span class="md-ellipsis">
-      predict(data)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#savepath" class="md-nav__link">
-    <span class="md-ellipsis">
-      save(path)
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#loadpath" class="md-nav__link">
-    <span class="md-ellipsis">
-      load(path)
+      forward(x: torch.Tensor) -&gt; torch.Tensor
     </span>
   </a>
   
@@ -1305,6 +1962,51 @@
         
       </ul>
     </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#eventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequenceencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      SequenceEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embeddinglayer" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmbeddingLayer
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projectionhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      ProjectionHead
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predictionhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      PredictionHead
+    </span>
+  </a>
   
 </li>
         
@@ -1314,70 +2016,29 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#model-components" class="md-nav__link">
+  <a href="#component-configurations" class="md-nav__link">
     <span class="md-ellipsis">
-      Model Components
+      Component Configurations
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Model Components">
+    <nav class="md-nav" aria-label="Component Configurations">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#feature-embedding" class="md-nav__link">
+  <a href="#componentconfig" class="md-nav__link">
     <span class="md-ellipsis">
-      Feature Embedding
+      ComponentConfig
     </span>
   </a>
   
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#transformer-encoder" class="md-nav__link">
-    <span class="md-ellipsis">
-      Transformer Encoder
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#task-heads" class="md-nav__link">
-    <span class="md-ellipsis">
-      Task Heads
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#model-variants" class="md-nav__link">
-    <span class="md-ellipsis">
-      Model Variants
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Model Variants">
+    <nav class="md-nav" aria-label="ComponentConfig">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#tabularssl-large" class="md-nav__link">
+  <a href="#fields" class="md-nav__link">
     <span class="md-ellipsis">
-      TabularSSL-Large
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#tabularssl-small" class="md-nav__link">
-    <span class="md-ellipsis">
-      TabularSSL-Small
+      Fields
     </span>
   </a>
   
@@ -1387,13 +2048,624 @@
     </nav>
   
 </li>
-      
-        <li class="md-nav__item">
-  <a href="#related-resources" class="md-nav__link">
+        
+          <li class="md-nav__item">
+  <a href="#mlpconfig" class="md-nav__link">
     <span class="md-ellipsis">
-      Related Resources
+      MLPConfig
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="MLPConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequencemodelconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      SequenceModelConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="SequenceModelConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformerconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformerConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TransformerConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s4config" class="md-nav__link">
+    <span class="md-ellipsis">
+      S4Config
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="S4Config">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_4" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embeddingconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      EmbeddingConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="EmbeddingConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_5" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projectionheadconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      ProjectionHeadConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ProjectionHeadConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_6" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#predictionheadconfig" class="md-nav__link">
+    <span class="md-ellipsis">
+      PredictionHeadConfig
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="PredictionHeadConfig">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fields_7" class="md-nav__link">
+    <span class="md-ellipsis">
+      Fields
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#component-implementations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Component Implementations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Component Implementations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#event-encoders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Encoders
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Event Encoders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mlpeventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLPEventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoencodereventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      AutoEncoderEventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#decodez-torchtensor-torchtensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      decode(z: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reconstruction_lossx-torchtensor-torchtensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      reconstruction_loss(x: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#contrastiveeventencoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      ContrastiveEventEncoder
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#contrastive_lossz1-torchtensor-z2-torchtensor-torchtensor" class="md-nav__link">
+    <span class="md-ellipsis">
+      contrastive_loss(z1: torch.Tensor, z2: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequence-encoders" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sequence Encoders
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Sequence Encoders">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#rnnsequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      RNNSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lstmsequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      LSTMSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#grusequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      GRUSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformersequencemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      TransformerSequenceModel
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#s4model" class="md-nav__link">
+    <span class="md-ellipsis">
+      S4Model
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embedding-layers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Embedding Layers
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Embedding Layers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#categoricalembedding" class="md-nav__link">
+    <span class="md-ellipsis">
+      CategoricalEmbedding
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#projection-heads" class="md-nav__link">
+    <span class="md-ellipsis">
+      Projection Heads
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Projection Heads">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#mlpprojectionhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      MLPProjectionHead
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#prediction-heads" class="md-nav__link">
+    <span class="md-ellipsis">
+      Prediction Heads
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Prediction Heads">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#classificationhead" class="md-nav__link">
+    <span class="md-ellipsis">
+      ClassificationHead
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corruption-strategies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Corruption Strategies
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Corruption Strategies">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#randommasking" class="md-nav__link">
+    <span class="md-ellipsis">
+      RandomMasking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gaussiannoise" class="md-nav__link">
+    <span class="md-ellipsis">
+      GaussianNoise
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#swappingcorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      SwappingCorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#vimecorruption" class="md-nav__link">
+    <span class="md-ellipsis">
+      VIMECorruption
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#corruptionpipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      CorruptionPipeline
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#base-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      Base Model
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Base Model">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basemodel" class="md-nav__link">
+    <span class="md-ellipsis">
+      BaseModel
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BaseModel">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constructor_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      Constructor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#methods_3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Methods
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Methods">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#_init_componentconfig-componentconfig-basecomponent" class="md-nav__link">
+    <span class="md-ellipsis">
+      _init_component(config: ComponentConfig) -&gt; BaseComponent
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#forwardx-torchtensor-torchtensor_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      forward(x: torch.Tensor) -&gt; torch.Tensor
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#training_stepbatch-batch_idx" class="md-nav__link">
+    <span class="md-ellipsis">
+      training_step(batch, batch_idx)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation_stepbatch-batch_idx" class="md-nav__link">
+    <span class="md-ellipsis">
+      validation_step(batch, batch_idx)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configure_optimizers" class="md-nav__link">
+    <span class="md-ellipsis">
+      configure_optimizers()
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#event-encoder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Event Encoder Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sequence-encoder-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sequence Encoder Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Model Configuration
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -1414,209 +2686,322 @@
 
 
 <h1 id="models-reference">Models Reference<a class="headerlink" href="#models-reference" title="Permanent link">&para;</a></h1>
-<p>This section provides detailed documentation of the model architectures and configurations available in Tabular SSL.</p>
-<h2 id="tabularssl">TabularSSL<a class="headerlink" href="#tabularssl" title="Permanent link">&para;</a></h2>
-<p>The main model class for self-supervised learning on tabular data.</p>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl</span><span class="w"> </span><span class="kn">import</span> <span class="n">TabularSSL</span>
+<p>This section provides detailed documentation of the model components and configurations available in Tabular SSL.</p>
+<h2 id="component-registry">Component Registry<a class="headerlink" href="#component-registry" title="Permanent link">&para;</a></h2>
+<p>The <code>ComponentRegistry</code> is a central registry that manages all model components.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComponentRegistry</span>
 </code></pre></div>
-<h3 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h3>
-<p>The TabularSSL model consists of:</p>
-<ol>
-<li><strong>Input Layer</strong></li>
-<li>Handles mixed data types (numerical and categorical)</li>
-<li>Feature embedding layer</li>
-<li>
-<p>Positional encoding</p>
-</li>
-<li>
-<p><strong>Transformer Encoder</strong></p>
-</li>
-<li>Multi-head self-attention</li>
-<li>Feed-forward networks</li>
-<li>Layer normalization</li>
-<li>
-<p>Residual connections</p>
-</li>
-<li>
-<p><strong>Output Layer</strong></p>
-</li>
-<li>Feature reconstruction</li>
-<li>Task-specific heads</li>
-</ol>
-<h3 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h3>
-<p>The model uses Hydra's configuration system with the <code>_target_</code> pattern for flexible component instantiation.</p>
-<h4 id="example-configuration">Example Configuration<a class="headerlink" href="#example-configuration" title="Permanent link">&para;</a></h4>
-<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.TabularSSL</span>
-
-<span class="c1"># Model components</span>
-<span class="nt">event_encoder</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.EventEncoder</span>
-<span class="w">  </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
-<span class="w">  </span><span class="nt">hidden_dims</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">64</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">32</span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">output_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-
-<span class="nt">sequence_encoder</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.TransformerEncoder</span>
-<span class="w">  </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="w">  </span><span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="w">  </span><span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="w">  </span><span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-<span class="w">  </span><span class="nt">num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-
-<span class="nt">embedding</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.embeddings.FeatureEmbedding</span>
-<span class="w">  </span><span class="nt">embedding_dims</span><span class="p">:</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">5</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">8</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># 5 categories, 8-dimensional embedding</span>
-<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">3</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">]</span><span class="w">  </span><span class="c1"># 3 categories, 4-dimensional embedding</span>
-
-<span class="nt">projection_head</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.heads.ProjectionHead</span>
-<span class="w">  </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="w">  </span><span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="w">  </span><span class="nt">output_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
-
-<span class="nt">prediction_head</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.heads.PredictionHead</span>
-<span class="w">  </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
-<span class="w">  </span><span class="nt">num_classes</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="w">  </span><span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<h3 id="registry-methods">Registry Methods<a class="headerlink" href="#registry-methods" title="Permanent link">&para;</a></h3>
+<h4 id="registername-str"><code>register(name: str)</code><a class="headerlink" href="#registername-str" title="Permanent link">&para;</a></h4>
+<p>Register a component class with the registry.</p>
+<div class="highlight"><pre><span></span><code><span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_component&quot;</span><span class="p">)</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomComponent</span><span class="p">(</span><span class="n">BaseComponent</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ComponentConfig</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="c1"># Implementation...</span>
 </code></pre></div>
-<h4 id="available-encoders">Available Encoders<a class="headerlink" href="#available-encoders" title="Permanent link">&para;</a></h4>
-<ol>
-<li>
-<p><strong>Transformer Encoder</strong>
-   <div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.TransformerEncoder</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="nt">num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
-<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>RNN Encoder</strong>
-   <div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.RNNEncoder</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-<span class="nt">bidirectional</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>LSTM Encoder</strong>
-   <div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.LSTMEncoder</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-<span class="nt">bidirectional</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>GRU Encoder</strong>
-   <div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.GRUEncoder</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
-<span class="nt">bidirectional</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>SSM Encoder</strong>
-   <div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.SSMEncoder</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">state_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">use_gate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div></p>
-</li>
-<li>
-<p><strong>S4 Encoder</strong>
-   <div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.encoders.S4Encoder</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">16</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
-<span class="nt">max_sequence_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1024</span>
-<span class="nt">use_learnable_dt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-<span class="nt">use_initial_state</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
-</code></pre></div></p>
-</li>
-</ol>
+<h4 id="getname-str-typebasecomponent"><code>get(name: str) -&gt; Type[BaseComponent]</code><a class="headerlink" href="#getname-str-typebasecomponent" title="Permanent link">&para;</a></h4>
+<p>Get a component class by name.</p>
+<div class="highlight"><pre><span></span><code><span class="n">component_cls</span> <span class="o">=</span> <span class="n">ComponentRegistry</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;transformer&quot;</span><span class="p">)</span>
+</code></pre></div>
+<h4 id="list_components-dictstr-typebasecomponent"><code>list_components() -&gt; Dict[str, Type[BaseComponent]]</code><a class="headerlink" href="#list_components-dictstr-typebasecomponent" title="Permanent link">&para;</a></h4>
+<p>Get a dictionary of all registered components.</p>
+<div class="highlight"><pre><span></span><code><span class="n">available_components</span> <span class="o">=</span> <span class="n">ComponentRegistry</span><span class="o">.</span><span class="n">list_components</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="base-components">Base Components<a class="headerlink" href="#base-components" title="Permanent link">&para;</a></h2>
+<h3 id="basecomponent"><code>BaseComponent</code><a class="headerlink" href="#basecomponent" title="Permanent link">&para;</a></h3>
+<p>The abstract base class for all model components.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseComponent</span>
+</code></pre></div>
+<h4 id="constructor">Constructor<a class="headerlink" href="#constructor" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">ComponentConfig</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">_validate_config</span><span class="p">()</span>
+</code></pre></div>
 <h4 id="methods">Methods<a class="headerlink" href="#methods" title="Permanent link">&para;</a></h4>
-<h5 id="traindata-batch_size32-epochs100-learning_rate1e-4"><code>train(data, batch_size=32, epochs=100, learning_rate=1e-4)</code><a class="headerlink" href="#traindata-batch_size32-epochs100-learning_rate1e-4" title="Permanent link">&para;</a></h5>
-<p>Train the model using self-supervised learning.</p>
-<p><strong>Parameters:</strong>
-- <code>data</code> (pd.DataFrame): Input data
-- <code>batch_size</code> (int): Batch size for training
-- <code>epochs</code> (int): Number of training epochs
-- <code>learning_rate</code> (float): Learning rate</p>
-<p><strong>Returns:</strong>
-- <code>dict</code>: Training history</p>
-<h5 id="predictdata"><code>predict(data)</code><a class="headerlink" href="#predictdata" title="Permanent link">&para;</a></h5>
-<p>Make predictions on new data.</p>
-<p><strong>Parameters:</strong>
-- <code>data</code> (pd.DataFrame): Input data</p>
-<p><strong>Returns:</strong>
-- <code>np.ndarray</code>: Model predictions</p>
-<h5 id="savepath"><code>save(path)</code><a class="headerlink" href="#savepath" title="Permanent link">&para;</a></h5>
-<p>Save the model to disk.</p>
-<p><strong>Parameters:</strong>
-- <code>path</code> (str): Path to save the model</p>
-<h5 id="loadpath"><code>load(path)</code><a class="headerlink" href="#loadpath" title="Permanent link">&para;</a></h5>
-<p>Load a model from disk.</p>
-<p><strong>Parameters:</strong>
-- <code>path</code> (str): Path to the saved model</p>
-<p><strong>Returns:</strong>
-- <code>TabularSSL</code>: Loaded model</p>
-<h2 id="model-components">Model Components<a class="headerlink" href="#model-components" title="Permanent link">&para;</a></h2>
-<h3 id="feature-embedding">Feature Embedding<a class="headerlink" href="#feature-embedding" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.embeddings</span><span class="w"> </span><span class="kn">import</span> <span class="n">FeatureEmbedding</span>
-
-<span class="n">embedding</span> <span class="o">=</span> <span class="n">FeatureEmbedding</span><span class="p">(</span>
-    <span class="n">input_dim</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
-    <span class="n">embedding_dim</span><span class="o">=</span><span class="mi">64</span>
-<span class="p">)</span>
+<h5 id="_validate_config-none"><code>_validate_config() -&gt; None</code><a class="headerlink" href="#_validate_config-none" title="Permanent link">&para;</a></h5>
+<p>Validate the component configuration.</p>
+<h5 id="forwardx-torchtensor-torchtensor"><code>forward(x: torch.Tensor) -&gt; torch.Tensor</code><a class="headerlink" href="#forwardx-torchtensor-torchtensor" title="Permanent link">&para;</a></h5>
+<p>Abstract method for the forward pass.</p>
+<h3 id="eventencoder"><code>EventEncoder</code><a class="headerlink" href="#eventencoder" title="Permanent link">&para;</a></h3>
+<p>Base class for event encoders.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventEncoder</span>
 </code></pre></div>
-<h3 id="transformer-encoder">Transformer Encoder<a class="headerlink" href="#transformer-encoder" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.encoders</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformerEncoder</span>
-
-<span class="n">encoder</span> <span class="o">=</span> <span class="n">TransformerEncoder</span><span class="p">(</span>
-    <span class="n">input_dim</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
-    <span class="n">hidden_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-    <span class="n">num_layers</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">num_heads</span><span class="o">=</span><span class="mi">4</span>
-<span class="p">)</span>
+<h3 id="sequenceencoder"><code>SequenceEncoder</code><a class="headerlink" href="#sequenceencoder" title="Permanent link">&para;</a></h3>
+<p>Base class for sequence encoders.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequenceEncoder</span>
 </code></pre></div>
-<h3 id="task-heads">Task Heads<a class="headerlink" href="#task-heads" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.heads</span><span class="w"> </span><span class="kn">import</span> <span class="n">TaskHead</span>
-
-<span class="n">head</span> <span class="o">=</span> <span class="n">TaskHead</span><span class="p">(</span>
-    <span class="n">input_dim</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
-    <span class="n">output_dim</span><span class="o">=</span><span class="mi">10</span>
-<span class="p">)</span>
+<h3 id="embeddinglayer"><code>EmbeddingLayer</code><a class="headerlink" href="#embeddinglayer" title="Permanent link">&para;</a></h3>
+<p>Base class for embedding layers.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingLayer</span>
 </code></pre></div>
-<h2 id="model-variants">Model Variants<a class="headerlink" href="#model-variants" title="Permanent link">&para;</a></h2>
-<h3 id="tabularssl-large">TabularSSL-Large<a class="headerlink" href="#tabularssl-large" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.TabularSSLLarge</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
-<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6</span>
-<span class="nt">num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+<h3 id="projectionhead"><code>ProjectionHead</code><a class="headerlink" href="#projectionhead" title="Permanent link">&para;</a></h3>
+<p>Base class for projection heads.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionHead</span>
 </code></pre></div>
-<h3 id="tabularssl-small">TabularSSL-Small<a class="headerlink" href="#tabularssl-small" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.TabularSSLSmall</span>
-<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
-<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
-<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
-<span class="nt">num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<h3 id="predictionhead"><code>PredictionHead</code><a class="headerlink" href="#predictionhead" title="Permanent link">&para;</a></h3>
+<p>Base class for prediction heads.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">PredictionHead</span>
 </code></pre></div>
-<h2 id="related-resources">Related Resources<a class="headerlink" href="#related-resources" title="Permanent link">&para;</a></h2>
+<h2 id="component-configurations">Component Configurations<a class="headerlink" href="#component-configurations" title="Permanent link">&para;</a></h2>
+<h3 id="componentconfig"><code>ComponentConfig</code><a class="headerlink" href="#componentconfig" title="Permanent link">&para;</a></h3>
+<p>Base configuration for components.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComponentConfig</span>
+</code></pre></div>
+<h4 id="fields">Fields<a class="headerlink" href="#fields" title="Permanent link">&para;</a></h4>
 <ul>
-<li><a href="../api/">API Reference</a> - Complete API documentation</li>
-<li><a href="../../how-to-guides/model-training/">How-to Guides</a> - Training guides</li>
-<li><a href="../../explanation/architecture/">Explanation</a> - Architecture details </li>
+<li><code>name</code> (str): Name of the component</li>
+<li><code>type</code> (str): Type of the component</li>
 </ul>
+<h3 id="mlpconfig"><code>MLPConfig</code><a class="headerlink" href="#mlpconfig" title="Permanent link">&para;</a></h3>
+<p>Configuration for MLP-based components.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLPConfig</span>
+</code></pre></div>
+<h4 id="fields_1">Fields<a class="headerlink" href="#fields_1" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>input_dim</code> (int): Input dimension</li>
+<li><code>hidden_dims</code> (List[int]): List of hidden dimensions</li>
+<li><code>output_dim</code> (int): Output dimension</li>
+<li><code>dropout</code> (float, default=0.1): Dropout rate</li>
+<li><code>use_batch_norm</code> (bool, default=True): Whether to use batch normalization</li>
+</ul>
+<h3 id="sequencemodelconfig"><code>SequenceModelConfig</code><a class="headerlink" href="#sequencemodelconfig" title="Permanent link">&para;</a></h3>
+<p>Base configuration for sequence models.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequenceModelConfig</span>
+</code></pre></div>
+<h4 id="fields_2">Fields<a class="headerlink" href="#fields_2" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>input_dim</code> (int): Input dimension</li>
+<li><code>hidden_dim</code> (int): Hidden dimension</li>
+<li><code>num_layers</code> (int, default=1): Number of layers</li>
+<li><code>dropout</code> (float, default=0.1): Dropout rate</li>
+<li><code>bidirectional</code> (bool, default=False): Whether to use bidirectional processing</li>
+</ul>
+<h3 id="transformerconfig"><code>TransformerConfig</code><a class="headerlink" href="#transformerconfig" title="Permanent link">&para;</a></h3>
+<p>Configuration for Transformer models.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformerConfig</span>
+</code></pre></div>
+<h4 id="fields_3">Fields<a class="headerlink" href="#fields_3" title="Permanent link">&para;</a></h4>
+<ul>
+<li>All fields from <code>SequenceModelConfig</code></li>
+<li><code>num_heads</code> (int, default=4): Number of attention heads</li>
+<li><code>dim_feedforward</code> (int): Dimension of feedforward network</li>
+</ul>
+<h3 id="s4config"><code>S4Config</code><a class="headerlink" href="#s4config" title="Permanent link">&para;</a></h3>
+<p>Configuration for S4 models.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.s4</span><span class="w"> </span><span class="kn">import</span> <span class="n">S4Config</span>
+</code></pre></div>
+<h4 id="fields_4">Fields<a class="headerlink" href="#fields_4" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>d_model</code> (int): Model dimension</li>
+<li><code>d_state</code> (int): State dimension</li>
+<li><code>dropout</code> (float, default=0.1): Dropout rate</li>
+<li><code>bidirectional</code> (bool, default=False): Whether to use bidirectional processing</li>
+<li><code>max_sequence_length</code> (int, default=2048): Maximum sequence length</li>
+</ul>
+<h3 id="embeddingconfig"><code>EmbeddingConfig</code><a class="headerlink" href="#embeddingconfig" title="Permanent link">&para;</a></h3>
+<p>Configuration for embedding layers.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">EmbeddingConfig</span>
+</code></pre></div>
+<h4 id="fields_5">Fields<a class="headerlink" href="#fields_5" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>embedding_dims</code> (List[tuple[int, int]]): List of (num_categories, embedding_dim) tuples</li>
+<li><code>dropout</code> (float, default=0.1): Dropout rate</li>
+</ul>
+<h3 id="projectionheadconfig"><code>ProjectionHeadConfig</code><a class="headerlink" href="#projectionheadconfig" title="Permanent link">&para;</a></h3>
+<p>Configuration for projection heads.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionHeadConfig</span>
+</code></pre></div>
+<h4 id="fields_6">Fields<a class="headerlink" href="#fields_6" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>input_dim</code> (int): Input dimension</li>
+<li><code>hidden_dims</code> (List[int]): List of hidden dimensions</li>
+<li><code>output_dim</code> (int): Output dimension</li>
+<li><code>dropout</code> (float, default=0.1): Dropout rate</li>
+<li><code>use_batch_norm</code> (bool, default=True): Whether to use batch normalization</li>
+</ul>
+<h3 id="predictionheadconfig"><code>PredictionHeadConfig</code><a class="headerlink" href="#predictionheadconfig" title="Permanent link">&para;</a></h3>
+<p>Configuration for prediction heads.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">PredictionHeadConfig</span>
+</code></pre></div>
+<h4 id="fields_7">Fields<a class="headerlink" href="#fields_7" title="Permanent link">&para;</a></h4>
+<ul>
+<li><code>input_dim</code> (int): Input dimension</li>
+<li><code>num_classes</code> (int): Number of output classes</li>
+<li><code>hidden_dims</code> (Optional[List[int]], default=None): Optional list of hidden dimensions</li>
+<li><code>dropout</code> (float, default=0.1): Dropout rate</li>
+<li><code>use_batch_norm</code> (bool, default=True): Whether to use batch normalization</li>
+</ul>
+<h2 id="component-implementations">Component Implementations<a class="headerlink" href="#component-implementations" title="Permanent link">&para;</a></h2>
+<h3 id="event-encoders">Event Encoders<a class="headerlink" href="#event-encoders" title="Permanent link">&para;</a></h3>
+<h4 id="mlpeventencoder"><code>MLPEventEncoder</code><a class="headerlink" href="#mlpeventencoder" title="Permanent link">&para;</a></h4>
+<p>A simple MLP-based event encoder.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLPEventEncoder</span>
+</code></pre></div>
+<h4 id="autoencodereventencoder"><code>AutoEncoderEventEncoder</code><a class="headerlink" href="#autoencodereventencoder" title="Permanent link">&para;</a></h4>
+<p>Autoencoder-based event encoder.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoEncoderEventEncoder</span>
+</code></pre></div>
+<h4 id="methods_1">Methods<a class="headerlink" href="#methods_1" title="Permanent link">&para;</a></h4>
+<h5 id="decodez-torchtensor-torchtensor"><code>decode(z: torch.Tensor) -&gt; torch.Tensor</code><a class="headerlink" href="#decodez-torchtensor-torchtensor" title="Permanent link">&para;</a></h5>
+<p>Decode the latent representation.</p>
+<h5 id="reconstruction_lossx-torchtensor-torchtensor"><code>reconstruction_loss(x: torch.Tensor) -&gt; torch.Tensor</code><a class="headerlink" href="#reconstruction_lossx-torchtensor-torchtensor" title="Permanent link">&para;</a></h5>
+<p>Compute reconstruction loss.</p>
+<h4 id="contrastiveeventencoder"><code>ContrastiveEventEncoder</code><a class="headerlink" href="#contrastiveeventencoder" title="Permanent link">&para;</a></h4>
+<p>Contrastive learning-based event encoder.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">ContrastiveEventEncoder</span>
+</code></pre></div>
+<h4 id="methods_2">Methods<a class="headerlink" href="#methods_2" title="Permanent link">&para;</a></h4>
+<h5 id="contrastive_lossz1-torchtensor-z2-torchtensor-torchtensor"><code>contrastive_loss(z1: torch.Tensor, z2: torch.Tensor) -&gt; torch.Tensor</code><a class="headerlink" href="#contrastive_lossz1-torchtensor-z2-torchtensor-torchtensor" title="Permanent link">&para;</a></h5>
+<p>Compute contrastive loss between two views.</p>
+<h3 id="sequence-encoders">Sequence Encoders<a class="headerlink" href="#sequence-encoders" title="Permanent link">&para;</a></h3>
+<h4 id="rnnsequencemodel"><code>RNNSequenceModel</code><a class="headerlink" href="#rnnsequencemodel" title="Permanent link">&para;</a></h4>
+<p>Basic RNN sequence model.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">RNNSequenceModel</span>
+</code></pre></div>
+<h4 id="lstmsequencemodel"><code>LSTMSequenceModel</code><a class="headerlink" href="#lstmsequencemodel" title="Permanent link">&para;</a></h4>
+<p>LSTM sequence model.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">LSTMSequenceModel</span>
+</code></pre></div>
+<h4 id="grusequencemodel"><code>GRUSequenceModel</code><a class="headerlink" href="#grusequencemodel" title="Permanent link">&para;</a></h4>
+<p>GRU sequence model.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">GRUSequenceModel</span>
+</code></pre></div>
+<h4 id="transformersequencemodel"><code>TransformerSequenceModel</code><a class="headerlink" href="#transformersequencemodel" title="Permanent link">&para;</a></h4>
+<p>Transformer sequence model.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">TransformerSequenceModel</span>
+</code></pre></div>
+<h4 id="s4model"><code>S4Model</code><a class="headerlink" href="#s4model" title="Permanent link">&para;</a></h4>
+<p>S4 sequence model with multiple S4 blocks.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.s4</span><span class="w"> </span><span class="kn">import</span> <span class="n">S4Model</span>
+</code></pre></div>
+<h3 id="embedding-layers">Embedding Layers<a class="headerlink" href="#embedding-layers" title="Permanent link">&para;</a></h3>
+<h4 id="categoricalembedding"><code>CategoricalEmbedding</code><a class="headerlink" href="#categoricalembedding" title="Permanent link">&para;</a></h4>
+<p>Embedding layer for categorical variables.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">CategoricalEmbedding</span>
+</code></pre></div>
+<h3 id="projection-heads">Projection Heads<a class="headerlink" href="#projection-heads" title="Permanent link">&para;</a></h3>
+<h4 id="mlpprojectionhead"><code>MLPProjectionHead</code><a class="headerlink" href="#mlpprojectionhead" title="Permanent link">&para;</a></h4>
+<p>MLP-based projection head.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">MLPProjectionHead</span>
+</code></pre></div>
+<h3 id="prediction-heads">Prediction Heads<a class="headerlink" href="#prediction-heads" title="Permanent link">&para;</a></h3>
+<h4 id="classificationhead"><code>ClassificationHead</code><a class="headerlink" href="#classificationhead" title="Permanent link">&para;</a></h4>
+<p>Classification head.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">ClassificationHead</span>
+</code></pre></div>
+<h3 id="corruption-strategies">Corruption Strategies<a class="headerlink" href="#corruption-strategies" title="Permanent link">&para;</a></h3>
+<h4 id="randommasking"><code>RandomMasking</code><a class="headerlink" href="#randommasking" title="Permanent link">&para;</a></h4>
+<p>Random masking corruption strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">RandomMasking</span>
+</code></pre></div>
+<h4 id="gaussiannoise"><code>GaussianNoise</code><a class="headerlink" href="#gaussiannoise" title="Permanent link">&para;</a></h4>
+<p>Gaussian noise corruption strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">GaussianNoise</span>
+</code></pre></div>
+<h4 id="swappingcorruption"><code>SwappingCorruption</code><a class="headerlink" href="#swappingcorruption" title="Permanent link">&para;</a></h4>
+<p>Feature swapping corruption strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">SwappingCorruption</span>
+</code></pre></div>
+<h4 id="vimecorruption"><code>VIMECorruption</code><a class="headerlink" href="#vimecorruption" title="Permanent link">&para;</a></h4>
+<p>VIME-style corruption strategy.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">VIMECorruption</span>
+</code></pre></div>
+<h4 id="corruptionpipeline"><code>CorruptionPipeline</code><a class="headerlink" href="#corruptionpipeline" title="Permanent link">&para;</a></h4>
+<p>Pipeline of corruption strategies.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.components</span><span class="w"> </span><span class="kn">import</span> <span class="n">CorruptionPipeline</span>
+</code></pre></div>
+<h2 id="base-model">Base Model<a class="headerlink" href="#base-model" title="Permanent link">&para;</a></h2>
+<h3 id="basemodel"><code>BaseModel</code><a class="headerlink" href="#basemodel" title="Permanent link">&para;</a></h3>
+<p>Base model class for self-supervised sequence modeling.</p>
+<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+</code></pre></div>
+<h4 id="constructor_1">Constructor<a class="headerlink" href="#constructor_1" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+    <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+    <span class="c1"># Convert Hydra configs to ComponentConfigs</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">component_configs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">ComponentConfig</span><span class="o">.</span><span class="n">from_hydra</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cfg</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">cfg</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+    <span class="p">}</span>
+
+    <span class="c1"># Initialize components</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">components</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">name</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_component</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">cfg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">component_configs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">save_hyperparameters</span><span class="p">(</span><span class="n">OmegaConf</span><span class="o">.</span><span class="n">to_container</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">resolve</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+</code></pre></div>
+<h4 id="methods_3">Methods<a class="headerlink" href="#methods_3" title="Permanent link">&para;</a></h4>
+<h5 id="_init_componentconfig-componentconfig-basecomponent"><code>_init_component(config: ComponentConfig) -&gt; BaseComponent</code><a class="headerlink" href="#_init_componentconfig-componentconfig-basecomponent" title="Permanent link">&para;</a></h5>
+<p>Initialize a component from its configuration.</p>
+<h5 id="forwardx-torchtensor-torchtensor_1"><code>forward(x: torch.Tensor) -&gt; torch.Tensor</code><a class="headerlink" href="#forwardx-torchtensor-torchtensor_1" title="Permanent link">&para;</a></h5>
+<p>Forward pass through the model.</p>
+<h5 id="training_stepbatch-batch_idx"><code>training_step(batch, batch_idx)</code><a class="headerlink" href="#training_stepbatch-batch_idx" title="Permanent link">&para;</a></h5>
+<p>Training step (to be implemented by subclasses).</p>
+<h5 id="validation_stepbatch-batch_idx"><code>validation_step(batch, batch_idx)</code><a class="headerlink" href="#validation_stepbatch-batch_idx" title="Permanent link">&para;</a></h5>
+<p>Validation step (to be implemented by subclasses).</p>
+<h5 id="configure_optimizers"><code>configure_optimizers()</code><a class="headerlink" href="#configure_optimizers" title="Permanent link">&para;</a></h5>
+<p>Configure optimizers.</p>
+<h2 id="configuration-examples">Configuration Examples<a class="headerlink" href="#configuration-examples" title="Permanent link">&para;</a></h2>
+<h3 id="event-encoder-configuration">Event Encoder Configuration<a class="headerlink" href="#event-encoder-configuration" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example configuration for an MLP event encoder</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp_encoder</span>
+<span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp_event_encoder</span>
+<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span>
+<span class="nt">hidden_dims</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">128</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">]</span>
+<span class="nt">output_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">use_batch_norm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h3 id="sequence-encoder-configuration">Sequence Encoder Configuration<a class="headerlink" href="#sequence-encoder-configuration" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example configuration for a Transformer sequence encoder</span>
+<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformer_encoder</span>
+<span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformer</span>
+<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span>
+<span class="nt">num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8</span>
+<span class="nt">dim_feedforward</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
+<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="nt">bidirectional</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+</code></pre></div>
+<h3 id="model-configuration">Model Configuration<a class="headerlink" href="#model-configuration" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Example model configuration</span>
+<span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">event_encoder</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp_event_encoder</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp_event_encoder</span>
+<span class="w">    </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span>
+<span class="w">    </span><span class="nt">hidden_dims</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">128</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">256</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">output_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="w">    </span><span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">use_batch_norm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">sequence_encoder</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">s4</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">s4</span>
+<span class="w">    </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="w">    </span><span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span>
+<span class="w">    </span><span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">    </span><span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">bidirectional</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">max_sequence_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2048</span>
+<span class="w">  </span><span class="nt">projection_head</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp_projection</span>
+<span class="w">    </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp_projection</span>
+<span class="w">    </span><span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="w">    </span><span class="nt">hidden_dims</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">256</span><span class="p p-Indicator">]</span>
+<span class="w">    </span><span class="nt">output_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span>
+<span class="w">    </span><span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
+<span class="w">    </span><span class="nt">use_batch_norm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="nt">optimizer</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">torch.optim.Adam</span>
+<span class="w">  </span><span class="nt">lr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.001</span>
+</code></pre></div>
 
 
 

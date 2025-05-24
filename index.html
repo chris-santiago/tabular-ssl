@@ -468,6 +468,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     <span class="md-ellipsis">
       Contributing
@@ -1165,6 +1174,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#key-features" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Features
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     <span class="md-ellipsis">
       Contributing
@@ -1206,6 +1224,7 @@
 <ul>
 <li><a href="tutorials/getting-started/">Getting Started</a></li>
 <li><a href="tutorials/basic-usage/">Basic Usage</a></li>
+<li><a href="tutorials/custom-components/">Creating Custom Components</a></li>
 </ul>
 <h3 id="how-to-guides">How-to Guides<a class="headerlink" href="#how-to-guides" title="Permanent link">&para;</a></h3>
 <p>Find practical solutions to specific problems and tasks.</p>
@@ -1213,6 +1232,7 @@
 <li><a href="how-to-guides/data-preparation/">Data Preparation</a></li>
 <li><a href="how-to-guides/model-training/">Model Training</a></li>
 <li><a href="how-to-guides/evaluation/">Evaluation</a></li>
+<li><a href="how-to-guides/configuring-experiments/">Configuring Experiments</a></li>
 </ul>
 <h3 id="reference">Reference<a class="headerlink" href="#reference" title="Permanent link">&para;</a></h3>
 <p>Detailed technical documentation of the library's components.</p>
@@ -1221,29 +1241,56 @@
 <li><a href="reference/models/">Models</a></li>
 <li><a href="reference/data/">Data Utilities</a></li>
 <li><a href="reference/utils/">Utility Functions</a></li>
+<li><a href="reference/config/">Configuration</a></li>
 </ul>
 <h3 id="explanation">Explanation<a class="headerlink" href="#explanation" title="Permanent link">&para;</a></h3>
 <p>Understand the concepts and design decisions behind Tabular SSL.</p>
 <ul>
 <li><a href="explanation/architecture/">Architecture Overview</a></li>
+<li><a href="explanation/component-registry/">Component Registry</a></li>
 <li><a href="explanation/ssl-methods/">SSL Methods</a></li>
 <li><a href="explanation/performance/">Performance Considerations</a></li>
 </ul>
 <h2 id="quick-start">Quick Start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl</span><span class="w"> </span><span class="kn">import</span> <span class="n">TabularSSL</span>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">hydra</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span>
 
-<span class="c1"># Initialize the model</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">TabularSSL</span><span class="p">()</span>
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
+    <span class="c1"># Create model from configuration</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">BaseModel</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
-<span class="c1"># Train the model</span>
-<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+    <span class="c1"># Train model with given config</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trainer</span><span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
 
-<span class="c1"># Make predictions</span>
-<span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">new_data</span><span class="p">)</span>
+    <span class="c1"># Make predictions</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </code></pre></div>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>tabular-ssl
+<div class="highlight"><pre><span></span><code><span class="c1"># Clone the repository</span>
+git<span class="w"> </span>clone<span class="w"> </span>https://github.com/yourusername/tabular-ssl.git
+<span class="nb">cd</span><span class="w"> </span>tabular-ssl
+
+<span class="c1"># Install dependencies</span>
+pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </span>requirements.txt
+
+<span class="c1"># Install the package in development mode</span>
+pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
 </code></pre></div>
+<h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Component Registry</strong>: Modular design with type-safe component registration</li>
+<li><strong>Configuration Management</strong>: Hierarchical configuration with Hydra</li>
+<li><strong>Self-Supervised Learning</strong>: Multiple SSL methods for tabular data</li>
+<li><strong>Flexible Architecture</strong>: Mix and match components for custom models</li>
+<li><strong>Experiment Management</strong>: Easy experiment configuration and tracking</li>
+<li><strong>Type Safety</strong>: Pydantic-based configuration validation</li>
+</ul>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
 <p>We welcome contributions! Please see our <a href="CONTRIBUTING.md">Contributing Guide</a> for details.</p>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
