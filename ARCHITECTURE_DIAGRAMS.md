@@ -235,7 +235,7 @@ graph TB
     subgraph "Current SSL Flow (Complex)"
         CB[Batch] --> SSLM[SSLModel]
         SSLM --> DT[_detect_corruption_type]
-        DT --> |complex isinstance| VTYPE[corruption_type = "vime"]
+        DT --> |complex isinstance| VTYPE[corruption_type = vime]
         SSLM --> ISH[_init_ssl_heads]
         ISH --> |manual creation| MH[mask_head]
         ISH --> |manual creation| VH[value_head]
@@ -249,7 +249,7 @@ graph TB
         SB[Batch] --> TSSLM[TabularSSLModel]
         TSSLM --> |simple check| ISSSL{is_ssl?}
         ISSSL --> |True| SSLTS[_ssl_training_step]
-        SSLTS --> |name-based| VNAME["vime" in corruption.__class__.__name__]
+        SSLTS --> |name-based| VNAME[vime in corruption class name]
         VNAME --> CSVL[_compute_vime_loss]
         CSVL --> |unified dict| USSL[ssl_loss_weights]
         USSL --> |get| UMW[mask_estimation: 1.0]
@@ -276,23 +276,23 @@ graph LR
     end
     
     subgraph "Encoder Factory"
-        EF --> |type="mlp"| EF_MLP[MLPEncoder]
-        EF --> |type="transformer"| EF_TRF[TransformerEncoder]
-        EF --> |type="rnn"| EF_RNN[RNNEncoder]
-        EF --> |type="lstm"| EF_LSTM[RNNEncoder(rnn_type='lstm')]
-        EF --> |type="gru"| EF_GRU[RNNEncoder(rnn_type='gru')]
+        EF --> |type=mlp| EF_MLP[MLPEncoder]
+        EF --> |type=transformer| EF_TRF[TransformerEncoder]
+        EF --> |type=rnn| EF_RNN[RNNEncoder]
+        EF --> |type=lstm| EF_LSTM[RNNEncoder with LSTM]
+        EF --> |type=gru| EF_GRU[RNNEncoder with GRU]
     end
     
     subgraph "Corruption Factory"
-        CF --> |type="vime"| CF_VIME[VIMECorruption]
-        CF --> |type="scarf"| CF_SCARF[SCARFCorruption]
-        CF --> |type="recontab"| CF_RECON[ReConTabCorruption]
+        CF --> |type=vime| CF_VIME[VIMECorruption]
+        CF --> |type=scarf| CF_SCARF[SCARFCorruption]
+        CF --> |type=recontab| CF_RECON[ReConTabCorruption]
     end
     
     subgraph "Usage Examples"
         PROG[Programmatic Creation]
-        PROG --> |create_encoder('mlp', ...)| EF_MLP
-        PROG --> |create_corruption('vime', ...)| CF_VIME
+        PROG --> |create_encoder call| EF_MLP
+        PROG --> |create_corruption call| CF_VIME
         
         TEST[Testing Framework]
         TEST --> |Easy component testing| EF
