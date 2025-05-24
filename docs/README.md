@@ -56,7 +56,6 @@ The configuration system uses Hydra with a structured directory layout:
 configs/
 ├── config.yaml                # Main configuration
 ├── model/                     # Model configurations
-│   ├── default.yaml          # Default model config
 │   ├── event_encoder/        # Event encoder configs
 │   ├── sequence_encoder/     # Sequence encoder configs
 │   ├── embedding/            # Embedding configs

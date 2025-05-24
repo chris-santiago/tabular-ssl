@@ -33,7 +33,6 @@ tabular-ssl/
 ├── configs/                        # Hydra configuration files
 │   ├── config.yaml                # Main configuration
 │   ├── model/                     # Model configurations
-│   │   ├── default.yaml          # Default model config
 │   │   ├── event_encoder/        # Event encoder configs
 │   │   ├── sequence_encoder/     # Sequence encoder configs
 │   │   ├── embedding/            # Embedding configs

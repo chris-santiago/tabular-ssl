@@ -9,60 +9,66 @@ from pydantic import Field
 class S4Config(ComponentConfig):
     """Configuration for S4 model."""
     
-    d_model: int = Field(..., description="Model dimension")
-    d_state: int = Field(..., description="State dimension")
+    input_dim: int = Field(..., description="Input dimension")
+    hidden_dim: int = Field(..., description="Hidden dimension (state dimension)")
+    num_layers: int = Field(1, description="Number of S4 blocks")
     dropout: float = Field(0.1, description="Dropout rate")
     bidirectional: bool = Field(False, description="Whether to use bidirectional processing")
     max_sequence_length: int = Field(2048, description="Maximum sequence length")
+
+def initialize_complex_parameters(d_state: int) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+    """Utility function to initialize complex state space parameters."""
+    A = torch.complex(-torch.rand(d_state) * 0.1, torch.randn(d_state) * 0.1)
+    B = torch.randn(d_state, dtype=torch.cfloat) * 0.02
+    C = torch.randn(d_state, dtype=torch.cfloat) * 0.02
+    D = torch.randn(d_state, dtype=torch.cfloat) * 0.02
+    return A, B, C, D
+
+
+def compute_s4_kernel(A: torch.Tensor, B: torch.Tensor, C: torch.Tensor, D: torch.Tensor, L: int) -> torch.Tensor:
+    """Utility function to compute the S4 kernel for sequence length L."""
+    A_powers = torch.pow(A.unsqueeze(0), torch.arange(L, device=A.device))
+    kernel = torch.einsum("l,dn->ldn", A_powers, B)
+    kernel = torch.einsum("ldn,md->lmn", kernel, C)
+    kernel = kernel + D.unsqueeze(0)
+    return kernel
+
+
+def apply_bidirectional_convolution(x: torch.Tensor, kernel: torch.Tensor, d_model: int) -> torch.Tensor:
+    """Utility function to apply bidirectional convolution."""
+    L = x.size(1)
+    x_padded = F.pad(x, (0, 0, L-1, L-1))
+    kernel_rev = kernel.flip(0)
+    y_forward = F.conv1d(
+        x_padded.transpose(1, 2),
+        kernel.transpose(1, 2),
+        groups=d_model
+    ).transpose(1, 2)
+    y_backward = F.conv1d(
+        x_padded.transpose(1, 2),
+        kernel_rev.transpose(1, 2),
+        groups=d_model
+    ).transpose(1, 2)
+    return y_forward + y_backward
+
 
 class S4Block(nn.Module):
     """S4 block with diagonal state space matrices."""
 
     def __init__(self, config: S4Config):
         super().__init__()
-        self.d_model = config.d_model
-        self.d_state = config.d_state
+        self.d_model = config.input_dim
+        self.d_state = config.hidden_dim
         self.bidirectional = config.bidirectional
         self.max_sequence_length = config.max_sequence_length
 
         # State space parameters
-        self.A = nn.Parameter(torch.randn(d_state, dtype=torch.cfloat) * 0.02)
-        self.B = nn.Parameter(torch.randn(d_state, dtype=torch.cfloat) * 0.02)
-        self.C = nn.Parameter(torch.randn(d_model, d_state, dtype=torch.cfloat) * 0.02)
-        self.D = nn.Parameter(torch.randn(d_model, dtype=torch.cfloat) * 0.02)
+        self.A, self.B, self.C, self.D = initialize_complex_parameters(self.d_state)
 
         # Input projection
-        self.input_proj = nn.Linear(d_model, d_model)
+        self.input_proj = nn.Linear(self.d_model, self.d_model)
         self.dropout = nn.Dropout(config.dropout)
-        self.norm = nn.LayerNorm(d_model)
-
-        # Initialize state space parameters
-        self._init_state_space()
-
-    def _init_state_space(self):
-        """Initialize state space parameters for stability."""
-        # Initialize A with negative real parts for stability
-        real = -torch.rand(self.d_state) * 0.1
-        imag = torch.randn(self.d_state) * 0.1
-        self.A.data = torch.complex(real, imag)
-
-        # Initialize B and C with small values
-        self.B.data *= 0.02
-        self.C.data *= 0.02
-
-    def _compute_kernel(self, L: int) -> torch.Tensor:
-        """Compute the S4 kernel for sequence length L."""
-        # Compute powers of A
-        A_powers = torch.pow(self.A.unsqueeze(0), torch.arange(L, device=self.A.device))
-        
-        # Compute kernel
-        kernel = torch.einsum("l,dn->ldn", A_powers, self.B)
-        kernel = torch.einsum("ldn,md->lmn", kernel, self.C)
-        
-        # Add direct term
-        kernel = kernel + self.D.unsqueeze(0)
-        
-        return kernel
+        self.norm = nn.LayerNorm(self.d_model)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -82,26 +88,11 @@ class S4Block(nn.Module):
         L = x.size(1)
         
         # Compute kernel
-        kernel = self._compute_kernel(L)
+        kernel = compute_s4_kernel(self.A, self.B, self.C, self.D, L)
         
         # Apply convolution
         if self.bidirectional:
-            # Pad for bidirectional
-            x_padded = F.pad(x, (0, 0, L-1, L-1))
-            # Compute both directions
-            kernel_rev = kernel.flip(0)
-            y_forward = F.conv1d(
-                x_padded.transpose(1, 2),
-                kernel.transpose(1, 2),
-                groups=self.d_model
-            ).transpose(1, 2)
-            y_backward = F.conv1d(
-                x_padded.transpose(1, 2),
-                kernel_rev.transpose(1, 2),
-                groups=self.d_model
-            ).transpose(1, 2)
-            # Combine directions
-            y = y_forward + y_backward
+            y = apply_bidirectional_convolution(x, kernel, self.d_model)
         else:
             # Pad for causal
             x_padded = F.pad(x, (0, 0, L-1, 0))
@@ -124,18 +115,20 @@ class S4Model(SequenceEncoder):
 
     def __init__(self, config: S4Config):
         super().__init__(config)
-        self.d_model = config.d_model
-        self.d_state = config.d_state
-        self.num_layers = config.get("num_layers", 1)
+        self.d_model = config.input_dim
+        self.d_state = config.hidden_dim
+        self.num_layers = config.num_layers
         self.dropout = config.dropout
         self.bidirectional = config.bidirectional
         self.max_sequence_length = config.max_sequence_length
 
         # Input projection if needed
-        if self.d_model != self.d_state:
-            self.input_proj = nn.Linear(self.d_model, self.d_state)
+        if hasattr(config, 'output_dim') and config.output_dim != self.d_model:
+            self.output_dim = config.output_dim
+            self.output_proj = nn.Linear(self.d_model, self.output_dim)
         else:
-            self.input_proj = nn.Identity()
+            self.output_dim = self.d_model
+            self.output_proj = nn.Identity()
 
         # S4 blocks
         self.blocks = nn.ModuleList([
@@ -143,22 +136,16 @@ class S4Model(SequenceEncoder):
             for _ in range(self.num_layers)
         ])
 
-        # Output projection
-        self.output_proj = nn.Linear(self.d_state, self.d_model)
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the S4 model.
         
         Args:
-            x: Input tensor of shape (batch_size, sequence_length, d_model)
+            x: Input tensor of shape (batch_size, sequence_length, input_dim)
             
         Returns:
-            Output tensor of shape (batch_size, sequence_length, d_model)
+            Output tensor of shape (batch_size, sequence_length, output_dim)
         """
-        # Input projection
-        x = self.input_proj(x)
-        
         # Apply S4 blocks
         for block in self.blocks:
             x = block(x)

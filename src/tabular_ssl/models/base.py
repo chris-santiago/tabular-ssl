@@ -74,7 +74,6 @@ class BaseComponent(ABC, nn.Module, Generic[T]):
         """Forward pass of the component."""
         pass
 
-@ComponentRegistry.register("event_encoder")
 class EventEncoder(BaseComponent):
     """Base class for event encoders."""
     
@@ -82,7 +81,6 @@ class EventEncoder(BaseComponent):
         """Forward pass of the event encoder."""
         raise NotImplementedError("Event encoder forward pass must be implemented")
 
-@ComponentRegistry.register("sequence_encoder")
 class SequenceEncoder(BaseComponent):
     """Base class for sequence encoders."""
     
@@ -90,7 +88,6 @@ class SequenceEncoder(BaseComponent):
         """Forward pass of the sequence encoder."""
         raise NotImplementedError("Sequence encoder forward pass must be implemented")
 
-@ComponentRegistry.register("embedding")
 class EmbeddingLayer(BaseComponent):
     """Base class for embedding layers."""
     
@@ -98,7 +95,6 @@ class EmbeddingLayer(BaseComponent):
         """Forward pass of the embedding layer."""
         raise NotImplementedError("Embedding layer forward pass must be implemented")
 
-@ComponentRegistry.register("projection_head")
 class ProjectionHead(BaseComponent):
     """Base class for projection heads."""
     
@@ -106,7 +102,6 @@ class ProjectionHead(BaseComponent):
         """Forward pass of the projection head."""
         raise NotImplementedError("Projection head forward pass must be implemented")
 
-@ComponentRegistry.register("prediction_head")
 class PredictionHead(BaseComponent):
     """Base class for prediction heads."""
     
@@ -122,18 +117,16 @@ class BaseModel(pl.LightningModule):
         self.config = config
         
         # Convert Hydra configs to ComponentConfigs
-        self.event_encoder_config = ComponentConfig.from_hydra(config.model.event_encoder)
-        self.sequence_encoder_config = ComponentConfig.from_hydra(config.model.sequence_encoder) if config.model.sequence_encoder else None
-        self.embedding_config = ComponentConfig.from_hydra(config.model.embedding) if config.model.embedding else None
-        self.projection_head_config = ComponentConfig.from_hydra(config.model.projection_head) if config.model.projection_head else None
-        self.prediction_head_config = ComponentConfig.from_hydra(config.model.prediction_head) if config.model.prediction_head else None
+        self.component_configs = {
+            name: ComponentConfig.from_hydra(cfg)
+            for name, cfg in config.model.items() if cfg is not None
+        }
         
         # Initialize components
-        self.event_encoder = self._init_component(self.event_encoder_config)
-        self.sequence_encoder = self._init_component(self.sequence_encoder_config) if self.sequence_encoder_config else None
-        self.embedding_layer = self._init_component(self.embedding_config) if self.embedding_config else None
-        self.projection_head = self._init_component(self.projection_head_config) if self.projection_head_config else None
-        self.prediction_head = self._init_component(self.prediction_head_config) if self.prediction_head_config else None
+        self.components = {
+            name: self._init_component(cfg)
+            for name, cfg in self.component_configs.items()
+        }
         
         self.save_hyperparameters(OmegaConf.to_container(config, resolve=True))
     
@@ -144,25 +137,8 @@ class BaseModel(pl.LightningModule):
     
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass through the model."""
-        # Apply embeddings if present
-        if self.embedding_layer is not None:
-            x = self.embedding_layer(x)
-        
-        # Encode events
-        x = self.event_encoder(x)
-        
-        # Apply sequence encoding if present
-        if self.sequence_encoder is not None:
-            x = self.sequence_encoder(x)
-        
-        # Apply projection head if present
-        if self.projection_head is not None:
-            x = self.projection_head(x)
-        
-        # Apply prediction head if present
-        if self.prediction_head is not None:
-            x = self.prediction_head(x)
-        
+        for name, component in self.components.items():
+            x = component(x)
         return x
     
     def training_step(self, batch, batch_idx):
@@ -186,11 +162,3 @@ class BaseModel(pl.LightningModule):
                 }
             }
         return optimizer
-
-
-class TabularSSL:
-    pass
-
-
-class TabularSSLConfig:
-    pass
