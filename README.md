@@ -1,415 +1,444 @@
-# Tabular SSL: Self-Supervised Learning for Tabular Data
+# 🎯 Tabular SSL: Self-Supervised Learning for Tabular Data
 
-A modular framework for self-supervised learning on tabular data with **state-of-the-art corruption strategies** and **ready-to-use sample data**.
+A **unified, modular framework** for self-supervised learning on tabular data with **state-of-the-art corruption strategies**, **consistent interfaces**, and **fast experimentation**.
 
-## 🎭 New: State-of-the-Art Corruption Strategies
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange.svg)](https://pytorch.org/)
+[![Lightning](https://img.shields.io/badge/Lightning-2.0+-purple.svg)](https://lightning.ai/)
+[![Hydra](https://img.shields.io/badge/Hydra-1.3+-green.svg)](https://hydra.cc/)
 
-We've implemented corruption strategies from leading tabular SSL papers:
+## ✨ **Key Features**
 
-- **🎯 VIME** - Value imputation and mask estimation ([NeurIPS 2020](https://arxiv.org/abs/2006.06775))
-- **🌟 SCARF** - Contrastive learning with feature corruption ([arXiv 2021](https://arxiv.org/abs/2106.15147))
-- **🔧 ReConTab** - Multi-task reconstruction-based learning
+🔧 **Consistent Design**: All components follow unified interfaces  
+🧩 **Modular Architecture**: Easy to compose and extend  
+⚡ **Fast Experimentation**: Swap components with simple config changes  
+🎭 **State-of-the-Art SSL**: VIME, SCARF, ReConTab implementations  
+🏦 **Ready-to-Use Data**: IBM TabFormer credit card dataset included  
+📱 **Interactive Demos**: Understand corruption strategies visually  
 
-## 🚀 Quick Start
+---
 
-Try our interactive demos to see the corruption strategies in action:
+## 🚀 **Quick Start**
 
+### **Installation**
 ```bash
-# Demo corruption strategies (VIME, SCARF, ReConTab)
-python demo_corruption_strategies.py
-
-# Demo with real credit card transaction data
-python demo_credit_card_data.py
-
-# Train with state-of-the-art SSL methods
-python train.py +experiment=vime_ssl     # VIME approach
-python train.py +experiment=scarf_ssl    # SCARF approach  
-python train.py +experiment=recontab_ssl # ReConTab approach
-```
-
-## Overview
-
-Tabular SSL provides a flexible framework for self-supervised learning on tabular data, with support for:
-- **🎭 State-of-the-art corruption strategies** (VIME, SCARF, ReConTab)
-- **🏦 Ready-to-use sample data** (IBM TabFormer credit card transactions)
-- **📱 Interactive demos** to understand corruption strategies
-- Event sequence modeling with multiple encoder types (RNN, LSTM, GRU, Transformer, S4)
-- Modular architecture with Hydra configuration
-- PyTorch Lightning for robust training
-
-## Installation
-
-```bash
-# Clone the repository
 git clone https://github.com/yourusername/tabular-ssl.git
 cd tabular-ssl
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Install the package in development mode
 pip install -e .
-
-# Set up Python path
 export PYTHONPATH=$PWD/src
 ```
 
-## 🎬 Interactive Demos
-
-### Corruption Strategies Demo
-
-Explore how VIME, SCARF, and ReConTab corruption strategies work:
-
+### **Interactive Demos**
 ```bash
+# 🎭 Explore corruption strategies 
 python demo_corruption_strategies.py
-```
 
-This demo shows:
-- How each corruption strategy transforms data
-- Corruption rates and example outputs
-- Side-by-side comparison of all approaches
-
-### Credit Card Data Demo
-
-Work with real transaction data from IBM TabFormer:
-
-```bash
+# 🏦 Real credit card transaction data
 python demo_credit_card_data.py
+
+# 🔧 Final unified design demo
+python demo_final_design.py
 ```
 
-This demo:
-- Downloads real credit card transaction data
-- Shows data preprocessing and sequence creation
-- Demonstrates DataModule integration
-- Prepares you for actual training
-
-## 🧪 SSL Experiments
-
-### VIME: Value Imputation and Mask Estimation
-
+### **Train Models**
 ```bash
-python train.py +experiment=vime_ssl
+# 🎯 VIME: Value imputation + mask estimation
+python train.py model=ssl_vime
+
+# 🌟 SCARF: Contrastive learning with feature corruption  
+python train.py model=ssl_scarf
+
+# 🔧 ReConTab: Multi-task reconstruction learning
+python train.py model=ssl_recontab
+
+# 🤖 Simple MLP classifier
+python train.py model=base_mlp
+```
+
+---
+
+## 🧪 **Easy Experimentation**
+
+### **Component Swapping**
+```bash
+# Switch to RNN backbone
+python train.py model=ssl_vime sequence_encoder=rnn
+
+# Use autoencoder event encoder
+python train.py model=ssl_scarf event_encoder=autoencoder
+
+# Remove sequence modeling
+python train.py model=ssl_vime sequence_encoder=null
+
+# Custom corruption rate
+python train.py model=ssl_vime corruption.corruption_rate=0.5
+```
+
+### **Systematic Comparison**
+```bash
+# Compare all SSL strategies
+python train.py -m model=ssl_vime,ssl_scarf,ssl_recontab
+
+# Quick iteration setup
+python train.py experiment=quick_vime_ssl
+
+# Full comparison experiment
+python train.py experiment=compare_corruptions
+```
+
+### **Architecture Variants**
+```bash
+# Transformer + VIME SSL
+python train.py model=ssl_vime sequence_encoder=transformer
+
+# S4 + ReConTab SSL  
+python train.py model=ssl_recontab sequence_encoder=s4
+
+# RNN + SCARF SSL
+python train.py model=ssl_scarf sequence_encoder=rnn sequence_encoder.rnn_type=gru
+```
+
+---
+
+## 🏗️ **Architecture Overview**
+
+### **Unified Component Hierarchy**
+```
+BaseComponent (Abstract)
+├── EventEncoder
+│   ├── MLPEventEncoder
+│   ├── AutoEncoderEventEncoder
+│   └── ContrastiveEventEncoder
+├── SequenceEncoder  
+│   ├── TransformerSequenceEncoder
+│   ├── RNNSequenceEncoder
+│   └── S4SequenceEncoder
+├── ProjectionHead
+│   └── MLPProjectionHead
+├── PredictionHead
+│   └── ClassificationHead
+├── EmbeddingLayer
+│   └── CategoricalEmbedding
+└── BaseCorruption
+    ├── VIMECorruption (NeurIPS 2020)
+    ├── SCARFCorruption (arXiv 2021)
+    └── ReConTabCorruption
+```
+
+### **Model Composition**
+```python
+# Flexible model composition
+SSLModel(
+    event_encoder=MLPEventEncoder(...),
+    sequence_encoder=TransformerSequenceEncoder(...),
+    corruption=VIMECorruption(...)  # ← Type auto-detected
+)
+```
+
+### **Consistent Interfaces**
+All components follow the same patterns:
+- **Corruption strategies** return `Dict[str, torch.Tensor]` with `'corrupted'`, `'targets'`, `'mask'`, `'metadata'`
+- **All components** expose `input_dim` and `output_dim` properties
+- **Auto-detection** eliminates configuration errors
+
+---
+
+## 📁 **Configuration Structure**
+
+### **Standardized Layout**
+```
+configs/
+├── corruption/           # 🎭 VIME, SCARF, ReConTab, etc.
+├── event_encoder/        # 📦 MLP, Autoencoder, Contrastive
+├── sequence_encoder/     # 🔗 Transformer, RNN, S4, null
+├── projection_head/      # 📐 MLP, null
+├── prediction_head/      # 🎯 Classification, null  
+├── embedding/            # 🔤 Categorical, null
+├── model/                # 🤖 Complete model configs
+└── experiment/           # 🧪 Experiment templates
+```
+
+### **Consistent Pattern**
+All component configs follow:
+```yaml
+# Component Description
+_target_: tabular_ssl.models.components.ComponentClass
+param1: value1
+param2: value2
+```
+
+---
+
+## 🎭 **State-of-the-Art Corruption Strategies**
+
+### **VIME** - Value Imputation and Mask Estimation
+*From "VIME: Extending the Success of Self- and Semi-supervised Learning to Tabular Domain" (NeurIPS 2020)*
+
+```yaml
+# configs/corruption/vime.yaml
+_target_: tabular_ssl.models.components.VIMECorruption
+corruption_rate: 0.3
+categorical_indices: []
+numerical_indices: [0, 1, 2, 3]
 ```
 
 **Features:**
-- Corrupts data by masking features (30% corruption rate)
-- Learns to predict which features were masked
-- Learns to reconstruct original values
-- Two complementary pretext tasks
+- 🎯 Dual pretext tasks: mask estimation + value imputation
+- 🔢 Handles categorical and numerical features differently
+- 📊 Returns both corrupted data and mask for training
 
-### SCARF: Contrastive Learning with Feature Corruption
+### **SCARF** - Contrastive Learning with Feature Corruption  
+*From "SCARF: Self-Supervised Contrastive Learning using Random Feature Corruption" (arXiv 2021)*
 
-```bash
-python train.py +experiment=scarf_ssl
+```yaml
+# configs/corruption/scarf.yaml
+_target_: tabular_ssl.models.components.SCARFCorruption
+corruption_rate: 0.6
+corruption_strategy: random_swap
 ```
 
 **Features:**
-- High corruption rate (60%) by swapping feature values
-- Contrastive learning approach with InfoNCE loss
-- Large batch sizes for effective contrastive training
-- Temperature-scaled similarity
+- 🌟 High corruption rate (60%) for effective contrastive learning
+- 🔄 Feature swapping between samples in batch
+- 🌡️ Temperature-scaled InfoNCE loss
 
-### ReConTab: Multi-task Reconstruction
+### **ReConTab** - Multi-task Reconstruction
+*Reconstruction-based contrastive learning for tabular data*
 
-```bash
-python train.py +experiment=recontab_ssl
+```yaml
+# configs/corruption/recontab.yaml
+_target_: tabular_ssl.models.components.ReConTabCorruption
+corruption_rate: 0.15
+corruption_types: [masking, noise, swapping]
+masking_strategy: random
 ```
 
 **Features:**
-- Multiple corruption types: masking, noise, swapping
-- Detailed corruption tracking for reconstruction targets
-- Flexible masking strategies (random, column-wise, block)
-- Combines reconstruction with contrastive learning
+- 🔧 Multiple corruption types: masking, noise injection, swapping
+- 📊 Detailed corruption tracking for reconstruction targets
+- 🎯 Multi-task learning with specialized heads
 
-## Project Structure
+---
+
+## 📊 **Sample Data**
+
+### **IBM TabFormer Credit Card Dataset**
+```python
+from tabular_ssl.data.sample_data import load_credit_card_sample
+
+# Download and load real transaction data
+data, info = load_credit_card_sample()
+print(f"Loaded {len(data)} transactions")
+print(f"Features: {info['feature_names']}")
+```
+
+### **Synthetic Transaction Generator**
+```python
+from tabular_ssl.data.sample_data import generate_sequential_transactions
+
+# Generate synthetic data for experimentation
+data = generate_sequential_transactions(
+    num_users=1000,
+    transactions_per_user=50,
+    num_features=10
+)
+```
+
+---
+
+## 🔧 **Advanced Usage**
+
+### **Custom Component Creation**
+```python
+from tabular_ssl.models.components import BaseCorruption
+
+class CustomCorruption(BaseCorruption):
+    def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
+        # Your corruption logic
+        return {
+            'corrupted': corrupted_x,
+            'targets': x,
+            'mask': corruption_mask
+        }
+```
+
+### **Configuration Override Examples**
+```bash
+# Hyperparameter sweep
+python train.py -m model=ssl_vime \
+  corruption.corruption_rate=0.1,0.3,0.5 \
+  model.learning_rate=1e-4,5e-4,1e-3
+
+# Architecture ablation
+python train.py model=ssl_vime \
+  event_encoder.hidden_dims=[64,128] \
+  sequence_encoder.num_layers=2
+
+# Custom experiment
+python train.py model=ssl_vime \
+  event_encoder=autoencoder \
+  sequence_encoder=s4 \
+  corruption.corruption_rate=0.4
+```
+
+### **Modular Composition**
+```python
+# Mix and match components
+model = SSLModel(
+    event_encoder=AutoEncoderEventEncoder(...),
+    sequence_encoder=S4SequenceEncoder(...),
+    projection_head=MLPProjectionHead(...),
+    corruption=ReConTabCorruption(...)
+)
+```
+
+---
+
+## 📚 **Project Structure**
 
 ```
 tabular-ssl/
-├── configs/                        # Hydra configuration files
-│   ├── config.yaml                # Main configuration
-│   ├── model/                     # Model configurations
-│   │   ├── event_encoder/        # Event encoder configs
-│   │   ├── sequence_encoder/     # Sequence encoder configs
-│   │   ├── embedding/            # Embedding configs
-│   │   ├── projection_head/      # Projection head configs
-│   │   └── prediction_head/      # Prediction head configs
-│   ├── data/                     # Data configurations
-│   ├── trainer/                  # Training configurations
-│   ├── callbacks/                # Callback configurations
-│   ├── logger/                   # Logger configurations
-│   ├── experiment/               # Experiment configurations
-│   ├── hydra/                    # Hydra-specific configurations
-│   └── paths/                    # Path configurations
-├── src/
-│   ├── tabular_ssl/              # Core package
-│   │   ├── data/                # Data loading and processing
-│   │   ├── models/              # Model implementations
-│   │   │   ├── base.py         # Base model and component registry
-│   │   │   ├── components.py   # Model components
-│   │   │   └── s4.py           # S4 implementation
-│   │   └── utils/              # Utility functions
-│   └── train.py                  # Training script
-└── tests/                         # Unit tests
+├── 📁 configs/                    # Hydra configurations
+│   ├── 🎭 corruption/            # Corruption strategies
+│   ├── 📦 event_encoder/         # Event encoders
+│   ├── 🔗 sequence_encoder/      # Sequence encoders
+│   ├── 📐 projection_head/       # Projection heads
+│   ├── 🎯 prediction_head/       # Prediction heads
+│   ├── 🔤 embedding/             # Embedding layers
+│   ├── 🤖 model/                 # Complete models
+│   └── 🧪 experiment/            # Experiment configs
+├── 📁 src/tabular_ssl/
+│   ├── 📊 data/                  # Data loading & sample data
+│   ├── 🧠 models/                # Model implementations
+│   │   ├── base.py              # Base classes & models
+│   │   └── components.py        # All components
+│   └── 🛠️ utils/                 # Utilities
+├── 🎬 demo_*.py                  # Interactive demos
+├── 📖 docs/                      # Documentation
+└── ✅ tests/                     # Unit tests
 ```
 
-## Component Registry
+---
 
-The project uses a component registry pattern that allows for:
+## 🎯 **Design Principles**
 
-1. **Modular Components**: Easy to add, modify, or extend components
-2. **Configuration Validation**: Type-safe configuration with Pydantic
-3. **Dynamic Component Loading**: Components are loaded at runtime based on configuration
+✅ **Consistent Interfaces**: All components follow same patterns  
+✅ **Simplified Architecture**: Clean abstractions without complexity  
+✅ **Maintained Functionality**: All original features preserved  
+✅ **Modular & Extensible**: Easy to add new components  
+✅ **Intuitive Configuration**: Logical, well-organized configs  
+✅ **Fast Experimentation**: Easy component swapping  
 
-### How the Registry Works
+---
 
-All model components are registered with the `ComponentRegistry`:
+## 📈 **Benchmarks & Results**
 
-```python
-@ComponentRegistry.register("mlp_event_encoder")
-class MLPEventEncoder(EventEncoder):
-    def __init__(self, config: MLPConfig):
-        super().__init__(config)
-        # Implementation...
-```
+The framework includes implementations of methods from leading papers:
 
-Components can then be instantiated from configuration:
+| Method | Paper | Key Innovation |
+|--------|-------|----------------|
+| **VIME** | NeurIPS 2020 | Dual pretext tasks for tabular SSL |
+| **SCARF** | arXiv 2021 | Contrastive learning with feature corruption |
+| **ReConTab** | Custom | Multi-task reconstruction learning |
 
-```python
-# Get component class
-component_cls = ComponentRegistry.get("mlp_event_encoder")
-
-# Create configuration
-config = MLPConfig(
-    name="mlp_encoder",
-    type="mlp_event_encoder",
-    input_dim=64,
-    hidden_dims=[128, 256],
-    output_dim=512
-)
-
-# Instantiate component
-component = component_cls(config)
-```
-
-### Available Components
-
-#### Event Encoders
-- `mlp_event_encoder`: MLP-based event encoder
-- `autoencoder`: Autoencoder-based event encoder
-- `contrastive`: Contrastive learning event encoder
-
-#### Sequence Encoders
-- `rnn`: Basic RNN encoder
-- `lstm`: LSTM encoder
-- `gru`: GRU encoder
-- `transformer`: Transformer encoder
-- `s4`: Diagonal State Space Model (S4) encoder
-
-#### Embedding Layers
-- `categorical_embedding`: Embedding layer for categorical variables
-
-#### Projection Heads
-- `mlp_projection`: MLP-based projection head
-
-#### Prediction Heads
-- `classification`: Classification head
-
-#### Corruption Strategies
-- `vime`: VIME corruption (mask estimation + value imputation)
-- `scarf`: SCARF corruption (contrastive feature swapping)
-- `recontab`: ReConTab corruption (multi-task reconstruction)
-- `random_masking`: Simple random masking
-- `gaussian_noise`: Gaussian noise injection
-- `swapping`: Feature swapping between samples
-
-## Configuration with Hydra
-
-The project uses [Hydra](https://hydra.cc/) for configuration management, allowing for:
-
-1. **Hierarchical Configuration**: Configurations are organized into groups
-2. **Command-line Overrides**: Parameters can be changed via command line
-3. **Configuration Composition**: Mix and match configurations for experiments
-4. **Multirun**: Run parameter sweeps and experiments
-
-### Basic Usage
-
+### **Quick Comparison**
 ```bash
-# Try interactive demos first
-python demo_corruption_strategies.py
-python demo_credit_card_data.py
+# Run systematic comparison
+python train.py experiment=compare_corruptions
 
-# Train with SSL experiments
-python train.py +experiment=vime_ssl
-python train.py +experiment=scarf_ssl
-python train.py +experiment=recontab_ssl
-
-# Override specific parameters
-python train.py +experiment=vime_ssl model/corruption.corruption_rate=0.5
-python train.py +experiment=scarf_ssl data.batch_size=256
-
-# Customize corruption strategies
-python train.py model/corruption=vime model/corruption.corruption_rate=0.4
+# Results logged to W&B automatically
 ```
 
-### Example: Creating a Custom Component
+---
 
-1. **Create a new component class**:
+## 🚀 **Getting Started Guide**
 
-```python
-# src/tabular_ssl/models/components.py
-from .base import ComponentRegistry, EventEncoder, ComponentConfig
-from pydantic import Field
-
-class CustomEncoderConfig(ComponentConfig):
-    input_dim: int = Field(..., description="Input dimension")
-    output_dim: int = Field(..., description="Output dimension")
-    # Add custom parameters...
-
-@ComponentRegistry.register("custom_encoder")
-class CustomEncoder(EventEncoder):
-    def __init__(self, config: CustomEncoderConfig):
-        super().__init__(config)
-        # Implementation...
-        
-    def forward(self, x):
-        # Implementation...
-        return encoded
-```
-
-2. **Create a configuration file**:
-
-```yaml
-# configs/model/event_encoder/custom.yaml
-name: custom_encoder
-type: custom_encoder
-input_dim: 64
-output_dim: 32
-# Add custom parameters...
-```
-
-3. **Use in experiments**:
-
+### **1. Explore Demos**
 ```bash
-python src/train.py model/event_encoder=custom
+python demo_corruption_strategies.py  # Understand corruption methods
+python demo_credit_card_data.py       # See real data in action
+python demo_final_design.py           # Complete design overview
 ```
 
-### Example: Creating an Experiment
-
-Create a new experiment configuration:
-
-```yaml
-# configs/experiment/custom_experiment.yaml
-# @package _global_
-
-# to execute this experiment run:
-# python train.py experiment=custom_experiment
-
-defaults:
-  - override /model/event_encoder: custom.yaml
-  - override /model/sequence_encoder: s4.yaml
-  - override /trainer: default.yaml
-  - override /model: default.yaml
-  - _self_
-
-# all parameters below will be merged with parameters from default configurations set above
-# this allows you to overwrite only specific parameters
-
-tags: ["custom", "s4"]
-
-seed: 12345
-
-trainer:
-  max_epochs: 50
-  gradient_clip_val: 0.5
-
-model:
-  optimizer:
-    lr: 1.0e-4
-    weight_decay: 0.01
+### **2. Train Your First Model**
+```bash
+python train.py model=ssl_vime         # Start with VIME
 ```
 
-## Creating Self-Supervised Learning Tasks
-
-The framework supports various self-supervised learning tasks:
-
-### 1. Reconstruction-based (Autoencoder)
-
-```yaml
-# configs/model/event_encoder/autoencoder.yaml
-name: autoencoder_encoder
-type: autoencoder
-input_dim: 64
-hidden_dims: [128, 64]
-output_dim: 32
-dropout: 0.1
-use_batch_norm: true
-use_reconstruction_loss: true
+### **3. Experiment with Components**
+```bash
+python train.py model=ssl_vime sequence_encoder=rnn
+python train.py model=ssl_scarf event_encoder=autoencoder
 ```
 
-### 2. Contrastive Learning
-
-```yaml
-# configs/model/event_encoder/contrastive.yaml
-name: contrastive_encoder
-type: contrastive
-input_dim: 64
-hidden_dims: [128, 64]
-output_dim: 32
-dropout: 0.1
-use_batch_norm: true
-temperature: 0.07
+### **4. Create Custom Configurations**
+```bash
+# Copy and modify existing configs
+cp configs/corruption/vime.yaml configs/corruption/my_corruption.yaml
+# Edit my_corruption.yaml
+python train.py model=ssl_vime corruption=my_corruption
 ```
 
-### 3. Feature Corruption (VIME-style)
+---
 
-```yaml
-# Create a corruption pipeline in your model's training_step
-corruption_config = CorruptionPipelineConfig(
-    name="corruption_pipeline",
-    type="corruption_pipeline",
-    strategies=["random_masking", "gaussian_noise"],
-    corruption_rates=[0.15, 0.1]
-)
-corruption = ComponentRegistry.get("corruption_pipeline")(corruption_config)
+## 🤝 **Contributing**
 
-# Apply corruption
-x_corrupted = corruption(x)
+We welcome contributions! The modular design makes it easy to:
+
+- **Add new corruption strategies** following `BaseCorruption` interface
+- **Implement new encoders** extending base classes
+- **Create experiment configurations** in `configs/experiment/`
+- **Add new sample datasets** in `src/tabular_ssl/data/`
+
+### **Development Setup**
+```bash
+git clone https://github.com/yourusername/tabular-ssl.git
+cd tabular-ssl
+pip install -r requirements.txt
+pip install -e .
+python -m pytest tests/
 ```
 
-## Extending the Framework
+---
 
-### Adding New Components
+## 📖 **Documentation**
 
-1. Create a new configuration class that inherits from `ComponentConfig`
-2. Create a new component class that inherits from the appropriate base class
-3. Register the component with `@ComponentRegistry.register("component_name")`
-4. Create a configuration file in the appropriate directory
+- **🎯 [Design Summary](DESIGN_SUMMARY.md)**: Complete design overview
+- **📚 [API Reference](docs/api/)**: Detailed API documentation  
+- **🧪 [Experiments Guide](docs/experiments/)**: How to create experiments
+- **🔧 [Custom Components](docs/components/)**: Adding new components
 
-### Adding New Experiments
+---
 
-1. Create a new experiment configuration file in `configs/experiment/`
-2. Use the `defaults` section to override component configurations
-3. Add experiment-specific parameters
+## 📝 **Citation**
 
-### Adding New Metrics
-
-Add custom metrics in your model's training and validation steps:
-
-```python
-def training_step(self, batch, batch_idx):
-    # Your training logic
-    loss = ...
-    
-    # Log metrics
-    self.log("train/loss", loss)
-    self.log("train/accuracy", accuracy)
-    
-    return loss
+```bibtex
+@software{tabular_ssl,
+  title={Tabular SSL: A Unified Framework for Self-Supervised Learning on Tabular Data},
+  author={Your Name},
+  year={2024},
+  url={https://github.com/yourusername/tabular-ssl}
+}
 ```
 
-## References
+---
 
-- [PyTorch Lightning](https://lightning.ai/docs/pytorch/latest/)
-- [Hydra](https://hydra.cc/)
-- [S4: Structured State Space Sequence Models](https://arxiv.org/abs/2111.00396)
-- [Lightning-Hydra-Template](https://github.com/ashleve/lightning-hydra-template) 
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🙏 **Acknowledgments**
+
+- **VIME**: [Yoon et al., NeurIPS 2020](https://arxiv.org/abs/2006.06775)
+- **SCARF**: [Bahri et al., arXiv 2021](https://arxiv.org/abs/2106.15147)
+- **S4**: [Gu et al., ICLR 2022](https://arxiv.org/abs/2111.00396)
+- **IBM TabFormer**: [Padhi et al., arXiv 2021](https://arxiv.org/abs/2106.11959)
+- **PyTorch Lightning**: [Falcon et al.](https://lightning.ai/)
+- **Hydra**: [Facebook Research](https://hydra.cc/)
+
+---
+
+**🎉 Ready for fast, iterative tabular SSL experimentation!** 
