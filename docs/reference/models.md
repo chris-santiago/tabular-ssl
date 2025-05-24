@@ -280,6 +280,98 @@ from tabular_ssl.models.components import ClassificationHead
 - `hidden_dims` (List[int]): Optional hidden layers
 - `dropout` (float): Dropout rate
 
+## Corruption Strategies
+
+Corruption strategies are essential components for self-supervised learning on tabular data. They create pretext tasks by transforming input data.
+
+### `VIMECorruption`
+
+VIME (Value Imputation and Mask Estimation) corruption strategy.
+
+```python
+from tabular_ssl.models.components import VIMECorruption
+```
+
+**Constructor Parameters:**
+- `corruption_rate` (float): Fraction of features to corrupt (default: 0.15)
+- `categorical_indices` (List[int]): Indices of categorical features
+- `numerical_indices` (List[int]): Indices of numerical features
+- `categorical_vocab_sizes` (Dict[int, int]): Vocabulary sizes per categorical feature
+- `numerical_distributions` (Dict[int, Tuple[float, float]]): (mean, std) per numerical feature
+
+**Example Configuration:**
+```yaml
+_target_: tabular_ssl.models.components.VIMECorruption
+corruption_rate: 0.3
+categorical_indices: [0, 1, 2]
+numerical_indices: [3, 4, 5, 6]
+```
+
+### `SCARFCorruption`
+
+SCARF (Self-Supervised Contrastive Learning using Random Feature Corruption) strategy.
+
+```python
+from tabular_ssl.models.components import SCARFCorruption
+```
+
+**Constructor Parameters:**
+- `corruption_rate` (float): Fraction of features to corrupt (default: 0.6)
+- `corruption_strategy` (str): "random_swap" or "marginal_sampling"
+
+**Example Configuration:**
+```yaml
+_target_: tabular_ssl.models.components.SCARFCorruption
+corruption_rate: 0.6
+corruption_strategy: "random_swap"
+```
+
+### `ReConTabCorruption`
+
+Multi-task reconstruction-based corruption strategy.
+
+```python
+from tabular_ssl.models.components import ReConTabCorruption
+```
+
+**Constructor Parameters:**
+- `corruption_rate` (float): Base corruption rate for masking (default: 0.15)
+- `categorical_indices` (List[int]): Indices of categorical features
+- `numerical_indices` (List[int]): Indices of numerical features
+- `corruption_types` (List[str]): Types of corruption to apply
+- `masking_strategy` (str): "random", "column_wise", or "block"
+- `noise_std` (float): Standard deviation for noise corruption
+- `swap_probability` (float): Probability of feature swapping
+
+**Example Configuration:**
+```yaml
+_target_: tabular_ssl.models.components.ReConTabCorruption
+corruption_rate: 0.15
+corruption_types: ["masking", "noise", "swapping"]
+masking_strategy: "random"
+noise_std: 0.1
+```
+
+### Simple Corruption Strategies
+
+#### `RandomMasking`
+```yaml
+_target_: tabular_ssl.models.components.RandomMasking
+corruption_rate: 0.15
+```
+
+#### `GaussianNoise`
+```yaml
+_target_: tabular_ssl.models.components.GaussianNoise
+noise_std: 0.1
+```
+
+#### `SwappingCorruption`
+```yaml
+_target_: tabular_ssl.models.components.SwappingCorruption
+swap_prob: 0.15
+```
+
 ## Utility Functions
 
 ### `create_mlp`

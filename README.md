@@ -1,16 +1,41 @@
 # Tabular SSL: Self-Supervised Learning for Tabular Data
 
-This project provides a modular framework for self-supervised learning on tabular data, with a focus on sequence modeling using PyTorch Lightning and Hydra.
+A modular framework for self-supervised learning on tabular data with **state-of-the-art corruption strategies** and **ready-to-use sample data**.
+
+## 🎭 New: State-of-the-Art Corruption Strategies
+
+We've implemented corruption strategies from leading tabular SSL papers:
+
+- **🎯 VIME** - Value imputation and mask estimation ([NeurIPS 2020](https://arxiv.org/abs/2006.06775))
+- **🌟 SCARF** - Contrastive learning with feature corruption ([arXiv 2021](https://arxiv.org/abs/2106.15147))
+- **🔧 ReConTab** - Multi-task reconstruction-based learning
+
+## 🚀 Quick Start
+
+Try our interactive demos to see the corruption strategies in action:
+
+```bash
+# Demo corruption strategies (VIME, SCARF, ReConTab)
+python demo_corruption_strategies.py
+
+# Demo with real credit card transaction data
+python demo_credit_card_data.py
+
+# Train with state-of-the-art SSL methods
+python train.py +experiment=vime_ssl     # VIME approach
+python train.py +experiment=scarf_ssl    # SCARF approach  
+python train.py +experiment=recontab_ssl # ReConTab approach
+```
 
 ## Overview
 
 Tabular SSL provides a flexible framework for self-supervised learning on tabular data, with support for:
-- Event sequence modeling
-- Multiple sequence encoder types (RNN, LSTM, GRU, Transformer, S4)
-- Component registry for easy extension
-- Customizable feature processing pipelines
-- PyTorch Lightning for training
-- Hydra for configuration management
+- **🎭 State-of-the-art corruption strategies** (VIME, SCARF, ReConTab)
+- **🏦 Ready-to-use sample data** (IBM TabFormer credit card transactions)
+- **📱 Interactive demos** to understand corruption strategies
+- Event sequence modeling with multiple encoder types (RNN, LSTM, GRU, Transformer, S4)
+- Modular architecture with Hydra configuration
+- PyTorch Lightning for robust training
 
 ## Installation
 
