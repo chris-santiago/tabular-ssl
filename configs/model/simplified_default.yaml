@@ -1,0 +1,64 @@
+# Simplified model configuration - all components in one file
+
+# Main model class (unified for both SSL and standard training)
+_target_: tabular_ssl.models.simplified_base.TabularSSLModel
+
+# Core components
+event_encoder:
+  _target_: tabular_ssl.models.simplified_components.MLPEncoder
+  input_dim: 128  # Will be determined by data config
+  hidden_dims: [256, 512, 256]
+  output_dim: 128
+  dropout: 0.1
+  activation: "relu"
+  use_batch_norm: false
+
+sequence_encoder:
+  _target_: tabular_ssl.models.simplified_components.TransformerEncoder
+  input_dim: 128
+  hidden_dim: 256
+  num_heads: 8
+  num_layers: 4
+  dropout: 0.1
+  output_dim: 128
+
+projection_head:
+  _target_: tabular_ssl.models.simplified_components.MLPHead
+  input_dim: 128
+  output_dim: 64
+  hidden_dims: [96]
+  dropout: 0.1
+
+prediction_head:
+  _target_: tabular_ssl.models.simplified_components.MLPHead
+  input_dim: 64
+  output_dim: 2  # Number of classes
+  hidden_dims: null  # Linear layer only
+
+embedding_layer:
+  _target_: tabular_ssl.models.simplified_components.TabularEmbedding
+  vocab_sizes:
+    category_1: 10
+    category_2: 5
+  embedding_dims:
+    category_1: 8
+    category_2: 4
+
+# SSL components (only used if corruption is specified)
+corruption: null  # Override in SSL experiments
+
+# Training parameters
+learning_rate: 1e-3
+weight_decay: 1e-4
+optimizer_type: "adamw"
+scheduler_type: "cosine"
+
+# SSL-specific parameters (unified in single dict)
+ssl_loss_weights:
+  mask_estimation: 1.0      # VIME
+  value_imputation: 1.0     # VIME
+  masked: 1.0               # ReConTab
+  denoising: 0.5            # ReConTab
+  unswapping: 0.3           # ReConTab
+
+contrastive_temperature: 0.07  # SCARF 

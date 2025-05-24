@@ -1,0 +1,41 @@
+# @package _global_
+
+# Simplified VIME SSL Experiment
+# Uses simplified unified model structure
+
+defaults:
+  - override /model: simplified_default
+  - override /training: simplified_default
+
+# Experiment metadata
+experiment_name: "simplified_vime_ssl"
+tags: ["vime", "ssl", "simplified"]
+
+# Add VIME corruption to model
+model:
+  corruption:
+    _target_: tabular_ssl.models.simplified_components.VIMECorruption
+    corruption_rate: 0.3
+    categorical_indices: [0, 1]  # First two features are categorical
+    numerical_indices: [2, 3, 4, 5, 6, 7, 8, 9]  # Rest are numerical
+
+  # VIME-specific SSL loss weights
+  ssl_loss_weights:
+    mask_estimation: 1.0
+    value_imputation: 1.0
+
+# Training overrides for SSL
+training:
+  trainer:
+    max_epochs: 100
+    val_check_interval: 0.5
+  
+  callbacks:
+    model_checkpoint:
+      monitor: "val/ssl_loss"
+    early_stopping:
+      monitor: "val/ssl_loss"
+      patience: 20
+
+# Seed for reproducibility
+seed: 42 

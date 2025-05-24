@@ -1,0 +1,59 @@
+# @package _global_
+
+# Example of using custom components with the simplified design
+# This shows how ANY custom encoder/corruption can be configured via Hydra
+
+defaults:
+  - base_config.yaml
+
+model:
+  _target_: extensibility_demo.ExtendedTabularSSLModel
+  
+  # Custom convolutional encoder instead of standard MLP
+  event_encoder:
+    _target_: extensibility_demo.CustomConvEncoder
+    input_dim: ${data.input_dim}
+    num_filters: 64
+    kernel_sizes: [3, 5, 7]
+    output_dim: 128
+    dropout: 0.1
+  
+  # Custom attention encoder instead of standard Transformer  
+  sequence_encoder:
+    _target_: extensibility_demo.CustomAttentionEncoder
+    input_dim: 128  # Must match event_encoder.output_dim
+    hidden_dim: 256
+    num_heads: 8
+    output_dim: 192
+  
+  # Standard projection head (or could be custom too)
+  projection_head:
+    _target_: tabular_ssl.models.simplified_components.MLPHead
+    input_dim: 192  # Must match sequence_encoder.output_dim  
+    output_dim: 64
+    hidden_dims: [128]
+    dropout: 0.1
+  
+  # Custom Mixup corruption strategy
+  corruption:
+    _target_: extensibility_demo.CustomMixupCorruption
+    corruption_rate: 0.4
+    alpha: 0.3  # Mixup strength parameter
+  
+  # Custom SSL loss weights for Mixup
+  ssl_loss_weights:
+    mixup_lambda: 0.15
+    reconstruction: 1.0
+  
+  learning_rate: 1e-3
+  weight_decay: 1e-4
+
+# Training configuration stays the same
+trainer:
+  max_epochs: 100
+  check_val_every_n_epoch: 5
+
+# Optional: Override data for testing
+data:
+  input_dim: 20  # Example: 20 input features
+  batch_size: 32 
