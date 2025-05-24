@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Dict, Any, List, Optional
+from typing import List, Optional
 from pydantic import Field
 from .base import (
     EventEncoder,
@@ -12,29 +12,29 @@ from .base import (
     ComponentConfig,
     ComponentRegistry,
 )
+from tabular_ssl.models.configs import SequenceModelConfig, CorruptionConfig, ContrastiveConfig
+
 
 class MLPConfig(ComponentConfig):
     """Configuration for MLP-based components."""
-    
+
     input_dim: int = Field(..., description="Input dimension")
     hidden_dims: List[int] = Field(..., description="List of hidden dimensions")
     output_dim: int = Field(..., description="Output dimension")
     dropout: float = Field(0.1, description="Dropout rate")
     use_batch_norm: bool = Field(True, description="Whether to use batch normalization")
 
+
 class BaseSequenceModel(SequenceEncoder):
     """Base class for sequence models like RNN, LSTM, and GRU."""
+
     def __init__(self, config: SequenceModelConfig, rnn_type: str):
         super().__init__(config)
         self.hidden_dim = config.hidden_dim
         self.num_layers = config.num_layers
         self.dropout = config.dropout
 
-        rnn_class = {
-            'rnn': nn.RNN,
-            'lstm': nn.LSTM,
-            'gru': nn.GRU
-        }[rnn_type]
+        rnn_class = {"rnn": nn.RNN, "lstm": nn.LSTM, "gru": nn.GRU}[rnn_type]
 
         self.rnn = rnn_class(
             input_size=config.input_dim,
@@ -42,41 +42,54 @@ class BaseSequenceModel(SequenceEncoder):
             num_layers=self.num_layers,
             dropout=self.dropout if self.num_layers > 1 else 0,
             batch_first=True,
-            bidirectional=config.bidirectional
+            bidirectional=config.bidirectional,
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.rnn(x)[0]
 
+
 @ComponentRegistry.register("rnn")
 class RNNSequenceModel(BaseSequenceModel):
     def __init__(self, config: SequenceModelConfig):
-        super().__init__(config, rnn_type='rnn')
+        super().__init__(config, rnn_type="rnn")
+
 
 @ComponentRegistry.register("lstm")
 class LSTMSequenceModel(BaseSequenceModel):
     def __init__(self, config: SequenceModelConfig):
-        super().__init__(config, rnn_type='lstm')
+        super().__init__(config, rnn_type="lstm")
+
 
 @ComponentRegistry.register("gru")
 class GRUSequenceModel(BaseSequenceModel):
     def __init__(self, config: SequenceModelConfig):
-        super().__init__(config, rnn_type='gru')
+        super().__init__(config, rnn_type="gru")
 
-def create_mlp_layers(input_dim: int, hidden_dims: List[int], output_dim: int, dropout: float, use_batch_norm: bool) -> nn.Sequential:
+
+def create_mlp_layers(
+    input_dim: int,
+    hidden_dims: List[int],
+    output_dim: int,
+    dropout: float,
+    use_batch_norm: bool,
+) -> nn.Sequential:
     """Utility function to create MLP layers."""
     layers = []
     prev_dim = input_dim
     for hidden_dim in hidden_dims:
-        layers.extend([
-            nn.Linear(prev_dim, hidden_dim),
-            nn.ReLU(),
-            nn.BatchNorm1d(hidden_dim) if use_batch_norm else nn.Identity(),
-            nn.Dropout(dropout)
-        ])
+        layers.extend(
+            [
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if use_batch_norm else nn.Identity(),
+                nn.Dropout(dropout),
+            ]
+        )
         prev_dim = hidden_dim
     layers.append(nn.Linear(prev_dim, output_dim))
     return nn.Sequential(*layers)
+
 
 @ComponentRegistry.register("mlp_event_encoder")
 class MLPEventEncoder(EventEncoder):
@@ -89,58 +102,66 @@ class MLPEventEncoder(EventEncoder):
             config.hidden_dims,
             config.output_dim,
             config.dropout,
-            config.use_batch_norm
+            config.use_batch_norm,
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.mlp(x)
 
+
 class SequenceModelConfig(ComponentConfig):
     """Base configuration for sequence models."""
-    
+
     input_dim: int = Field(..., description="Input dimension")
     hidden_dim: int = Field(..., description="Hidden dimension")
     num_layers: int = Field(1, description="Number of layers")
     dropout: float = Field(0.1, description="Dropout rate")
-    bidirectional: bool = Field(False, description="Whether to use bidirectional processing")
+    bidirectional: bool = Field(
+        False, description="Whether to use bidirectional processing"
+    )
+
 
 class TransformerConfig(SequenceModelConfig):
     """Configuration for Transformer models."""
-    
+
     num_heads: int = Field(4, description="Number of attention heads")
     dim_feedforward: int = Field(..., description="Dimension of feedforward network")
+
 
 @ComponentRegistry.register("transformer")
 class TransformerSequenceModel(SequenceEncoder):
     """Transformer sequence model."""
-    
+
     def __init__(self, config: TransformerConfig):
         super().__init__(config)
         self.hidden_dim = config.hidden_dim
         self.num_layers = config.num_layers
         self.num_heads = config.num_heads
         self.dropout = config.dropout
-        
+
         encoder_layer = nn.TransformerEncoderLayer(
             d_model=config.input_dim,
             nhead=self.num_heads,
             dim_feedforward=config.dim_feedforward,
             dropout=self.dropout,
-            batch_first=True
+            batch_first=True,
         )
         self.transformer = nn.TransformerEncoder(
-            encoder_layer,
-            num_layers=self.num_layers
+            encoder_layer, num_layers=self.num_layers
         )
-    
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.transformer(x)
 
+
 class EmbeddingConfig(ComponentConfig):
     """Configuration for embedding layers."""
-    
-    embedding_dims: List[tuple[int, int]] = Field(..., description="List of (num_categories, embedding_dim) tuples")
+
+    embedding_dims: List[tuple[int, int]] = Field(
+        ..., description="List of (num_categories, embedding_dim) tuples"
+    )
     dropout: float = Field(0.1, description="Dropout rate")
+
 
 @ComponentRegistry.register("categorical_embedding")
 class CategoricalEmbedding(EmbeddingLayer):
@@ -149,10 +170,12 @@ class CategoricalEmbedding(EmbeddingLayer):
     def __init__(self, config: EmbeddingConfig):
         super().__init__(config)
         self.embedding_dims = config.embedding_dims
-        self.embeddings = nn.ModuleList([
-            nn.Embedding(num_categories, embedding_dim)
-            for num_categories, embedding_dim in self.embedding_dims
-        ])
+        self.embeddings = nn.ModuleList(
+            [
+                nn.Embedding(num_categories, embedding_dim)
+                for num_categories, embedding_dim in self.embedding_dims
+            ]
+        )
         self.dropout = nn.Dropout(config.dropout)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
@@ -162,14 +185,16 @@ class CategoricalEmbedding(EmbeddingLayer):
             embedded.append(embedding(x[:, i]))
         return self.dropout(torch.cat(embedded, dim=1))
 
+
 class ProjectionHeadConfig(ComponentConfig):
     """Configuration for projection heads."""
-    
+
     input_dim: int = Field(..., description="Input dimension")
     hidden_dims: List[int] = Field(..., description="List of hidden dimensions")
     output_dim: int = Field(..., description="Output dimension")
     dropout: float = Field(0.1, description="Dropout rate")
     use_batch_norm: bool = Field(True, description="Whether to use batch normalization")
+
 
 @ComponentRegistry.register("mlp_projection")
 class MLPProjectionHead(ProjectionHead):
@@ -182,20 +207,24 @@ class MLPProjectionHead(ProjectionHead):
             config.hidden_dims,
             config.output_dim,
             config.dropout,
-            config.use_batch_norm
+            config.use_batch_norm,
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.mlp(x)
 
+
 class PredictionHeadConfig(ComponentConfig):
     """Configuration for prediction heads."""
-    
+
     input_dim: int = Field(..., description="Input dimension")
     num_classes: int = Field(..., description="Number of output classes")
-    hidden_dims: Optional[List[int]] = Field(None, description="Optional list of hidden dimensions")
+    hidden_dims: Optional[List[int]] = Field(
+        None, description="Optional list of hidden dimensions"
+    )
     dropout: float = Field(0.1, description="Dropout rate")
     use_batch_norm: bool = Field(True, description="Whether to use batch normalization")
+
 
 @ComponentRegistry.register("classification")
 class ClassificationHead(PredictionHead):
@@ -210,12 +239,16 @@ class ClassificationHead(PredictionHead):
             layers = []
             prev_dim = self.input_dim
             for hidden_dim in config.hidden_dims:
-                layers.extend([
-                    nn.Linear(prev_dim, hidden_dim),
-                    nn.ReLU(),
-                    nn.BatchNorm1d(hidden_dim) if config.use_batch_norm else nn.Identity(),
-                    nn.Dropout(config.dropout)
-                ])
+                layers.extend(
+                    [
+                        nn.Linear(prev_dim, hidden_dim),
+                        nn.ReLU(),
+                        nn.BatchNorm1d(hidden_dim)
+                        if config.use_batch_norm
+                        else nn.Identity(),
+                        nn.Dropout(config.dropout),
+                    ]
+                )
                 prev_dim = hidden_dim
             layers.append(nn.Linear(prev_dim, self.num_classes))
             self.mlp = nn.Sequential(*layers)
@@ -225,10 +258,14 @@ class ClassificationHead(PredictionHead):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.mlp(x)
 
+
 class AutoEncoderConfig(MLPConfig):
     """Configuration for autoencoder."""
-    
-    use_reconstruction_loss: bool = Field(True, description="Whether to use reconstruction loss")
+
+    use_reconstruction_loss: bool = Field(
+        True, description="Whether to use reconstruction loss"
+    )
+
 
 class BaseCorruptionStrategy(nn.Module):
     """Base class for corruption strategies."""
@@ -292,18 +329,26 @@ class VIMECorruption(BaseCorruptionStrategy):
         return torch.where(x_masked != 0, x_masked, x_noisy)
 
 
-def create_encoder_decoder_layers(input_dim: int, hidden_dims: List[int], output_dim: int, dropout: float, use_batch_norm: bool) -> (nn.Sequential, nn.Sequential):
+def create_encoder_decoder_layers(
+    input_dim: int,
+    hidden_dims: List[int],
+    output_dim: int,
+    dropout: float,
+    use_batch_norm: bool,
+) -> (nn.Sequential, nn.Sequential):
     """Utility function to create encoder and decoder layers."""
     # Encoder
     encoder_layers = []
     prev_dim = input_dim
     for hidden_dim in hidden_dims:
-        encoder_layers.extend([
-            nn.Linear(prev_dim, hidden_dim),
-            nn.ReLU(),
-            nn.BatchNorm1d(hidden_dim) if use_batch_norm else nn.Identity(),
-            nn.Dropout(dropout)
-        ])
+        encoder_layers.extend(
+            [
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if use_batch_norm else nn.Identity(),
+                nn.Dropout(dropout),
+            ]
+        )
         prev_dim = hidden_dim
     encoder_layers.append(nn.Linear(prev_dim, output_dim))
     encoder = nn.Sequential(*encoder_layers)
@@ -312,12 +357,14 @@ def create_encoder_decoder_layers(input_dim: int, hidden_dims: List[int], output
     decoder_layers = []
     prev_dim = output_dim
     for hidden_dim in reversed(hidden_dims):
-        decoder_layers.extend([
-            nn.Linear(prev_dim, hidden_dim),
-            nn.ReLU(),
-            nn.BatchNorm1d(hidden_dim) if use_batch_norm else nn.Identity(),
-            nn.Dropout(dropout)
-        ])
+        decoder_layers.extend(
+            [
+                nn.Linear(prev_dim, hidden_dim),
+                nn.ReLU(),
+                nn.BatchNorm1d(hidden_dim) if use_batch_norm else nn.Identity(),
+                nn.Dropout(dropout),
+            ]
+        )
         prev_dim = hidden_dim
     decoder_layers.append(nn.Linear(prev_dim, input_dim))
     decoder = nn.Sequential(*decoder_layers)
@@ -336,7 +383,7 @@ class AutoEncoderEventEncoder(EventEncoder):
             config.hidden_dims,
             config.output_dim,
             config.dropout,
-            config.use_batch_norm
+            config.use_batch_norm,
         )
         self.use_reconstruction_loss = config.use_reconstruction_loss
 
@@ -363,7 +410,7 @@ class ContrastiveEventEncoder(EventEncoder):
             config.hidden_dims,
             config.output_dim,
             config.dropout,
-            config.use_batch_norm
+            config.use_batch_norm,
         )
         self.temperature = config.temperature
 
@@ -378,16 +425,23 @@ class ContrastiveEventEncoder(EventEncoder):
         loss = F.cross_entropy(similarity, labels)
         return loss
 
+
 class CorruptionConfig(ComponentConfig):
     """Base configuration for corruption strategies."""
-    
+
     corruption_rate: float = Field(0.15, description="Rate of corruption")
+
 
 class CorruptionPipelineConfig(ComponentConfig):
     """Configuration for corruption pipeline."""
-    
-    strategies: List[str] = Field(..., description="List of corruption strategies to apply")
-    corruption_rates: List[float] = Field(..., description="Corruption rates for each strategy")
+
+    strategies: List[str] = Field(
+        ..., description="List of corruption strategies to apply"
+    )
+    corruption_rates: List[float] = Field(
+        ..., description="Corruption rates for each strategy"
+    )
+
 
 @ComponentRegistry.register("corruption_pipeline")
 class CorruptionPipeline(nn.Module):

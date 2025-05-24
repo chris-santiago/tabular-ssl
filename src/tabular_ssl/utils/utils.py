@@ -1,5 +1,4 @@
 import logging
-import os
 import warnings
 from typing import List, Dict, Any, Tuple, Optional, Sequence
 import numpy as np
@@ -214,59 +213,65 @@ def close_loggers(logger: List[Logger]) -> None:
 def compute_metrics(y_true: np.ndarray, y_pred: np.ndarray) -> Dict[str, float]:
     """Compute classification metrics."""
     return {
-        'accuracy': accuracy_score(y_true, y_pred),
-        'precision': precision_score(y_true, y_pred),
-        'recall': recall_score(y_true, y_pred),
-        'f1': f1_score(y_true, y_pred)
+        "accuracy": accuracy_score(y_true, y_pred),
+        "precision": precision_score(y_true, y_pred),
+        "recall": recall_score(y_true, y_pred),
+        "f1": f1_score(y_true, y_pred),
     }
 
 
-def plot_training_history(history: Dict[str, List[float]], save_path: Optional[str] = None) -> None:
+def plot_training_history(
+    history: Dict[str, List[float]], save_path: Optional[str] = None
+) -> None:
     """Plot training history."""
     plt.figure(figsize=(12, 4))
-    
+
     # Plot loss
     plt.subplot(1, 2, 1)
-    plt.plot(history['train_loss'], label='Train Loss')
-    plt.plot(history['val_loss'], label='Validation Loss')
-    plt.title('Loss')
-    plt.xlabel('Epoch')
-    plt.ylabel('Loss')
+    plt.plot(history["train_loss"], label="Train Loss")
+    plt.plot(history["val_loss"], label="Validation Loss")
+    plt.title("Loss")
+    plt.xlabel("Epoch")
+    plt.ylabel("Loss")
     plt.legend()
-    
+
     # Plot accuracy
     plt.subplot(1, 2, 2)
-    plt.plot(history['train_accuracy'], label='Train Accuracy')
-    plt.plot(history['val_accuracy'], label='Validation Accuracy')
-    plt.title('Accuracy')
-    plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
+    plt.plot(history["train_accuracy"], label="Train Accuracy")
+    plt.plot(history["val_accuracy"], label="Validation Accuracy")
+    plt.title("Accuracy")
+    plt.xlabel("Epoch")
+    plt.ylabel("Accuracy")
     plt.legend()
-    
+
     plt.tight_layout()
     if save_path:
         plt.savefig(save_path)
     plt.close()
 
 
-def get_feature_importance(model: torch.nn.Module, data: torch.Tensor, feature_names: List[str]) -> Dict[str, float]:
+def get_feature_importance(
+    model: torch.nn.Module, data: torch.Tensor, feature_names: List[str]
+) -> Dict[str, float]:
     """Compute feature importance scores."""
     model.eval()
     with torch.no_grad():
         # Get attention weights from the last layer
         _, attention_weights = model(data, return_attention=True)
         last_layer_weights = attention_weights[-1]
-        
+
         # Average attention weights across heads and sequence length
         importance = last_layer_weights.mean(dim=(0, 1, 2))
-        
+
         # Normalize importance scores
         importance = importance / importance.sum()
-        
+
         return dict(zip(feature_names, importance.tolist()))
 
 
-def compute_shap_values(model: torch.nn.Module, data: torch.Tensor, feature_names: List[str]) -> np.ndarray:
+def compute_shap_values(
+    model: torch.nn.Module, data: torch.Tensor, feature_names: List[str]
+) -> np.ndarray:
     """Compute SHAP values for model predictions."""
     model.eval()
     explainer = shap.DeepExplainer(model, data)
@@ -274,49 +279,58 @@ def compute_shap_values(model: torch.nn.Module, data: torch.Tensor, feature_name
     return shap_values
 
 
-def grid_search(objective: callable, param_grid: Dict[str, List[Any]]) -> Tuple[Dict[str, Any], float]:
+def grid_search(
+    objective: callable, param_grid: Dict[str, List[Any]]
+) -> Tuple[Dict[str, Any], float]:
     """Perform grid search for hyperparameter tuning."""
-    best_score = float('-inf')
+    best_score = float("-inf")
     best_params = None
-    
+
     # Generate all parameter combinations
-    param_combinations = [dict(zip(param_grid.keys(), v)) for v in np.array(np.meshgrid(*param_grid.values())).T.reshape(-1, len(param_grid))]
-    
+    param_combinations = [
+        dict(zip(param_grid.keys(), v))
+        for v in np.array(np.meshgrid(*param_grid.values())).T.reshape(
+            -1, len(param_grid)
+        )
+    ]
+
     for params in param_combinations:
         score = objective(params)
         if score > best_score:
             best_score = score
             best_params = params
-    
+
     return best_params, best_score
 
 
-def random_search(objective: callable, param_distributions: Dict[str, List[Any]], n_iter: int = 10) -> Tuple[Dict[str, Any], float]:
+def random_search(
+    objective: callable, param_distributions: Dict[str, List[Any]], n_iter: int = 10
+) -> Tuple[Dict[str, Any], float]:
     """Perform random search for hyperparameter tuning."""
-    best_score = float('-inf')
+    best_score = float("-inf")
     best_params = None
-    
+
     for _ in range(n_iter):
         # Sample random parameters
         params = {k: np.random.choice(v) for k, v in param_distributions.items()}
         score = objective(params)
-        
+
         if score > best_score:
             best_score = score
             best_params = params
-    
+
     return best_params, best_score
 
 
 class EarlyStopping:
     """Early stopping callback."""
-    
+
     def __init__(self, patience: int = 3, min_delta: float = 0.0):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
-        self.best_loss = float('inf')
-    
+        self.best_loss = float("inf")
+
     def __call__(self, val_loss: float, train_loss: float) -> bool:
         """Check if training should be stopped."""
         if val_loss < self.best_loss - self.min_delta:

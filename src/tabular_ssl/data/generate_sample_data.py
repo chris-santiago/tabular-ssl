@@ -3,10 +3,9 @@ import pandas as pd
 from datetime import datetime, timedelta
 import logging
 from pathlib import Path
-from typing import Dict, List, Tuple
+from typing import Dict, List
 import multiprocessing as mp
 from functools import partial
-import warnings
 
 logger = logging.getLogger(__name__)
 
@@ -37,10 +36,10 @@ class TransactionDataGenerator:
         self.end_date = datetime.strptime(end_date, "%Y-%m-%d")
         self.seed = seed
         self.n_jobs = mp.cpu_count() if n_jobs == -1 else n_jobs
-        
+
         # Set random seed
         np.random.seed(seed)
-        
+
         # Cache for random values
         self._cache: Dict[str, np.ndarray] = {}
 
@@ -65,7 +64,9 @@ class TransactionDataGenerator:
         # Define risk levels and their probabilities
         self.risk_levels = {"low": 0.7, "medium": 0.2, "high": 0.1}
 
-    def _get_cached_random(self, key: str, generator: callable, *args, **kwargs) -> np.ndarray:
+    def _get_cached_random(
+        self, key: str, generator: callable, *args, **kwargs
+    ) -> np.ndarray:
         """Get or generate cached random values."""
         if key not in self._cache:
             self._cache[key] = generator(*args, **kwargs)
@@ -79,43 +80,55 @@ class TransactionDataGenerator:
         # Generate entity features using vectorized operations
         data = {
             "entity_id": entity_ids,
-            "age": self._get_cached_random("age", np.random.randint, 18, 80, size=self.n_entities),
+            "age": self._get_cached_random(
+                "age", np.random.randint, 18, 80, size=self.n_entities
+            ),
             "income_level": self._get_cached_random(
                 "income_level",
                 np.random.choice,
                 ["low", "medium", "high"],
                 size=self.n_entities,
-                p=[0.3, 0.5, 0.2]
+                p=[0.3, 0.5, 0.2],
             ),
-            "credit_score": self._get_cached_random("credit_score", np.random.randint, 300, 850, size=self.n_entities),
-            "account_age_days": self._get_cached_random("account_age", np.random.randint, 0, 3650, size=self.n_entities),
+            "credit_score": self._get_cached_random(
+                "credit_score", np.random.randint, 300, 850, size=self.n_entities
+            ),
+            "account_age_days": self._get_cached_random(
+                "account_age", np.random.randint, 0, 3650, size=self.n_entities
+            ),
             "risk_level": self._get_cached_random(
                 "risk_level",
                 np.random.choice,
                 list(self.risk_levels.keys()),
                 size=self.n_entities,
-                p=list(self.risk_levels.values())
+                p=list(self.risk_levels.values()),
             ),
         }
 
         return pd.DataFrame(data)
 
-    def _generate_timestamps_chunk(self, chunk_size: int, start_date: datetime) -> List[datetime]:
+    def _generate_timestamps_chunk(
+        self, chunk_size: int, start_date: datetime
+    ) -> List[datetime]:
         """Generate a chunk of timestamps."""
         timestamps = []
         current_date = start_date
-        
+
         while len(timestamps) < chunk_size:
             if current_date > self.end_date:
                 break
 
             # Generate more transactions during business hours
-            n_transactions = np.random.poisson(100 if current_date.weekday() < 5 else 50)
-            
+            n_transactions = np.random.poisson(
+                100 if current_date.weekday() < 5 else 50
+            )
+
             # Vectorized hour generation
-            hours = np.clip(np.random.normal(14, 3, size=n_transactions), 0, 23).astype(int)
+            hours = np.clip(np.random.normal(14, 3, size=n_transactions), 0, 23).astype(
+                int
+            )
             minutes = np.random.randint(0, 60, size=n_transactions)
-            
+
             for hour, minute in zip(hours, minutes):
                 timestamp = current_date.replace(hour=hour, minute=minute)
                 timestamps.append(timestamp)
@@ -135,13 +148,13 @@ class TransactionDataGenerator:
             "shopping": (3.8, 0.8),
             "utilities": (4.0, 0.3),
         }
-        
+
         # Generate amounts for each category
         amounts = np.zeros(len(categories))
         for category, (mu, sigma) in dist_params.items():
             mask = categories == category
             amounts[mask] = np.random.lognormal(mu, sigma, size=mask.sum())
-        
+
         return np.round(amounts, 2)
 
     def generate_transaction_data(self) -> pd.DataFrame:
@@ -150,7 +163,9 @@ class TransactionDataGenerator:
         transaction_ids = np.array([f"TXN_{i:08d}" for i in range(self.n_transactions)])
 
         # Generate entity IDs with some entities having more transactions
-        entity_weights = self._get_cached_random("entity_weights", np.random.power, 2, size=self.n_entities)
+        entity_weights = self._get_cached_random(
+            "entity_weights", np.random.power, 2, size=self.n_entities
+        )
         entity_weights = entity_weights / entity_weights.sum()
         entity_ids = np.random.choice(
             [f"ENT_{i:06d}" for i in range(self.n_entities)],
@@ -163,17 +178,17 @@ class TransactionDataGenerator:
         with mp.Pool(self.n_jobs) as pool:
             timestamps_chunks = pool.map(
                 partial(self._generate_timestamps_chunk, chunk_size=chunk_size),
-                [self.start_date + timedelta(days=i) for i in range(self.n_jobs)]
+                [self.start_date + timedelta(days=i) for i in range(self.n_jobs)],
             )
         timestamps = [ts for chunk in timestamps_chunks for ts in chunk]
-        timestamps = timestamps[:self.n_transactions]
+        timestamps = timestamps[: self.n_transactions]
         timestamps.sort()
 
         # Generate categories
         categories = np.random.choice(
             list(self.categories.keys()),
             size=self.n_transactions,
-            p=list(self.categories.values())
+            p=list(self.categories.values()),
         )
 
         # Generate amounts using vectorized operations
@@ -183,26 +198,20 @@ class TransactionDataGenerator:
         merchant_types = np.random.choice(
             list(self.merchant_types.keys()),
             size=self.n_transactions,
-            p=list(self.merchant_types.values())
+            p=list(self.merchant_types.values()),
         )
 
         locations = np.random.choice(
-            ["domestic", "international"],
-            size=self.n_transactions,
-            p=[0.9, 0.1]
+            ["domestic", "international"], size=self.n_transactions, p=[0.9, 0.1]
         )
 
         statuses = np.random.choice(
             ["completed", "failed", "pending"],
             size=self.n_transactions,
-            p=[0.95, 0.03, 0.02]
+            p=[0.95, 0.03, 0.02],
         )
 
-        is_fraud = np.random.choice(
-            [0, 1],
-            size=self.n_transactions,
-            p=[0.99, 0.01]
-        )
+        is_fraud = np.random.choice([0, 1], size=self.n_transactions, p=[0.99, 0.01])
 
         # Create transaction dataframe
         data = {

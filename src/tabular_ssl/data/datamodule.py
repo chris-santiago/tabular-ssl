@@ -8,7 +8,6 @@ import numpy as np
 from sklearn.preprocessing import StandardScaler
 import logging
 from dataclasses import dataclass, field
-import pandas as pd
 import pytorch_lightning as lit
 
 log = logging.getLogger(__name__)

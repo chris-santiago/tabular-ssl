@@ -20,10 +20,26 @@ class ExampleModel(BaseModel):
         super().__init__(config)
         # Directly initialize components
         self.event_encoder = MLPEventEncoder(config.event_encoder_config)
-        self.sequence_encoder = TransformerSequenceEncoder(config.sequence_encoder_config) if config.sequence_encoder_config else None
-        self.embedding_layer = CategoricalEmbedding(config.embedding_config) if config.embedding_config else None
-        self.projection_head = MLPProjectionHead(config.projection_head_config) if config.projection_head_config else None
-        self.prediction_head = ClassificationHead(config.prediction_head_config) if config.prediction_head_config else None
+        self.sequence_encoder = (
+            TransformerSequenceEncoder(config.sequence_encoder_config)
+            if config.sequence_encoder_config
+            else None
+        )
+        self.embedding_layer = (
+            CategoricalEmbedding(config.embedding_config)
+            if config.embedding_config
+            else None
+        )
+        self.projection_head = (
+            MLPProjectionHead(config.projection_head_config)
+            if config.projection_head_config
+            else None
+        )
+        self.prediction_head = (
+            ClassificationHead(config.prediction_head_config)
+            if config.prediction_head_config
+            else None
+        )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         if self.embedding_layer is not None:
@@ -94,43 +110,44 @@ class ExampleModel(BaseModel):
         loss = F.cross_entropy(similarity, labels)
         return loss
 
+
 # Example configuration
-config = OmegaConf.create({
-    'model': {
-        'event_encoder': {
-            'name': 'mlp_event_encoder',
-            'type': 'mlp_event_encoder',
-            'input_dim': 64,
-            'hidden_dims': [128, 256],
-            'output_dim': 512,
-            'dropout': 0.1,
-            'use_batch_norm': True
+config = OmegaConf.create(
+    {
+        "model": {
+            "event_encoder": {
+                "name": "mlp_event_encoder",
+                "type": "mlp_event_encoder",
+                "input_dim": 64,
+                "hidden_dims": [128, 256],
+                "output_dim": 512,
+                "dropout": 0.1,
+                "use_batch_norm": True,
+            },
+            "sequence_encoder": {
+                "name": "s4",
+                "type": "s4",
+                "input_dim": 512,
+                "hidden_dim": 64,
+                "num_layers": 2,
+                "dropout": 0.1,
+                "bidirectional": True,
+                "max_sequence_length": 2048,
+            },
+            "projection_head": {
+                "name": "mlp_projection",
+                "type": "mlp_projection",
+                "input_dim": 512,
+                "hidden_dims": [256],
+                "output_dim": 128,
+                "dropout": 0.1,
+                "use_batch_norm": True,
+            },
         },
-        'sequence_encoder': {
-            'name': 's4',
-            'type': 's4',
-            'input_dim': 512,
-            'hidden_dim': 64,
-            'num_layers': 2,
-            'dropout': 0.1,
-            'bidirectional': True,
-            'max_sequence_length': 2048
-        },
-        'projection_head': {
-            'name': 'mlp_projection',
-            'type': 'mlp_projection',
-            'input_dim': 512,
-            'hidden_dims': [256],
-            'output_dim': 128,
-            'dropout': 0.1,
-            'use_batch_norm': True
-        }
-    },
-    'optimizer': {
-        '_target_': 'torch.optim.Adam',
-        'lr': 0.001
+        "optimizer": {"_target_": "torch.optim.Adam", "lr": 0.001},
     }
-})
+)
+
 
 # Create a random dataset
 class RandomDataset(torch.utils.data.Dataset):
@@ -142,6 +159,7 @@ class RandomDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         return self.data[idx], self.data[idx]  # Dummy target
+
 
 # Initialize the model
 model = BaseModel(config)

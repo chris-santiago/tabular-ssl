@@ -1,18 +1,16 @@
 #!/usr/bin/env python
 
-import os
 import dotenv
 import hydra
-from omegaconf import DictConfig, OmegaConf
+from omegaconf import DictConfig
 import pytorch_lightning as pl
 from pytorch_lightning import LightningModule, LightningDataModule, Callback, Trainer
 from pytorch_lightning.loggers import Logger
+from tabular_ssl import utils
 
 # Load environment variables from `.env` file if it exists
 # Recursively searches for `.env` in all folders starting from work dir
 dotenv.load_dotenv(override=True)
-
-from tabular_ssl import utils
 
 log = utils.get_logger(__name__)
 
@@ -20,10 +18,10 @@ log = utils.get_logger(__name__)
 @hydra.main(version_base=None, config_path="../configs", config_name="config")
 def main(config: DictConfig) -> None:
     """Main training pipeline with error handling and performance optimizations."""
-    
+
     # Set up environment variables and configurations
     utils.extras(config)
-    
+
     # Set seed for random number generators in pytorch, numpy and python.random
     if config.get("seed"):
         pl.seed_everything(config.seed, workers=True)
@@ -53,7 +51,7 @@ def main(config: DictConfig) -> None:
                 logger.append(hydra.utils.instantiate(lg_conf))
 
     # Initialize the trainer
-    log.info(f"Instantiating trainer")
+    log.info("Instantiating trainer")
     trainer: Trainer = hydra.utils.instantiate(
         config.trainer, callbacks=callbacks, logger=logger
     )
@@ -85,11 +83,11 @@ def main(config: DictConfig) -> None:
 
     # Make sure everything closed properly
     log.info("Finalizing!")
-    
+
     # Print path to best checkpoint
     if trainer.checkpoint_callback:
         log.info(f"Best checkpoint path: {trainer.checkpoint_callback.best_model_path}")
-    
+
     # Return for possible use in optimizations like Optuna
     return trainer.callback_metrics.get("test/acc_best", None)
 
