@@ -1,0 +1,21 @@
+# https://hydra.cc/docs/configure_hydra/job_scheduling/
+
+# output directory, generated dynamically based on the time the job was launched
+# can be used to store all files generated during the run, like checkpoints and metrics
+run:
+  dir: ${paths.log_dir}/${task_name}/runs/${name}
+
+# sweep directory, generated dynamically based on the time the sweep was launched
+# can be used to store all files generated during sweep, like checkpoints and metrics
+sweep:
+  dir: ${paths.log_dir}/${task_name}/multiruns/${name}
+  subdir: ${hydra.job.num}
+
+job:
+  # sets `PYTHONPATH` environment variable to the project root
+  # so all modules in the project can be imported by hydra
+  env_set:
+    PYTHONPATH: ${paths.root_dir}
+
+# disable printing of config parameter information at job launch
+verbose: false 

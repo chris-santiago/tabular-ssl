@@ -86,12 +86,6 @@ mlruns/
 ehthumbs.db
 Thumbs.db
 
-# Project specific
-outputs/
-multirun/
-hydra/
-.hydra/
-*.hydra/
 
 # Testing
 .coverage
