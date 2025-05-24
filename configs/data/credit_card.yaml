@@ -1,0 +1,43 @@
+_target_: tabular_ssl.data.datamodule.TabularDataModule
+
+# Dataset configuration
+dataset_name: credit_card_transactions
+data_dir: ${paths.data_dir}
+
+# Use sample data download function
+use_sample_data: true
+sample_data_config:
+  data_source: "credit_card"
+  n_users: 1000
+  sequence_length: ${data.sequence_length}
+
+# DataLoader settings
+batch_size: 64
+num_workers: 4
+pin_memory: true
+persistent_workers: true
+
+# Data splitting
+train_val_test_split: [0.7, 0.15, 0.15]
+seed: ${seed}
+
+# Sequence settings
+sequence_length: 32
+min_events: 10
+max_events: 200
+
+# Feature configuration - will be auto-detected from sample data
+feature_config:
+  auto_detect: true
+  # These will be populated automatically from the downloaded data
+  categorical_features: []
+  numerical_features: []
+
+# Preprocessing
+normalize_numerical: true
+categorical_encoding: embedding
+
+# Credit card specific settings
+filter_users:
+  min_transactions: ${data.min_events}
+  max_transactions: ${data.max_events} 

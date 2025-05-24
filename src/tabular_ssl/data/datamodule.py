@@ -1,13 +1,17 @@
 import os
 from typing import Optional, Dict, List, Any
 import polars as pl
+import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import train_test_split
 import logging
 from dataclasses import dataclass, field
 import pytorch_lightning as lit
+
+from .sample_data import setup_sample_data, load_credit_card_sample
 
 log = logging.getLogger(__name__)
 
@@ -158,27 +162,38 @@ class TabularDataModule(lit.LightningDataModule):
 
     def __init__(
         self,
-        data_dir: str,
-        train_file: str,
-        val_file: str,
-        test_file: str,
-        feature_config: FeatureConfig,
+        data_dir: str = "data",
+        train_file: Optional[str] = None,
+        val_file: Optional[str] = None,
+        test_file: Optional[str] = None,
+        feature_config: Optional[FeatureConfig] = None,
         batch_size: int = 32,
         num_workers: int = 4,
         pin_memory: bool = True,
         sequence_length: int = 100,
+        # Sample data configuration
+        use_sample_data: bool = False,
+        sample_data_config: Optional[Dict[str, Any]] = None,
+        train_val_test_split: List[float] = [0.7, 0.15, 0.15],
+        seed: int = 42,
+        **kwargs,
     ):
         super().__init__()
         self.data_dir = data_dir
         self.train_file = train_file
         self.val_file = val_file
         self.test_file = test_file
-        self.feature_config = feature_config
         self.batch_size = batch_size
         self.num_workers = num_workers
         self.pin_memory = pin_memory
         self.sequence_length = sequence_length
+        self.use_sample_data = use_sample_data
+        self.sample_data_config = sample_data_config or {}
+        self.train_val_test_split = train_val_test_split
+        self.seed = seed
 
+        # Will be set during setup
+        self.feature_config = feature_config
         self.train_dataset = None
         self.val_dataset = None
         self.test_dataset = None
@@ -186,13 +201,32 @@ class TabularDataModule(lit.LightningDataModule):
 
     def prepare_data(self) -> None:
         """Download data if needed."""
-        pass
+        if self.use_sample_data:
+            # Download sample data (credit card transactions)
+            if self.sample_data_config.get("data_source") == "credit_card":
+                try:
+                    load_credit_card_sample(data_dir=self.data_dir)
+                    log.info("Sample credit card data downloaded successfully")
+                except Exception as e:
+                    log.error(f"Failed to download sample data: {e}")
+                    raise
 
     def setup(self, stage: Optional[str] = None) -> None:
         """Load and prepare datasets."""
         if stage == "fit" or stage is None:
-            # Load training data
-            train_data = pl.read_parquet(os.path.join(self.data_dir, self.train_file))
+            if self.use_sample_data:
+                # Load sample data
+                data = self._load_sample_data()
+            else:
+                # Load custom data from files
+                data = self._load_custom_data()
+
+            # Auto-detect features if needed
+            if self.feature_config is None:
+                self.feature_config = self._auto_detect_features(data)
+
+            # Split data
+            train_data, val_data, test_data = self._split_data(data)
 
             # Initialize and fit feature processor
             self.feature_processor = TabularFeatureProcessor(self.feature_config)
@@ -205,17 +239,12 @@ class TabularDataModule(lit.LightningDataModule):
                 feature_processor=self.feature_processor,
             )
 
-            # Load validation data
-            val_data = pl.read_parquet(os.path.join(self.data_dir, self.val_file))
             self.val_dataset = SequenceDataset(
                 data=val_data,
                 sequence_length=self.sequence_length,
                 feature_processor=self.feature_processor,
             )
 
-        if stage == "test":
-            # Load test data
-            test_data = pl.read_parquet(os.path.join(self.data_dir, self.test_file))
             self.test_dataset = SequenceDataset(
                 data=test_data,
                 sequence_length=self.sequence_length,
@@ -247,4 +276,103 @@ class TabularDataModule(lit.LightningDataModule):
             shuffle=False,
             num_workers=self.num_workers,
             pin_memory=self.pin_memory,
+        )
+
+    def _load_sample_data(self) -> pl.DataFrame:
+        """Load sample data (credit card transactions)."""
+        if self.sample_data_config.get("data_source") == "credit_card":
+            # Load credit card sample data
+            df, metadata = load_credit_card_sample(
+                data_dir=self.data_dir,
+                n_users=self.sample_data_config.get("n_users", 1000),
+                min_transactions=self.sequence_length,
+                max_transactions=200
+            )
+            
+            log.info(f"Loaded sample data: {len(df)} transactions for {metadata['n_users']} users")
+            
+            # Convert pandas to polars
+            return pl.from_pandas(df)
+        else:
+            raise ValueError(f"Unknown sample data source: {self.sample_data_config.get('data_source')}")
+
+    def _load_custom_data(self) -> pl.DataFrame:
+        """Load custom data from files."""
+        if not self.train_file:
+            raise ValueError("train_file must be specified when not using sample data")
+        
+        train_path = os.path.join(self.data_dir, self.train_file)
+        if train_path.endswith('.parquet'):
+            data = pl.read_parquet(train_path)
+        elif train_path.endswith('.csv'):
+            data = pl.read_csv(train_path)
+        else:
+            raise ValueError(f"Unsupported file format: {train_path}")
+        
+        return data
+
+    def _auto_detect_features(self, data: pl.DataFrame) -> FeatureConfig:
+        """Auto-detect categorical and numerical features."""
+        categorical_cols = []
+        numerical_cols = []
+        
+        for col in data.columns:
+            # Skip common metadata columns
+            if col.lower() in ['user_id', 'timestamp', 'sequence_id', 'position_in_sequence']:
+                continue
+                
+            dtype = data[col].dtype
+            
+            if dtype == pl.String or dtype == pl.Categorical:
+                # Consider categorical if not too many unique values
+                n_unique = data[col].n_unique()
+                if n_unique < len(data) * 0.5:  # Less than 50% unique values
+                    categorical_cols.append(col)
+            elif dtype in [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.Float32, pl.Float64]:
+                numerical_cols.append(col)
+        
+        log.info(f"Auto-detected features: {len(categorical_cols)} categorical, {len(numerical_cols)} numerical")
+        
+        return FeatureConfig(
+            categorical_cols=categorical_cols,
+            numerical_cols=numerical_cols,
+            categorical_encoding="embedding",
+            normalize_numerical=True
+        )
+
+    def _split_data(self, data: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+        """Split data into train/val/test sets."""
+        np.random.seed(self.seed)
+        
+        # Convert to pandas for splitting (easier with sklearn)
+        df = data.to_pandas()
+        
+        # First split: train vs (val + test)
+        train_size = self.train_val_test_split[0]
+        val_test_size = 1 - train_size
+        
+        train_df, val_test_df = train_test_split(
+            df, 
+            train_size=train_size, 
+            random_state=self.seed,
+            shuffle=True
+        )
+        
+        # Second split: val vs test
+        val_size = self.train_val_test_split[1] / val_test_size
+        
+        val_df, test_df = train_test_split(
+            val_test_df,
+            train_size=val_size,
+            random_state=self.seed,
+            shuffle=True
+        )
+        
+        log.info(f"Data split: train={len(train_df)}, val={len(val_df)}, test={len(test_df)}")
+        
+        # Convert back to polars
+        return (
+            pl.from_pandas(train_df),
+            pl.from_pandas(val_df),
+            pl.from_pandas(test_df)
         )

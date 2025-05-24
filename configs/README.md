@@ -307,4 +307,314 @@ export PYTHONPATH=/path/to/tabular-ssl/src
 
 # Optional: Set PROJECT_ROOT for data paths
 export PROJECT_ROOT=/path/to/tabular-ssl
+```
+
+# Configurations
+
+This directory contains Hydra configuration files for the Tabular SSL library.
+
+## Structure
+
+```
+configs/
+├── config.yaml                 # Main configuration file
+├── data/                       # Data configurations
+│   ├── synthetic.yaml          # Synthetic tabular data
+│   ├── credit_card.yaml        # Credit card transactions (IBM TabFormer)
+│   └── custom.yaml             # Template for custom data
+├── model/                      # Model component configurations
+│   ├── event_encoder/          # Event encoding architectures
+│   ├── sequence_encoder/       # Sequence modeling architectures
+│   ├── projection_head/        # Projection head configurations
+│   └── prediction_head/        # Prediction head configurations
+├── experiments/                # Complete experiment configurations
+│   ├── simple_demo.yaml        # Basic demonstration
+│   ├── credit_card_demo.yaml   # Credit card data demo
+│   └── transformer_ssl.yaml    # Advanced transformer setup
+├── trainer/                    # PyTorch Lightning trainer settings
+├── callbacks/                  # Training callbacks (checkpointing, logging)
+├── logger/                     # Experiment logging configurations
+└── paths/                      # Directory paths
+```
+
+## Quick Start
+
+### Using Sample Data (Credit Card Transactions)
+
+The easiest way to get started is with the IBM TabFormer credit card dataset:
+
+```bash
+# Run the demo to download and explore the data
+python demo_credit_card_data.py
+
+# Train a model on credit card transactions
+python train.py +experiment=credit_card_demo
+```
+
+The credit card dataset provides:
+- **Sequential transaction data** from real credit card usage patterns
+- **Mixed data types**: categorical (merchant, category) and numerical (amount, time)
+- **Multiple users**: sequences of transactions per credit card holder
+- **Realistic patterns**: temporal dependencies and user behavior
+
+### Using Your Own Data
+
+To use custom data, create a new data configuration:
+
+```yaml
+# configs/data/my_data.yaml
+_target_: tabular_ssl.data.datamodule.TabularDataModule
+
+data_dir: ${paths.data_dir}
+train_file: "my_train.parquet"
+val_file: "my_val.parquet" 
+test_file: "my_test.parquet"
+
+sequence_length: 50
+batch_size: 32
+
+feature_config:
+  categorical_cols: ["category", "merchant"]
+  numerical_cols: ["amount", "time_since_last"]
+  normalize_numerical: true
+  categorical_encoding: embedding
+```
+
+## Sample Data Sources
+
+### Credit Card Transactions (IBM TabFormer)
+
+- **Source**: [IBM TabFormer Repository](https://github.com/IBM/TabFormer/blob/main/data/credit_card/transactions.tgz)
+- **Description**: Real credit card transaction sequences with privacy protection
+- **Features**: Transaction amounts, merchant categories, timestamps, user IDs
+- **Use cases**: Fraud detection, spending pattern analysis, sequence prediction
+
+**Configuration**: `configs/data/credit_card.yaml`
+
+```yaml
+_target_: tabular_ssl.data.datamodule.TabularDataModule
+
+use_sample_data: true
+sample_data_config:
+  data_source: "credit_card" 
+  n_users: 1000
+  sequence_length: 32
+
+sequence_length: 32
+batch_size: 64
+```
+
+## Experiment Templates
+
+### Credit Card Demo
+
+A complete experiment using credit card transaction data:
+
+```bash
+python train.py +experiment=credit_card_demo
+```
+
+This experiment:
+- Downloads IBM TabFormer credit card data automatically
+- Uses a transformer-based sequence encoder
+- Includes proper validation and checkpointing
+- Optimized for real transaction patterns
+
+### Custom Experiment Template
+
+```yaml
+# configs/experiments/my_experiment.yaml
+# @package _global_
+
+defaults:
+  - override /data: my_data
+  - override /model/event_encoder: mlp
+  - override /model/sequence_encoder: transformer
+
+model:
+  learning_rate: 1e-4
+  sequence_encoder:
+    num_layers: 6
+    num_heads: 8
+
+trainer:
+  max_epochs: 50
+  precision: 16-mixed
+```
+
+## Configuration Components
+
+### Event Encoders (`model/event_encoder/`)
+
+Transform individual events/transactions into dense representations:
+
+- **MLP**: Multi-layer perceptron for mixed tabular features
+- **Embedding**: Specialized for categorical-heavy data
+- **Linear**: Simple linear transformation
+
+### Sequence Encoders (`model/sequence_encoder/`)
+
+Model temporal dependencies between events:
+
+- **Transformer**: Self-attention for complex dependencies
+- **LSTM**: Recurrent networks for sequential patterns
+- **GRU**: Lighter alternative to LSTM
+- **1D CNN**: Convolutional approach for local patterns
+
+### Model Architecture
+
+The complete model pipeline:
+
+```
+Raw Tabular Data
+       ↓
+Event Encoder (per transaction)
+       ↓
+Sequence Encoder (across time)
+       ↓
+Projection Head
+       ↓
+Task-specific Head
+```
+
+## Data Configuration Details
+
+### Feature Processing
+
+```yaml
+feature_config:
+  # Columns to treat as categorical
+  categorical_cols: ["merchant_category", "transaction_type"]
+  
+  # Columns to treat as numerical  
+  numerical_cols: ["amount", "time_since_last"]
+  
+  # Target column (optional)
+  target_col: "is_fraud"
+  
+  # How to encode categorical features
+  categorical_encoding: "embedding"  # or "onehot"
+  
+  # Whether to normalize numerical features
+  normalize_numerical: true
+  
+  # Custom embedding dimensions per categorical column
+  categorical_embedding_dims:
+    merchant_category: 32
+    transaction_type: 8
+```
+
+### Sequence Settings
+
+```yaml
+# Length of each sequence
+sequence_length: 32
+
+# Filter users by transaction count
+filter_users:
+  min_transactions: 10
+  max_transactions: 200
+
+# Data splitting
+train_val_test_split: [0.7, 0.15, 0.15]
+```
+
+## Advanced Usage
+
+### Multiple Data Sources
+
+```yaml
+# Combine different data sources
+data:
+  primary_source: "credit_card"
+  auxiliary_sources: ["user_profiles", "merchant_data"]
+  
+sample_data_config:
+  data_source: "credit_card"
+  n_users: 5000
+  include_fraud_labels: true
+```
+
+### Custom Preprocessing
+
+```yaml
+# Custom preprocessing pipeline
+preprocessing:
+  - normalize_amounts
+  - encode_timestamps  
+  - create_user_features
+  - filter_outliers
+```
+
+### Distributed Training
+
+```yaml
+trainer:
+  strategy: "ddp"  # Distributed data parallel
+  devices: 4
+  num_nodes: 1
+  precision: 16-mixed
+```
+
+## Validation Commands
+
+Test your configurations:
+
+```bash
+# Validate data configuration
+python train.py data=credit_card --cfg job --resolve
+
+# Test data loading
+python -c "
+from tabular_ssl.data.datamodule import TabularDataModule
+dm = TabularDataModule(use_sample_data=True, sample_data_config={'data_source': 'credit_card'})
+dm.prepare_data()
+dm.setup()
+print('✅ Data configuration valid')
+"
+
+# Run quick training test
+python train.py +experiment=credit_card_demo trainer.fast_dev_run=5
+```
+
+## Contributing
+
+When adding new configurations:
+
+1. **Data configs**: Add to `data/` with clear documentation
+2. **Model configs**: Split into logical components under `model/`
+3. **Experiments**: Include complete working examples in `experiments/`
+4. **Documentation**: Update this README with usage examples
+
+For sample data:
+1. Add download function to `src/tabular_ssl/data/sample_data.py`
+2. Create data config in `configs/data/`
+3. Add demo experiment in `configs/experiments/`
+4. Update documentation with examples
+
+## Troubleshooting
+
+**Data download issues**:
+```bash
+# Force re-download
+python -c "from tabular_ssl.data.sample_data import download_credit_card_transactions; download_credit_card_transactions(force_download=True)"
+```
+
+**Memory issues with large datasets**:
+```yaml
+data:
+  batch_size: 16  # Reduce batch size
+  num_workers: 2  # Reduce workers
+  
+model:
+  sequence_encoder:
+    hidden_dim: 256  # Reduce model size
+```
+
+**Feature detection issues**:
+```yaml
+feature_config:
+  auto_detect: false  # Disable auto-detection
+  categorical_cols: ["col1", "col2"]  # Specify manually
+  numerical_cols: ["col3", "col4"]
 ``` 
