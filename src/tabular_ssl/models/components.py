@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from abc import abstractmethod
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Union, Any
 from .base import (
     BaseComponent,
     EventEncoder,
@@ -15,7 +15,32 @@ from .base import (
 
 
 class MLPEventEncoder(EventEncoder):
-    """Simple MLP-based event encoder."""
+    """Simple MLP-based event encoder.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dims : List[int]
+        List of hidden layer dimensions.
+    output_dim : int
+        Output feature dimension.
+    dropout : float, default=0.1
+        Dropout probability.
+    activation : str, default="relu"
+        Activation function. One of {"relu", "gelu", "tanh", "leaky_relu", "silu"}.
+    use_batch_norm : bool, default=False
+        Whether to use batch normalization.
+        
+    Attributes
+    ----------
+    input_dim : int
+        Input feature dimension.
+    output_dim : int
+        Output feature dimension.
+    mlp : nn.Sequential
+        The MLP network.
+    """
 
     def __init__(
         self,
@@ -25,7 +50,7 @@ class MLPEventEncoder(EventEncoder):
         dropout: float = 0.1,
         activation: str = "relu",
         use_batch_norm: bool = False,
-    ):
+    ) -> None:
         super().__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
@@ -39,11 +64,46 @@ class MLPEventEncoder(EventEncoder):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass through the MLP.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, ..., input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Output tensor of shape (batch_size, ..., output_dim).
+        """
         return self.mlp(x)
 
 
 class AutoEncoderEventEncoder(EventEncoder):
-    """Autoencoder-based event encoder for self-supervised learning."""
+    """Autoencoder-based event encoder for self-supervised learning.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dims : List[int]
+        List of hidden layer dimensions for the encoder.
+    latent_dim : int
+        Latent representation dimension.
+    dropout : float, default=0.1
+        Dropout probability.
+    activation : str, default="relu"
+        Activation function. One of {"relu", "gelu", "tanh", "leaky_relu", "silu"}.
+    use_batch_norm : bool, default=False
+        Whether to use batch normalization.
+        
+    Attributes
+    ----------
+    encoder : nn.Sequential
+        The encoder network.
+    decoder : nn.Sequential
+        The decoder network with reversed architecture.
+    """
 
     def __init__(
         self,
@@ -53,7 +113,7 @@ class AutoEncoderEventEncoder(EventEncoder):
         dropout: float = 0.1,
         activation: str = "relu",
         use_batch_norm: bool = False,
-    ):
+    ) -> None:
         super().__init__()
 
         # Encoder
@@ -78,22 +138,80 @@ class AutoEncoderEventEncoder(EventEncoder):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass returns the latent representation."""
+        """Forward pass returns the latent representation.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, ..., input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Latent representation of shape (batch_size, ..., latent_dim).
+        """
         return self.encoder(x)
 
     def decode(self, z: torch.Tensor) -> torch.Tensor:
-        """Decode latent representation back to input space."""
+        """Decode latent representation back to input space.
+        
+        Parameters
+        ----------
+        z : torch.Tensor
+            Latent representation of shape (batch_size, ..., latent_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Reconstructed tensor of shape (batch_size, ..., input_dim).
+        """
         return self.decoder(z)
 
     def reconstruction_loss(self, x: torch.Tensor) -> torch.Tensor:
-        """Compute reconstruction loss."""
+        """Compute reconstruction loss.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, ..., input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Scalar reconstruction loss (MSE between input and reconstruction).
+        """
         z = self.encoder(x)
         x_recon = self.decoder(z)
         return F.mse_loss(x_recon, x)
 
 
 class ContrastiveEventEncoder(EventEncoder):
-    """Contrastive learning-based event encoder."""
+    """Contrastive learning-based event encoder.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dims : List[int]
+        List of hidden layer dimensions.
+    output_dim : int
+        Output feature dimension.
+    temperature : float, default=0.1
+        Temperature parameter for contrastive learning.
+    dropout : float, default=0.1
+        Dropout probability.
+    activation : str, default="relu"
+        Activation function. One of {"relu", "gelu", "tanh", "leaky_relu", "silu"}.
+    use_batch_norm : bool, default=False
+        Whether to use batch normalization.
+        
+    Attributes
+    ----------
+    encoder : nn.Sequential
+        The encoder network.
+    temperature : float
+        Temperature parameter for contrastive learning.
+    """
 
     def __init__(
         self,
@@ -104,7 +222,7 @@ class ContrastiveEventEncoder(EventEncoder):
         dropout: float = 0.1,
         activation: str = "relu",
         use_batch_norm: bool = False,
-    ):
+    ) -> None:
         super().__init__()
 
         self.encoder = create_mlp(
@@ -118,12 +236,36 @@ class ContrastiveEventEncoder(EventEncoder):
         self.temperature = temperature
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass returns normalized embeddings."""
+        """Forward pass returns normalized embeddings.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, ..., input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            L2-normalized embeddings of shape (batch_size, ..., output_dim).
+        """
         z = self.encoder(x)
         return F.normalize(z, dim=-1)
 
     def contrastive_loss(self, z1: torch.Tensor, z2: torch.Tensor) -> torch.Tensor:
-        """Compute contrastive loss between two views."""
+        """Compute contrastive loss between two views.
+        
+        Parameters
+        ----------
+        z1 : torch.Tensor
+            First view embeddings of shape (batch_size, output_dim).
+        z2 : torch.Tensor
+            Second view embeddings of shape (batch_size, output_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Scalar contrastive loss value.
+        """
         # Compute similarity matrix
         sim_matrix = torch.matmul(z1, z2.T) / self.temperature
 
@@ -137,7 +279,50 @@ class ContrastiveEventEncoder(EventEncoder):
 
 
 class TransformerSequenceEncoder(SequenceEncoder):
-    """Transformer-based sequence encoder."""
+    """Transformer-based sequence encoder.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dim : int
+        Hidden dimension and output dimension.
+    num_heads : int, default=8
+        Number of attention heads.
+    num_layers : int, default=6
+        Number of transformer layers.
+    dim_feedforward : int, default=2048
+        Dimension of feedforward network.
+    dropout : float, default=0.1
+        Dropout probability.
+    max_seq_length : int, default=2048
+        Maximum sequence length for positional encoding.
+    use_positional_encoding : bool, default=True
+        Whether to use positional encoding.
+        
+    Attributes
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dim : int
+        Hidden dimension.
+    output_dim : int
+        Output dimension (same as hidden_dim).
+    max_seq_length : int
+        Maximum sequence length.
+    use_positional_encoding : bool
+        Whether positional encoding is used.
+    input_proj : nn.Module
+        Input projection layer (Linear or Identity).
+    pos_encoding : Optional[nn.Parameter]
+        Positional encoding parameters.
+    transformer : nn.TransformerEncoder
+        The transformer encoder.
+    dropout : nn.Dropout
+        Dropout layer.
+    layer_norm : nn.LayerNorm
+        Layer normalization.
+    """
 
     def __init__(
         self,
@@ -149,7 +334,7 @@ class TransformerSequenceEncoder(SequenceEncoder):
         dropout: float = 0.1,
         max_seq_length: int = 2048,
         use_positional_encoding: bool = True,
-    ):
+    ) -> None:
         super().__init__()
 
         self.input_dim = input_dim
@@ -185,7 +370,18 @@ class TransformerSequenceEncoder(SequenceEncoder):
         self.layer_norm = nn.LayerNorm(hidden_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through transformer."""
+        """Forward pass through transformer.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Output tensor of shape (batch_size, seq_len, hidden_dim).
+        """
         batch_size, seq_len, _ = x.shape
 
         # Input projection
@@ -212,7 +408,36 @@ class TransformerSequenceEncoder(SequenceEncoder):
 
 
 class RNNSequenceEncoder(SequenceEncoder):
-    """RNN-based sequence encoder (LSTM/GRU)."""
+    """RNN-based sequence encoder (LSTM/GRU/RNN).
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dim : int
+        Hidden dimension.
+    num_layers : int, default=2
+        Number of RNN layers.
+    rnn_type : str, default="lstm"
+        Type of RNN. One of {"lstm", "gru", "rnn"}.
+    dropout : float, default=0.1
+        Dropout probability (applied between layers if num_layers > 1).
+    bidirectional : bool, default=False
+        Whether to use bidirectional RNN.
+        
+    Attributes
+    ----------
+    hidden_dim : int
+        Hidden dimension.
+    output_dim : int
+        Output dimension (hidden_dim * 2 if bidirectional, else hidden_dim).
+    num_layers : int
+        Number of RNN layers.
+    bidirectional : bool
+        Whether bidirectional RNN is used.
+    rnn : nn.Module
+        The RNN module (LSTM, GRU, or RNN).
+    """
 
     def __init__(
         self,
@@ -222,7 +447,7 @@ class RNNSequenceEncoder(SequenceEncoder):
         rnn_type: str = "lstm",  # "lstm", "gru", "rnn"
         dropout: float = 0.1,
         bidirectional: bool = False,
-    ):
+    ) -> None:
         super().__init__()
 
         self.hidden_dim = hidden_dim
@@ -248,7 +473,18 @@ class RNNSequenceEncoder(SequenceEncoder):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through RNN."""
+        """Forward pass through RNN.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Output tensor of shape (batch_size, seq_len, output_dim).
+        """
         output, _ = self.rnn(x)
         return output
 
@@ -257,7 +493,18 @@ class RNNSequenceEncoder(SequenceEncoder):
 def _initialize_s4_parameters(
     d_state: int,
 ) -> Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-    """Initialize complex state space parameters for S4."""
+    """Initialize complex state space parameters for S4.
+    
+    Parameters
+    ----------
+    d_state : int
+        State space dimension.
+        
+    Returns
+    -------
+    Tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]
+        Tuple of (A, B, C, D) parameters as complex tensors.
+    """
     A = torch.complex(-torch.rand(d_state) * 0.1, torch.randn(d_state) * 0.1)
     B = torch.randn(d_state, dtype=torch.cfloat) * 0.02
     C = torch.randn(d_state, dtype=torch.cfloat) * 0.02
@@ -268,7 +515,26 @@ def _initialize_s4_parameters(
 def _compute_s4_kernel(
     A: torch.Tensor, B: torch.Tensor, C: torch.Tensor, D: torch.Tensor, L: int
 ) -> torch.Tensor:
-    """Compute the S4 kernel for sequence length L."""
+    """Compute the S4 kernel for sequence length L.
+    
+    Parameters
+    ----------
+    A : torch.Tensor
+        State transition matrix of shape (d_state,).
+    B : torch.Tensor
+        Input matrix of shape (d_state,).
+    C : torch.Tensor
+        Output matrix of shape (d_state,).
+    D : torch.Tensor
+        Feedthrough matrix of shape (d_state,).
+    L : int
+        Sequence length.
+        
+    Returns
+    -------
+    torch.Tensor
+        S4 kernel of shape (L, d_state, d_state).
+    """
     A_powers = torch.pow(A.unsqueeze(0), torch.arange(L, device=A.device))
     kernel = torch.einsum("l,dn->ldn", A_powers, B)
     kernel = torch.einsum("ldn,md->lmn", kernel, C)
@@ -279,7 +545,22 @@ def _compute_s4_kernel(
 def _apply_bidirectional_s4_conv(
     x: torch.Tensor, kernel: torch.Tensor, d_model: int
 ) -> torch.Tensor:
-    """Apply bidirectional convolution for S4."""
+    """Apply bidirectional convolution for S4.
+    
+    Parameters
+    ----------
+    x : torch.Tensor
+        Input tensor of shape (batch_size, seq_len, d_model).
+    kernel : torch.Tensor
+        S4 kernel of shape (seq_len, d_model, d_model).
+    d_model : int
+        Model dimension.
+        
+    Returns
+    -------
+    torch.Tensor
+        Output tensor of shape (batch_size, seq_len, d_model).
+    """
     L = x.size(1)
     x_padded = F.pad(x, (0, 0, L - 1, L - 1))
     kernel_rev = kernel.flip(0)
@@ -293,7 +574,40 @@ def _apply_bidirectional_s4_conv(
 
 
 class _S4Block(nn.Module):
-    """S4 block with diagonal state space matrices."""
+    """S4 block with diagonal state space matrices.
+    
+    Parameters
+    ----------
+    d_model : int
+        Model dimension.
+    d_state : int
+        State space dimension.
+    dropout : float, default=0.1
+        Dropout probability.
+    bidirectional : bool, default=False
+        Whether to use bidirectional processing.
+    max_sequence_length : int, default=2048
+        Maximum sequence length.
+        
+    Attributes
+    ----------
+    d_model : int
+        Model dimension.
+    d_state : int
+        State space dimension.
+    bidirectional : bool
+        Whether bidirectional processing is used.
+    max_sequence_length : int
+        Maximum sequence length.
+    A, B, C, D : torch.Tensor
+        State space parameters.
+    input_proj : nn.Linear
+        Input projection layer.
+    dropout : nn.Dropout
+        Dropout layer.
+    norm : nn.LayerNorm
+        Layer normalization.
+    """
 
     def __init__(
         self,
@@ -302,7 +616,7 @@ class _S4Block(nn.Module):
         dropout: float = 0.1,
         bidirectional: bool = False,
         max_sequence_length: int = 2048,
-    ):
+    ) -> None:
         super().__init__()
         self.d_model = d_model
         self.d_state = d_state
@@ -318,7 +632,18 @@ class _S4Block(nn.Module):
         self.norm = nn.LayerNorm(self.d_model)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass of the S4 block."""
+        """Forward pass of the S4 block.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, d_model).
+            
+        Returns
+        -------
+        torch.Tensor
+            Output tensor of shape (batch_size, seq_len, d_model).
+        """
         # Input projection and normalization
         x = self.input_proj(x)
         x = self.norm(x)
@@ -348,7 +673,48 @@ class _S4Block(nn.Module):
 
 
 class S4SequenceEncoder(SequenceEncoder):
-    """S4 (Structured State Space) sequence encoder."""
+    """S4 (Structured State Space) sequence encoder.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dim : int
+        Hidden dimension.
+    num_layers : int, default=4
+        Number of S4 layers.
+    dropout : float, default=0.1
+        Dropout probability.
+    bidirectional : bool, default=False
+        Whether to use bidirectional processing.
+    max_sequence_length : int, default=2048
+        Maximum sequence length.
+    output_dim : Optional[int], default=None
+        Output dimension. If None, uses hidden_dim.
+        
+    Attributes
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dim : int
+        Hidden dimension.
+    num_layers : int
+        Number of S4 layers.
+    dropout : float
+        Dropout probability.
+    bidirectional : bool
+        Whether bidirectional processing is used.
+    max_sequence_length : int
+        Maximum sequence length.
+    output_dim : int
+        Output dimension.
+    input_proj : nn.Module
+        Input projection layer.
+    blocks : nn.ModuleList
+        List of S4 blocks.
+    output_proj : nn.Module
+        Output projection layer.
+    """
 
     def __init__(
         self,
@@ -359,7 +725,7 @@ class S4SequenceEncoder(SequenceEncoder):
         bidirectional: bool = False,
         max_sequence_length: int = 2048,
         output_dim: Optional[int] = None,
-    ):
+    ) -> None:
         super().__init__()
         self.input_dim = input_dim
         self.hidden_dim = hidden_dim
@@ -397,7 +763,18 @@ class S4SequenceEncoder(SequenceEncoder):
             self.output_dim = hidden_dim
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Forward pass through S4 layers."""
+        """Forward pass through S4 layers.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Output tensor of shape (batch_size, seq_len, output_dim).
+        """
         # Input projection
         x = self.input_proj(x)
 
@@ -412,9 +789,28 @@ class S4SequenceEncoder(SequenceEncoder):
 
 
 class CategoricalEmbedding(EmbeddingLayer):
-    """Embedding layer for categorical variables with flexible dimensions."""
+    """Embedding layer for categorical variables with flexible dimensions.
+    
+    Parameters
+    ----------
+    vocab_sizes : Dict[str, int]
+        Dictionary mapping column names to vocabulary sizes.
+    embedding_dims : Dict[str, int]
+        Dictionary mapping column names to embedding dimensions.
+        
+    Attributes
+    ----------
+    vocab_sizes : Dict[str, int]
+        Vocabulary sizes for each categorical column.
+    embedding_dims : Dict[str, int]
+        Embedding dimensions for each categorical column.
+    embeddings : nn.ModuleDict
+        Dictionary of embedding layers for each column.
+    output_dim : int
+        Total output dimension (sum of all embedding dimensions).
+    """
 
-    def __init__(self, vocab_sizes: Dict[str, int], embedding_dims: Dict[str, int]):
+    def __init__(self, vocab_sizes: Dict[str, int], embedding_dims: Dict[str, int]) -> None:
         super().__init__()
 
         self.vocab_sizes = vocab_sizes
@@ -431,12 +827,18 @@ class CategoricalEmbedding(EmbeddingLayer):
         self.output_dim = sum(embedding_dims.values())
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """
-        Forward pass.
-        Args:
-            x: Tensor of shape (batch_size, sequence_length, num_categorical_features)
-        Returns:
-            Embedded features of shape (batch_size, sequence_length, total_embedding_dim)
+        """Forward pass through categorical embeddings.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, sequence_length, num_categorical_features).
+            Contains integer indices for each categorical feature.
+            
+        Returns
+        -------
+        torch.Tensor
+            Embedded features of shape (batch_size, sequence_length, total_embedding_dim).
         """
         embedded_features = []
 
@@ -452,7 +854,28 @@ class CategoricalEmbedding(EmbeddingLayer):
 
 
 class MLPProjectionHead(ProjectionHead):
-    """MLP-based projection head for downstream tasks."""
+    """MLP-based projection head for downstream tasks.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    hidden_dims : List[int]
+        List of hidden layer dimensions.
+    output_dim : int
+        Output feature dimension.
+    dropout : float, default=0.1
+        Dropout probability.
+    activation : str, default="relu"
+        Activation function. One of {"relu", "gelu", "tanh", "leaky_relu", "silu"}.
+    use_batch_norm : bool, default=False
+        Whether to use batch normalization.
+        
+    Attributes
+    ----------
+    projection : nn.Sequential
+        The MLP projection network.
+    """
 
     def __init__(
         self,
@@ -462,7 +885,7 @@ class MLPProjectionHead(ProjectionHead):
         dropout: float = 0.1,
         activation: str = "relu",
         use_batch_norm: bool = False,
-    ):
+    ) -> None:
         super().__init__()
 
         self.projection = create_mlp(
@@ -475,11 +898,44 @@ class MLPProjectionHead(ProjectionHead):
         )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass through projection head.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, ..., input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Projected tensor of shape (batch_size, ..., output_dim).
+        """
         return self.projection(x)
 
 
 class ClassificationHead(PredictionHead):
-    """Classification head for supervised learning."""
+    """Classification head for supervised learning.
+    
+    Parameters
+    ----------
+    input_dim : int
+        Input feature dimension.
+    num_classes : int
+        Number of output classes.
+    hidden_dims : Optional[List[int]], default=None
+        List of hidden layer dimensions. If None, uses a simple linear classifier.
+    dropout : float, default=0.1
+        Dropout probability.
+    activation : str, default="relu"
+        Activation function. One of {"relu", "gelu", "tanh", "leaky_relu", "silu"}.
+    use_batch_norm : bool, default=False
+        Whether to use batch normalization.
+        
+    Attributes
+    ----------
+    classifier : nn.Module
+        The classification network (either linear or MLP).
+    """
 
     def __init__(
         self,
@@ -489,7 +945,7 @@ class ClassificationHead(PredictionHead):
         dropout: float = 0.1,
         activation: str = "relu",
         use_batch_norm: bool = False,
-    ):
+    ) -> None:
         super().__init__()
 
         if hidden_dims is None:
@@ -509,6 +965,18 @@ class ClassificationHead(PredictionHead):
             )
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
+        """Forward pass through classification head.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, ..., input_dim).
+            
+        Returns
+        -------
+        torch.Tensor
+            Class logits of shape (batch_size, ..., num_classes).
+        """
         return self.classifier(x)
 
 
@@ -518,9 +986,21 @@ class BaseCorruption(BaseComponent):
     
     All corruption strategies should inherit from this class and implement
     the standardized interface for consistent integration with SSL models.
+    
+    Parameters
+    ----------
+    corruption_rate : float, default=0.15
+        Base corruption rate (interpretation depends on specific strategy).
+    **kwargs : Any
+        Additional keyword arguments.
+        
+    Attributes
+    ----------
+    corruption_rate : float
+        The corruption rate parameter.
     """
     
-    def __init__(self, corruption_rate: float = 0.15, **kwargs):
+    def __init__(self, corruption_rate: float = 0.15, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.corruption_rate = corruption_rate
     
@@ -528,10 +1008,14 @@ class BaseCorruption(BaseComponent):
     def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         """Apply corruption to input tensor.
         
-        Args:
-            x: Input tensor of shape (batch_size, seq_len, num_features)
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, num_features).
             
-        Returns:
+        Returns
+        -------
+        Dict[str, torch.Tensor]
             Dictionary containing:
             - 'corrupted': Corrupted input tensor
             - 'targets': Targets for reconstruction (optional)
@@ -540,28 +1024,57 @@ class BaseCorruption(BaseComponent):
         """
         pass
     
-    def get_loss_components(self, output: Dict[str, torch.Tensor], original: torch.Tensor) -> Dict[str, torch.Tensor]:
+    def get_loss_components(
+        self, output: Dict[str, torch.Tensor], original: torch.Tensor
+    ) -> Dict[str, torch.Tensor]:
         """Extract loss components from corruption output.
         
-        Args:
-            output: Output from forward() method
-            original: Original uncorrupted input
+        Parameters
+        ----------
+        output : Dict[str, torch.Tensor]
+            Output from forward() method.
+        original : torch.Tensor
+            Original uncorrupted input.
             
-        Returns:
-            Dictionary of loss components for this corruption strategy
+        Returns
+        -------
+        Dict[str, torch.Tensor]
+            Dictionary of loss components for this corruption strategy.
         """
         return {}
 
 
 # Simple corruption strategies
 class RandomMasking(BaseCorruption):
-    """Random masking corruption strategy."""
+    """Random masking corruption strategy.
+    
+    Parameters
+    ----------
+    corruption_rate : float, default=0.15
+        Probability of masking each element.
+    **kwargs : Any
+        Additional keyword arguments passed to BaseCorruption.
+    """
 
-    def __init__(self, corruption_rate: float = 0.15, **kwargs):
+    def __init__(self, corruption_rate: float = 0.15, **kwargs: Any) -> None:
         super().__init__(corruption_rate=corruption_rate, **kwargs)
 
     def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
-        """Apply random masking to input tensor."""
+        """Apply random masking to input tensor.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, num_features).
+            
+        Returns
+        -------
+        Dict[str, torch.Tensor]
+            Dictionary containing:
+            - 'corrupted': Masked input tensor
+            - 'mask': Binary mask (1 where corrupted, 0 where original)
+            - 'targets': Original tensor for reconstruction
+        """
         mask = torch.rand_like(x) > self.corruption_rate
         corrupted = x * mask.float()
         
@@ -573,14 +1086,41 @@ class RandomMasking(BaseCorruption):
 
 
 class GaussianNoise(BaseCorruption):
-    """Gaussian noise corruption strategy."""
+    """Gaussian noise corruption strategy.
+    
+    Parameters
+    ----------
+    noise_std : float, default=0.1
+        Standard deviation of Gaussian noise.
+    **kwargs : Any
+        Additional keyword arguments passed to BaseCorruption.
+        
+    Attributes
+    ----------
+    noise_std : float
+        Standard deviation of the noise.
+    """
 
-    def __init__(self, noise_std: float = 0.1, **kwargs):
+    def __init__(self, noise_std: float = 0.1, **kwargs: Any) -> None:
         super().__init__(**kwargs)
         self.noise_std = noise_std
 
     def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
-        """Add Gaussian noise to input tensor."""
+        """Add Gaussian noise to input tensor.
+        
+        Parameters
+        ----------
+        x : torch.Tensor
+            Input tensor of shape (batch_size, seq_len, num_features).
+            
+        Returns
+        -------
+        Dict[str, torch.Tensor]
+            Dictionary containing:
+            - 'corrupted': Noisy input tensor
+            - 'targets': Clean version for denoising
+            - 'metadata': Noise parameters
+        """
         if self.training:
             noise = torch.randn_like(x) * self.noise_std
             corrupted = x + noise
