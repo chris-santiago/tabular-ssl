@@ -32,7 +32,7 @@ from .components import (
 __all__ = [
     # Base classes
     "BaseModel",
-    "BaseComponent", 
+    "BaseComponent",
     "EventEncoder",
     "SequenceEncoder",
     "EmbeddingLayer",
@@ -40,27 +40,22 @@ __all__ = [
     "PredictionHead",
     "FeatureEncoder",
     "create_mlp",
-    
     # Event encoders
     "MLPEventEncoder",
-    "AutoEncoderEventEncoder", 
+    "AutoEncoderEventEncoder",
     "ContrastiveEventEncoder",
-    
     # Sequence encoders
     "TransformerSequenceEncoder",
     "RNNSequenceEncoder",
     "S4SequenceEncoder",
-    
     # Embeddings and heads
     "CategoricalEmbedding",
     "MLPProjectionHead",
     "ClassificationHead",
-    
     # Data corruption
     "RandomMasking",
-    "GaussianNoise", 
+    "GaussianNoise",
     "SwappingCorruption",
-    
     # Backward compatibility (deprecated)
     "ModelConfig",
     "TabularSSL",

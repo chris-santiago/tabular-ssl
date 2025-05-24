@@ -1,7 +1,6 @@
 import os
 from typing import Optional, Dict, List, Any
 import polars as pl
-import pandas as pd
 import torch
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
@@ -11,7 +10,7 @@ import logging
 from dataclasses import dataclass, field
 import pytorch_lightning as lit
 
-from .sample_data import setup_sample_data, load_credit_card_sample
+from .sample_data import load_credit_card_sample
 
 log = logging.getLogger(__name__)
 
@@ -19,7 +18,7 @@ log = logging.getLogger(__name__)
 @dataclass
 class FeatureConfig:
     """Configuration for feature processing."""
-    
+
     categorical_cols: List[str]
     numerical_cols: List[str]
     target_col: Optional[str] = None
@@ -47,7 +46,7 @@ class TabularFeatureProcessor:
             self.categorical_mappings[col] = {
                 val: idx for idx, val in enumerate(unique_values)
             }
-            
+
             # Set embedding dimensions for each categorical column
             if self.config.categorical_encoding == "embedding":
                 self._embedding_dims[col] = self.config.categorical_embedding_dims.get(
@@ -100,7 +99,9 @@ class TabularFeatureProcessor:
                 categorical_data = []
                 for col in self.config.categorical_cols:
                     values = data[col].to_list()
-                    encoded = torch.zeros((len(values), len(self.categorical_mappings[col])))
+                    encoded = torch.zeros(
+                        (len(values), len(self.categorical_mappings[col]))
+                    )
                     for i, val in enumerate(values):
                         encoded[i, self.categorical_mappings[col][val]] = 1
                     categorical_data.append(encoded)
@@ -111,7 +112,7 @@ class TabularFeatureProcessor:
                     values = data[col].to_list()
                     encoded = torch.tensor(
                         [self.categorical_mappings[col][val] for val in values],
-                        dtype=torch.long
+                        dtype=torch.long,
                     )
                     categorical_data.append(encoded)
                 result["categorical"] = torch.stack(categorical_data, dim=1)
@@ -286,93 +287,109 @@ class TabularDataModule(lit.LightningDataModule):
                 data_dir=self.data_dir,
                 n_users=self.sample_data_config.get("n_users", 1000),
                 min_transactions=self.sequence_length,
-                max_transactions=200
+                max_transactions=200,
             )
-            
-            log.info(f"Loaded sample data: {len(df)} transactions for {metadata['n_users']} users")
-            
+
+            log.info(
+                f"Loaded sample data: {len(df)} transactions for {metadata['n_users']} users"
+            )
+
             # Convert pandas to polars
             return pl.from_pandas(df)
         else:
-            raise ValueError(f"Unknown sample data source: {self.sample_data_config.get('data_source')}")
+            raise ValueError(
+                f"Unknown sample data source: {self.sample_data_config.get('data_source')}"
+            )
 
     def _load_custom_data(self) -> pl.DataFrame:
         """Load custom data from files."""
         if not self.train_file:
             raise ValueError("train_file must be specified when not using sample data")
-        
+
         train_path = os.path.join(self.data_dir, self.train_file)
-        if train_path.endswith('.parquet'):
+        if train_path.endswith(".parquet"):
             data = pl.read_parquet(train_path)
-        elif train_path.endswith('.csv'):
+        elif train_path.endswith(".csv"):
             data = pl.read_csv(train_path)
         else:
             raise ValueError(f"Unsupported file format: {train_path}")
-        
+
         return data
 
     def _auto_detect_features(self, data: pl.DataFrame) -> FeatureConfig:
         """Auto-detect categorical and numerical features."""
         categorical_cols = []
         numerical_cols = []
-        
+
         for col in data.columns:
             # Skip common metadata columns
-            if col.lower() in ['user_id', 'timestamp', 'sequence_id', 'position_in_sequence']:
+            if col.lower() in [
+                "user_id",
+                "timestamp",
+                "sequence_id",
+                "position_in_sequence",
+            ]:
                 continue
-                
+
             dtype = data[col].dtype
-            
+
             if dtype == pl.String or dtype == pl.Categorical:
                 # Consider categorical if not too many unique values
                 n_unique = data[col].n_unique()
                 if n_unique < len(data) * 0.5:  # Less than 50% unique values
                     categorical_cols.append(col)
-            elif dtype in [pl.Int8, pl.Int16, pl.Int32, pl.Int64, pl.Float32, pl.Float64]:
+            elif dtype in [
+                pl.Int8,
+                pl.Int16,
+                pl.Int32,
+                pl.Int64,
+                pl.Float32,
+                pl.Float64,
+            ]:
                 numerical_cols.append(col)
-        
-        log.info(f"Auto-detected features: {len(categorical_cols)} categorical, {len(numerical_cols)} numerical")
-        
+
+        log.info(
+            f"Auto-detected features: {len(categorical_cols)} categorical, {len(numerical_cols)} numerical"
+        )
+
         return FeatureConfig(
             categorical_cols=categorical_cols,
             numerical_cols=numerical_cols,
             categorical_encoding="embedding",
-            normalize_numerical=True
+            normalize_numerical=True,
         )
 
-    def _split_data(self, data: pl.DataFrame) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
+    def _split_data(
+        self, data: pl.DataFrame
+    ) -> tuple[pl.DataFrame, pl.DataFrame, pl.DataFrame]:
         """Split data into train/val/test sets."""
         np.random.seed(self.seed)
-        
+
         # Convert to pandas for splitting (easier with sklearn)
         df = data.to_pandas()
-        
+
         # First split: train vs (val + test)
         train_size = self.train_val_test_split[0]
         val_test_size = 1 - train_size
-        
+
         train_df, val_test_df = train_test_split(
-            df, 
-            train_size=train_size, 
-            random_state=self.seed,
-            shuffle=True
+            df, train_size=train_size, random_state=self.seed, shuffle=True
         )
-        
+
         # Second split: val vs test
         val_size = self.train_val_test_split[1] / val_test_size
-        
+
         val_df, test_df = train_test_split(
-            val_test_df,
-            train_size=val_size,
-            random_state=self.seed,
-            shuffle=True
+            val_test_df, train_size=val_size, random_state=self.seed, shuffle=True
         )
-        
-        log.info(f"Data split: train={len(train_df)}, val={len(val_df)}, test={len(test_df)}")
-        
+
+        log.info(
+            f"Data split: train={len(train_df)}, val={len(val_df)}, test={len(test_df)}"
+        )
+
         # Convert back to polars
         return (
             pl.from_pandas(train_df),
             pl.from_pandas(val_df),
-            pl.from_pandas(test_df)
+            pl.from_pandas(test_df),
         )

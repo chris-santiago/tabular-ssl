@@ -2,6 +2,7 @@
 
 try:
     import dotenv
+
     # Load environment variables from `.env` file if it exists
     # Recursively searches for `.env` in all folders starting from work dir
     dotenv.load_dotenv(override=True)
