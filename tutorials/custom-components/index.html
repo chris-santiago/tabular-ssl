@@ -981,54 +981,45 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-1-create-a-configuration-class" class="md-nav__link">
+  <a href="#step-1-create-a-custom-component-class" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 1: Create a Configuration Class
+      Step 1: Create a Custom Component Class
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-2-create-a-component-class" class="md-nav__link">
+  <a href="#step-2-create-a-configuration-file" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 2: Create a Component Class
+      Step 2: Create a Configuration File
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-3-create-a-configuration-file" class="md-nav__link">
+  <a href="#step-3-use-your-component-in-an-experiment" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 3: Create a Configuration File
+      Step 3: Use Your Component in an Experiment
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-4-use-your-component-in-an-experiment" class="md-nav__link">
+  <a href="#step-4-import-your-component-module" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 4: Use Your Component in an Experiment
+      Step 4: Import Your Component Module
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#step-5-import-your-component-module" class="md-nav__link">
+  <a href="#step-5-run-your-experiment" class="md-nav__link">
     <span class="md-ellipsis">
-      Step 5: Import Your Component Module
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#step-6-run-your-experiment" class="md-nav__link">
-    <span class="md-ellipsis">
-      Step 6: Run Your Experiment
+      Step 5: Run Your Experiment
     </span>
   </a>
   
@@ -1068,36 +1059,78 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-component-with-custom-forward-arguments" class="md-nav__link">
+  <a href="#advanced-example-custom-attention-mechanism" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced: Component with Custom Forward Arguments
+      Advanced Example: Custom Attention Mechanism
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-component-with-multiple-output-values" class="md-nav__link">
+  <a href="#testing-your-custom-component" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced: Component with Multiple Output Values
+      Testing Your Custom Component
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#advanced-component-with-custom-methods" class="md-nav__link">
+  <a href="#best-practices" class="md-nav__link">
     <span class="md-ellipsis">
-      Advanced: Component with Custom Methods
+      Best Practices
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#conclusion" class="md-nav__link">
+  <a href="#common-issues-and-solutions" class="md-nav__link">
     <span class="md-ellipsis">
-      Conclusion
+      Common Issues and Solutions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Issues and Solutions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#import-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#configuration-errors" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration Errors
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dimension-mismatches" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dimension Mismatches
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
     </span>
   </a>
   
@@ -1120,7 +1153,7 @@
 
 
 <h1 id="creating-custom-components">Creating Custom Components<a class="headerlink" href="#creating-custom-components" title="Permanent link">&para;</a></h1>
-<p>This tutorial will guide you through creating custom components in Tabular SSL using the component registry.</p>
+<p>This tutorial will guide you through creating custom components in Tabular SSL using the simplified modular architecture.</p>
 <h2 id="prerequisites">Prerequisites<a class="headerlink" href="#prerequisites" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Basic understanding of PyTorch</li>
@@ -1128,67 +1161,61 @@
 <li>Python environment with Tabular SSL installed</li>
 </ul>
 <h2 id="introduction">Introduction<a class="headerlink" href="#introduction" title="Permanent link">&para;</a></h2>
-<p>Tabular SSL uses a component registry pattern that allows you to create and register custom components. This enables you to extend the library with your own custom event encoders, sequence encoders, or other components without modifying the core codebase.</p>
-<h2 id="step-1-create-a-configuration-class">Step 1: Create a Configuration Class<a class="headerlink" href="#step-1-create-a-configuration-class" title="Permanent link">&para;</a></h2>
-<p>First, define a configuration class for your component. This should inherit from the appropriate base configuration class.</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># src/tabular_ssl/models/custom_components.py</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">Field</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ComponentConfig</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomEncoderConfig</span><span class="p">(</span><span class="n">ComponentConfig</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration for custom encoder.&quot;&quot;&quot;</span>
-
-    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Input dimension&quot;</span><span class="p">)</span>
-    <span class="n">hidden_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Hidden dimensions&quot;</span><span class="p">)</span>
-    <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Output dimension&quot;</span><span class="p">)</span>
-    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Dropout rate&quot;</span><span class="p">)</span>
-    <span class="n">use_batch_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Whether to use batch normalization&quot;</span><span class="p">)</span>
-    <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="s2">&quot;relu&quot;</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Activation function&quot;</span><span class="p">)</span>
-</code></pre></div>
-<p>The configuration class uses Pydantic fields with validation and documentation. Required fields are marked with <code>...</code> as the default value, while optional fields have explicit defaults.</p>
-<h2 id="step-2-create-a-component-class">Step 2: Create a Component Class<a class="headerlink" href="#step-2-create-a-component-class" title="Permanent link">&para;</a></h2>
-<p>Next, create a component class that inherits from the appropriate base component class:</p>
+<p>Tabular SSL uses a simplified modular architecture that allows you to create custom components by directly subclassing base classes and using Hydra's <code>_target_</code> mechanism for instantiation. This approach is much simpler than the previous registry-based system.</p>
+<h2 id="step-1-create-a-custom-component-class">Step 1: Create a Custom Component Class<a class="headerlink" href="#step-1-create-a-custom-component-class" title="Permanent link">&para;</a></h2>
+<p>Create a component class that inherits from the appropriate base class:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># src/tabular_ssl/models/custom_components.py</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventEncoder</span><span class="p">,</span> <span class="n">ComponentRegistry</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">EventEncoder</span>
 
-<span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_encoder&quot;</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomEncoder</span><span class="p">(</span><span class="n">EventEncoder</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomEventEncoder</span><span class="p">(</span><span class="n">EventEncoder</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom event encoder implementation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CustomEncoderConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> 
+        <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hidden_dims</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">activation</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;relu&quot;</span><span class="p">,</span>
+        <span class="n">use_batch_norm</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dims</span> <span class="o">=</span> <span class="n">hidden_dims</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">activation</span> <span class="o">=</span> <span class="n">activation</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_batch_norm</span> <span class="o">=</span> <span class="n">use_batch_norm</span>
 
         <span class="c1"># Build the layers</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layers</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">()</span>
-        <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">input_dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">config</span><span class="o">.</span><span class="n">hidden_dims</span>
+        <span class="n">dims</span> <span class="o">=</span> <span class="p">[</span><span class="n">input_dim</span><span class="p">]</span> <span class="o">+</span> <span class="n">hidden_dims</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dims</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
             <span class="n">layer</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">dims</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span>
 
-            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">use_batch_norm</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">use_batch_norm</span><span class="p">:</span>
                 <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">BatchNorm1d</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]))</span>
 
-            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;relu&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;relu&quot;</span><span class="p">:</span>
                 <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">())</span>
-            <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;leaky_relu&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;leaky_relu&quot;</span><span class="p">:</span>
                 <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">LeakyReLU</span><span class="p">(</span><span class="mf">0.2</span><span class="p">))</span>
-            <span class="k">elif</span> <span class="n">config</span><span class="o">.</span><span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;gelu&quot;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">activation</span> <span class="o">==</span> <span class="s2">&quot;gelu&quot;</span><span class="p">:</span>
                 <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">())</span>
 
-            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">dropout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">dropout</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">dropout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">layer</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="n">layer</span><span class="p">))</span>
 
         <span class="c1"># Output layer</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">config</span><span class="o">.</span><span class="n">output_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">dims</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">output_dim</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.&quot;&quot;&quot;</span>
@@ -1205,165 +1232,294 @@
         <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_layer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
         <span class="c1"># Reshape back to sequence</span>
-        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">output_dim</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">x</span>
 </code></pre></div>
-<p>Note the <code>@ComponentRegistry.register("custom_encoder")</code> decorator, which registers the component with the registry.</p>
-<h2 id="step-3-create-a-configuration-file">Step 3: Create a Configuration File<a class="headerlink" href="#step-3-create-a-configuration-file" title="Permanent link">&para;</a></h2>
+<h2 id="step-2-create-a-configuration-file">Step 2: Create a Configuration File<a class="headerlink" href="#step-2-create-a-configuration-file" title="Permanent link">&para;</a></h2>
 <p>Create a YAML configuration file for your component:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># configs/model/event_encoder/custom.yaml</span>
-<span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom_encoder</span>
-<span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom_encoder</span>
+<span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.custom_components.CustomEventEncoder</span>
+
 <span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span>
 <span class="nt">hidden_dims</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">128</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">64</span><span class="p p-Indicator">]</span>
 <span class="nt">output_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
 <span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.2</span>
-<span class="nt">use_batch_norm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 <span class="nt">activation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gelu</span>
+<span class="nt">use_batch_norm</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
 </code></pre></div>
-<h2 id="step-4-use-your-component-in-an-experiment">Step 4: Use Your Component in an Experiment<a class="headerlink" href="#step-4-use-your-component-in-an-experiment" title="Permanent link">&para;</a></h2>
+<h2 id="step-3-use-your-component-in-an-experiment">Step 3: Use Your Component in an Experiment<a class="headerlink" href="#step-3-use-your-component-in-an-experiment" title="Permanent link">&para;</a></h2>
 <p>Create an experiment configuration that uses your custom component:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># configs/experiment/custom_experiment.yaml</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/experiments/custom_experiment.yaml</span>
 <span class="c1"># @package _global_</span>
 
 <span class="nt">defaults</span><span class="p">:</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/event_encoder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom.yaml</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/sequence_encoder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformer.yaml</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /trainer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default.yaml</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">default.yaml</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">_self_</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/event_encoder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">custom</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/sequence_encoder</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">transformer</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/projection_head</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mlp</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">override /model/prediction_head</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">classification</span>
 
 <span class="nt">tags</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;custom&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;transformer&quot;</span><span class="p p-Indicator">]</span>
 
-<span class="nt">seed</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">12345</span>
+<span class="nt">model</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">learning_rate</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-4</span>
+<span class="w">  </span><span class="nt">weight_decay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="w">  </span><span class="nt">optimizer_type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">adamw</span>
 
 <span class="nt">trainer</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50</span>
 <span class="w">  </span><span class="nt">gradient_clip_val</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.5</span>
 
-<span class="nt">model</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">optimizer</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">lr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1.0e-4</span>
-<span class="w">    </span><span class="nt">weight_decay</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.01</span>
+<span class="nt">data</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">64</span>
+<span class="w">  </span><span class="nt">sequence_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
 </code></pre></div>
-<h2 id="step-5-import-your-component-module">Step 5: Import Your Component Module<a class="headerlink" href="#step-5-import-your-component-module" title="Permanent link">&para;</a></h2>
-<p>Make sure your component module is imported somewhere in your code. You can do this in your main training script:</p>
+<h2 id="step-4-import-your-component-module">Step 4: Import Your Component Module<a class="headerlink" href="#step-4-import-your-component-module" title="Permanent link">&para;</a></h2>
+<p>Make sure your component module is imported. You can do this in your main training script or by adding it to the package's <code>__init__.py</code>:</p>
 <div class="highlight"><pre><span></span><code><span class="c1"># src/train.py</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">hydra</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span>
 
-<span class="c1"># Import your custom components</span>
+<span class="c1"># Import your custom components module to register them</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">tabular_ssl.models.custom_components</span>
 
-<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">)</span>
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
-    <span class="c1"># Rest of your code...</span>
+    <span class="c1"># Create components using Hydra</span>
+    <span class="n">datamodule</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trainer</span><span class="p">)</span>
+
+    <span class="c1"># Training loop</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </code></pre></div>
-<h2 id="step-6-run-your-experiment">Step 6: Run Your Experiment<a class="headerlink" href="#step-6-run-your-experiment" title="Permanent link">&para;</a></h2>
+<h2 id="step-5-run-your-experiment">Step 5: Run Your Experiment<a class="headerlink" href="#step-5-run-your-experiment" title="Permanent link">&para;</a></h2>
 <p>Run your experiment with your custom component:</p>
-<div class="highlight"><pre><span></span><code>python<span class="w"> </span>src/train.py<span class="w"> </span><span class="nv">experiment</span><span class="o">=</span>custom_experiment
+<div class="highlight"><pre><span></span><code>python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>custom_experiment
 </code></pre></div>
 <h2 id="creating-other-component-types">Creating Other Component Types<a class="headerlink" href="#creating-other-component-types" title="Permanent link">&para;</a></h2>
 <h3 id="custom-sequence-encoder">Custom Sequence Encoder<a class="headerlink" href="#custom-sequence-encoder" title="Permanent link">&para;</a></h3>
 <p>Here's how to create a custom sequence encoder:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Configuration</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomSequenceEncoderConfig</span><span class="p">(</span><span class="n">ComponentConfig</span><span class="p">):</span>
-    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Input dimension&quot;</span><span class="p">)</span>
-    <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Hidden dimension&quot;</span><span class="p">)</span>
-    <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Number of layers&quot;</span><span class="p">)</span>
-    <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Dropout rate&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/tabular_ssl/models/custom_components.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">SequenceEncoder</span>
 
-<span class="c1"># Component</span>
-<span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_sequence_encoder&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CustomSequenceEncoder</span><span class="p">(</span><span class="n">SequenceEncoder</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CustomSequenceEncoderConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom sequence encoder implementation.&quot;&quot;&quot;</span>
 
-        <span class="c1"># Implementation...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_layers</span> <span class="o">=</span> <span class="n">num_layers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">dropout</span>
+
+        <span class="c1"># Example: Multi-layer GRU</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">GRU</span><span class="p">(</span>
+            <span class="n">input_size</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
+            <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_dim</span><span class="p">,</span>
+            <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span> <span class="k">if</span> <span class="n">num_layers</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="c1"># Forward pass...</span>
-        <span class="k">return</span> <span class="n">x</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass.&quot;&quot;&quot;</span>
+        <span class="c1"># x shape: (batch_size, seq_len, input_dim)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">gru</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># output shape: (batch_size, seq_len, hidden_dim)</span>
+        <span class="k">return</span> <span class="n">output</span>
+</code></pre></div>
+<p>Configuration file:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># configs/model/sequence_encoder/custom_gru.yaml</span>
+<span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">tabular_ssl.models.custom_components.CustomSequenceEncoder</span>
+
+<span class="nt">input_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span>
+<span class="nt">hidden_dim</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">256</span>
+<span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="nt">dropout</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.1</span>
 </code></pre></div>
 <h3 id="custom-projection-head">Custom Projection Head<a class="headerlink" href="#custom-projection-head" title="Permanent link">&para;</a></h3>
-<p>Here's how to create a custom projection head:</p>
-<div class="highlight"><pre><span></span><code><span class="c1"># Configuration</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomProjectionHeadConfig</span><span class="p">(</span><span class="n">ComponentConfig</span><span class="p">):</span>
-    <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Input dimension&quot;</span><span class="p">)</span>
-    <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="o">...</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Output dimension&quot;</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/tabular_ssl/models/custom_components.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">ProjectionHead</span>
 
-<span class="c1"># Component</span>
-<span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_projection_head&quot;</span><span class="p">)</span>
 <span class="k">class</span><span class="w"> </span><span class="nc">CustomProjectionHead</span><span class="p">(</span><span class="n">ProjectionHead</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CustomProjectionHeadConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom projection head with residual connections.&quot;&quot;&quot;</span>
 
-        <span class="c1"># Implementation...</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">output_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_layers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_dim</span> <span class="o">=</span> <span class="n">output_dim</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-        <span class="c1"># Forward pass...</span>
-        <span class="k">return</span> <span class="n">x</span>
-</code></pre></div>
-<h2 id="advanced-component-with-custom-forward-arguments">Advanced: Component with Custom Forward Arguments<a class="headerlink" href="#advanced-component-with-custom-forward-arguments" title="Permanent link">&para;</a></h2>
-<p>You can create components with custom forward arguments:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_encoder_with_mask&quot;</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomEncoderWithMask</span><span class="p">(</span><span class="n">EventEncoder</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CustomEncoderConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="c1"># Implementation...</span>
+        <span class="c1"># Input projection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">mask</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass with optional mask.&quot;&quot;&quot;</span>
-        <span class="c1"># Implementation using mask...</span>
-        <span class="k">return</span> <span class="n">x</span>
-</code></pre></div>
-<h2 id="advanced-component-with-multiple-output-values">Advanced: Component with Multiple Output Values<a class="headerlink" href="#advanced-component-with-multiple-output-values" title="Permanent link">&para;</a></h2>
-<p>Components can return multiple values:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_encoder_with_attention&quot;</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomEncoderWithAttention</span><span class="p">(</span><span class="n">EventEncoder</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CustomEncoderConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="c1"># Implementation...</span>
+        <span class="c1"># Residual blocks</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">ModuleList</span><span class="p">([</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+                <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">)</span>
+            <span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_layers</span><span class="p">)</span>
+        <span class="p">])</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass returning encoded values and attention weights.&quot;&quot;&quot;</span>
-        <span class="c1"># Implementation...</span>
-        <span class="k">return</span> <span class="n">encoded</span><span class="p">,</span> <span class="n">attention_weights</span>
-</code></pre></div>
-<h2 id="advanced-component-with-custom-methods">Advanced: Component with Custom Methods<a class="headerlink" href="#advanced-component-with-custom-methods" title="Permanent link">&para;</a></h2>
-<p>Components can have custom methods beyond the standard <code>forward</code>:</p>
-<div class="highlight"><pre><span></span><code><span class="nd">@ComponentRegistry</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="s2">&quot;custom_autoencoder&quot;</span><span class="p">)</span>
-<span class="k">class</span><span class="w"> </span><span class="nc">CustomAutoEncoder</span><span class="p">(</span><span class="n">EventEncoder</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">CustomEncoderConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="c1"># Implementation...</span>
+        <span class="c1"># Output projection</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">output_dim</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass (encoding only).&quot;&quot;&quot;</span>
-        <span class="c1"># Implementation...</span>
-        <span class="k">return</span> <span class="n">encoded</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass with residual connections.&quot;&quot;&quot;</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_proj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">decode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">z</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Decode latent representation.&quot;&quot;&quot;</span>
-        <span class="c1"># Implementation...</span>
-        <span class="k">return</span> <span class="n">decoded</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="n">residual</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">block</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">residual</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">reconstruct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Full reconstruction.&quot;&quot;&quot;</span>
-        <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">x</span>
 </code></pre></div>
-<h2 id="conclusion">Conclusion<a class="headerlink" href="#conclusion" title="Permanent link">&para;</a></h2>
-<p>You've learned how to create and use custom components in Tabular SSL. The component registry pattern allows you to extend the library with your own implementations while maintaining type safety and configuration validation.</p>
-<p>By creating custom components, you can:
-- Implement new architectures
-- Add domain-specific functionality
-- Experiment with novel approaches
-- Create specialized components for specific datasets</p>
-<p>Remember to always provide proper documentation for your components and to follow the library's design patterns for consistency. </p>
+<h2 id="advanced-example-custom-attention-mechanism">Advanced Example: Custom Attention Mechanism<a class="headerlink" href="#advanced-example-custom-attention-mechanism" title="Permanent link">&para;</a></h2>
+<p>Here's a more complex example with a custom attention mechanism:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># src/tabular_ssl/models/custom_components.py</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CustomAttentionEncoder</span><span class="p">(</span><span class="n">SequenceEncoder</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Custom encoder with learnable attention mechanism.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">hidden_dim</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">num_heads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">input_dim</span> <span class="o">=</span> <span class="n">input_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hidden_dim</span> <span class="o">=</span> <span class="n">hidden_dim</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">num_heads</span> <span class="o">=</span> <span class="n">num_heads</span>
+
+        <span class="c1"># Multi-head attention</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attention</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">MultiheadAttention</span><span class="p">(</span>
+            <span class="n">embed_dim</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
+            <span class="n">num_heads</span><span class="o">=</span><span class="n">num_heads</span><span class="p">,</span>
+            <span class="n">dropout</span><span class="o">=</span><span class="n">dropout</span><span class="p">,</span>
+            <span class="n">batch_first</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Feed-forward network</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ffn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">input_dim</span><span class="p">,</span> <span class="n">hidden_dim</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">ReLU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_dim</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">)</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Layer normalization</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">input_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">input_dim</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward pass with attention and residual connections.&quot;&quot;&quot;</span>
+        <span class="c1"># Self-attention</span>
+        <span class="n">attn_output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">attention</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm1</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">attn_output</span><span class="p">)</span>
+
+        <span class="c1"># Feed-forward</span>
+        <span class="n">ffn_output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ffn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">norm2</span><span class="p">(</span><span class="n">x</span> <span class="o">+</span> <span class="n">ffn_output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span>
+</code></pre></div>
+<h2 id="testing-your-custom-component">Testing Your Custom Component<a class="headerlink" href="#testing-your-custom-component" title="Permanent link">&para;</a></h2>
+<p>Create a simple test to verify your component works:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># test_custom_component.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.custom_components</span><span class="w"> </span><span class="kn">import</span> <span class="n">CustomEventEncoder</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">test_custom_encoder</span><span class="p">():</span>
+    <span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">input_dim</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span> <span class="mi">16</span><span class="p">,</span> <span class="mi">64</span>
+
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">CustomEventEncoder</span><span class="p">(</span>
+        <span class="n">input_dim</span><span class="o">=</span><span class="n">input_dim</span><span class="p">,</span>
+        <span class="n">hidden_dims</span><span class="o">=</span><span class="p">[</span><span class="mi">128</span><span class="p">,</span> <span class="mi">256</span><span class="p">],</span>
+        <span class="n">output_dim</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+        <span class="n">dropout</span><span class="o">=</span><span class="mf">0.1</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Create test input</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="n">input_dim</span><span class="p">)</span>
+
+    <span class="c1"># Forward pass</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c1"># Check output shape</span>
+    <span class="k">assert</span> <span class="n">output</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">seq_len</span><span class="p">,</span> <span class="mi">512</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;✅ Custom encoder test passed!&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">test_custom_encoder</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="best-practices">Best Practices<a class="headerlink" href="#best-practices" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p><strong>Inherit from Base Classes</strong>: Always inherit from appropriate base classes (<code>EventEncoder</code>, <code>SequenceEncoder</code>, etc.)</p>
+</li>
+<li>
+<p><strong>Use Type Hints</strong>: Add proper type hints for better code clarity and IDE support</p>
+</li>
+<li>
+<p><strong>Document Parameters</strong>: Use clear docstrings to document your component's parameters and behavior</p>
+</li>
+<li>
+<p><strong>Test Thoroughly</strong>: Create unit tests for your custom components</p>
+</li>
+<li>
+<p><strong>Follow Naming Conventions</strong>: Use descriptive names for your components and configuration files</p>
+</li>
+<li>
+<p><strong>Handle Edge Cases</strong>: Consider sequence length variations and batch size differences</p>
+</li>
+</ol>
+<h2 id="common-issues-and-solutions">Common Issues and Solutions<a class="headerlink" href="#common-issues-and-solutions" title="Permanent link">&para;</a></h2>
+<h3 id="import-errors">Import Errors<a class="headerlink" href="#import-errors" title="Permanent link">&para;</a></h3>
+<p>Make sure your custom module is importable:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check PYTHONPATH</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PWD</span>/src
+
+<span class="c1"># Test import</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;from tabular_ssl.models.custom_components import CustomEventEncoder; print(&#39;✅ Import successful&#39;)&quot;</span>
+</code></pre></div>
+<h3 id="configuration-errors">Configuration Errors<a class="headerlink" href="#configuration-errors" title="Permanent link">&para;</a></h3>
+<p>Validate your configuration:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Test configuration loading</span>
+python<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;import hydra; hydra.initialize(config_path=&#39;configs&#39;, version_base=None); cfg = hydra.compose(config_name=&#39;config&#39;, overrides=[&#39;+experiment=custom_experiment&#39;]); print(&#39;✅ Config valid&#39;)&quot;</span>
+</code></pre></div>
+<h3 id="dimension-mismatches">Dimension Mismatches<a class="headerlink" href="#dimension-mismatches" title="Permanent link">&para;</a></h3>
+<p>Ensure input/output dimensions match between components:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># Check component compatibility</span>
+<span class="n">event_encoder_output</span> <span class="o">=</span> <span class="mi">512</span>
+<span class="n">sequence_encoder_input</span> <span class="o">=</span> <span class="mi">512</span>  <span class="c1"># Should match</span>
+
+<span class="k">assert</span> <span class="n">event_encoder_output</span> <span class="o">==</span> <span class="n">sequence_encoder_input</span>
+</code></pre></div>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Explore the <a href="../../reference/api/">API Reference</a> for more base classes</li>
+<li>Check out <a href="../../explanation/architecture/">Architecture Overview</a> for design patterns</li>
+<li>See <a href="../../reference/config/">Configuration Reference</a> for advanced configuration options </li>
+</ul>
 
 
 

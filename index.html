@@ -477,6 +477,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quick-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-pre-configured-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Pre-configured Experiments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-component-combinations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Component Combinations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     <span class="md-ellipsis">
       Contributing
@@ -1183,6 +1216,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#quick-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      Quick Examples
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Quick Examples">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#running-pre-configured-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running Pre-configured Experiments
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#custom-component-combinations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Custom Component Combinations
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#contributing" class="md-nav__link">
     <span class="md-ellipsis">
       Contributing
@@ -1247,7 +1313,6 @@
 <p>Understand the concepts and design decisions behind Tabular SSL.</p>
 <ul>
 <li><a href="explanation/architecture/">Architecture Overview</a></li>
-<li><a href="explanation/component-registry/">Component Registry</a></li>
 <li><a href="explanation/ssl-methods/">SSL Methods</a></li>
 <li><a href="explanation/performance/">Performance Considerations</a></li>
 </ul>
@@ -1255,18 +1320,22 @@
 <div class="highlight"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">hydra</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">omegaconf</span><span class="w"> </span><span class="kn">import</span> <span class="n">DictConfig</span>
 
-<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">)</span>
+<span class="nd">@hydra</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../configs&quot;</span><span class="p">,</span> <span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="n">version_base</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 <span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">DictConfig</span><span class="p">):</span>
-    <span class="c1"># Create model from configuration</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">tabular_ssl.models.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">BaseModel</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+    <span class="c1"># Create data module</span>
+    <span class="n">datamodule</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
 
-    <span class="c1"># Train model with given config</span>
+    <span class="c1"># Create model with Hydra instantiation</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># Create trainer</span>
     <span class="n">trainer</span> <span class="o">=</span> <span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">trainer</span><span class="p">)</span>
-    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
 
-    <span class="c1"># Make predictions</span>
-    <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">hydra</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">instantiate</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+    <span class="c1"># Train model</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
+
+    <span class="c1"># Test model</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">test</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">datamodule</span><span class="o">=</span><span class="n">datamodule</span><span class="p">)</span>
 
 <span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">main</span><span class="p">()</span>
@@ -1281,16 +1350,43 @@ pip<span class="w"> </span>install<span class="w"> </span>-r<span class="w"> </s
 
 <span class="c1"># Install the package in development mode</span>
 pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>.
+
+<span class="c1"># Set PYTHONPATH for imports</span>
+<span class="nb">export</span><span class="w"> </span><span class="nv">PYTHONPATH</span><span class="o">=</span><span class="nv">$PWD</span>/src
 </code></pre></div>
 <h2 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Component Registry</strong>: Modular design with type-safe component registration</li>
-<li><strong>Configuration Management</strong>: Hierarchical configuration with Hydra</li>
+<li><strong>Simplified Architecture</strong>: Direct component instantiation with constructor parameters</li>
+<li><strong>Hydra Configuration</strong>: Clean configuration management with <code>_target_</code> specifications</li>
 <li><strong>Self-Supervised Learning</strong>: Multiple SSL methods for tabular data</li>
-<li><strong>Flexible Architecture</strong>: Mix and match components for custom models</li>
-<li><strong>Experiment Management</strong>: Easy experiment configuration and tracking</li>
-<li><strong>Type Safety</strong>: Pydantic-based configuration validation</li>
+<li><strong>Flexible Components</strong>: Mix and match components for custom models</li>
+<li><strong>Experiment Management</strong>: Pre-configured experiments for common architectures</li>
+<li><strong>Modular Design</strong>: Easy to extend and customize</li>
 </ul>
+<h2 id="quick-examples">Quick Examples<a class="headerlink" href="#quick-examples" title="Permanent link">&para;</a></h2>
+<h3 id="running-pre-configured-experiments">Running Pre-configured Experiments<a class="headerlink" href="#running-pre-configured-experiments" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># MLP-only baseline</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>simple_mlp
+
+<span class="c1"># Small transformer model</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>transformer_small
+
+<span class="c1"># Large S4 sequence model</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>s4_large
+
+<span class="c1"># RNN baseline</span>
+python<span class="w"> </span>train.py<span class="w"> </span>+experiment<span class="o">=</span>rnn_baseline
+</code></pre></div>
+<h3 id="custom-component-combinations">Custom Component Combinations<a class="headerlink" href="#custom-component-combinations" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><span class="c1"># Use specific components</span>
+python<span class="w"> </span>train.py<span class="w"> </span>model/sequence_encoder<span class="o">=</span>transformer<span class="w"> </span>model/event_encoder<span class="o">=</span>mlp
+
+<span class="c1"># MLP-only (no sequence processing)</span>
+python<span class="w"> </span>train.py<span class="w"> </span>model/sequence_encoder<span class="o">=</span>null
+
+<span class="c1"># Custom parameters</span>
+python<span class="w"> </span>train.py<span class="w"> </span>model.learning_rate<span class="o">=</span>1e-4<span class="w"> </span>data.batch_size<span class="o">=</span><span class="m">128</span>
+</code></pre></div>
 <h2 id="contributing">Contributing<a class="headerlink" href="#contributing" title="Permanent link">&para;</a></h2>
 <p>We welcome contributions! Please see our <a href="CONTRIBUTING.md">Contributing Guide</a> for details.</p>
 <h2 id="license">License<a class="headerlink" href="#license" title="Permanent link">&para;</a></h2>
