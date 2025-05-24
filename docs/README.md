@@ -33,18 +33,18 @@ mkdocs serve
 
 ### Key Concepts
 
-- **Component Registry**: Tabular SSL uses a component registry pattern to enable modular and extensible components
-- **Configuration System**: Configuration is managed using Hydra, allowing for hierarchical composition
+- **Modular Components**: Tabular SSL uses a simplified modular architecture with direct component instantiation
+- **Configuration System**: Configuration is managed using Hydra with `_target_` specifications for clean component composition
 - **Self-Supervised Learning**: Multiple SSL methods are implemented for tabular data
-- **Type Safety**: Configuration validation is performed using Pydantic
+- **Simplified Architecture**: Direct constructor parameters instead of complex configuration classes
 
 ### Component Types
 
 The library includes several component types:
 
-- **Event Encoders**: Encode individual events (MLP, Autoencoder, Contrastive)
+- **Event Encoders**: Encode individual events (MLP with flexible architecture)
 - **Sequence Encoders**: Encode sequences of events (RNN, LSTM, GRU, Transformer, S4)
-- **Embedding Layers**: Handle embedding of categorical features
+- **Embedding Layers**: Handle embedding of categorical features with flexible dimensions
 - **Projection Heads**: Project encoded representations to a different space
 - **Prediction Heads**: Generate predictions from encoded representations
 
@@ -56,18 +56,31 @@ The configuration system uses Hydra with a structured directory layout:
 configs/
 ├── config.yaml                # Main configuration
 ├── model/                     # Model configurations
+│   ├── default.yaml          # Default model assembly
 │   ├── event_encoder/        # Event encoder configs
 │   ├── sequence_encoder/     # Sequence encoder configs
 │   ├── embedding/            # Embedding configs
 │   ├── projection_head/      # Projection head configs
 │   └── prediction_head/      # Prediction head configs
+├── experiments/              # Pre-configured experiments
 ├── data/                     # Data configurations
 ├── trainer/                  # Training configurations
 ├── callbacks/                # Callback configurations
 ├── logger/                   # Logger configurations
-├── experiment/               # Experiment configurations
+├── paths/                    # Path configurations
 ├── hydra/                    # Hydra-specific configurations
-└── paths/                    # Path configurations
+└── extras/                   # Extra utilities
+```
+
+Components are instantiated using Hydra's `_target_` mechanism:
+
+```yaml
+# configs/model/event_encoder/mlp.yaml
+_target_: tabular_ssl.models.components.MLPEventEncoder
+input_dim: 64
+hidden_dims: [128, 256]
+output_dim: 512
+dropout: 0.1
 ```
 
 ## Contributing to the Documentation

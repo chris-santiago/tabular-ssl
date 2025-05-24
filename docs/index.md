@@ -32,7 +32,6 @@ Detailed technical documentation of the library's components.
 Understand the concepts and design decisions behind Tabular SSL.
 
 - [Architecture Overview](explanation/architecture.md)
-- [Component Registry](explanation/component-registry.md)
 - [SSL Methods](explanation/ssl-methods.md)
 - [Performance Considerations](explanation/performance.md)
 
@@ -42,18 +41,22 @@ Understand the concepts and design decisions behind Tabular SSL.
 import hydra
 from omegaconf import DictConfig
 
-@hydra.main(config_path="../configs", config_name="config")
+@hydra.main(config_path="../configs", config_name="config", version_base=None)
 def main(config: DictConfig):
-    # Create model from configuration
-    from tabular_ssl.models.base import BaseModel
-    model = BaseModel(config)
+    # Create data module
+    datamodule = hydra.utils.instantiate(config.data)
     
-    # Train model with given config
+    # Create model with Hydra instantiation
+    model = hydra.utils.instantiate(config.model)
+    
+    # Create trainer
     trainer = hydra.utils.instantiate(config.trainer)
-    trainer.fit(model, datamodule=hydra.utils.instantiate(config.data))
     
-    # Make predictions
-    trainer.test(model, datamodule=hydra.utils.instantiate(config.data))
+    # Train model
+    trainer.fit(model, datamodule=datamodule)
+    
+    # Test model
+    trainer.test(model, datamodule=datamodule)
 
 if __name__ == "__main__":
     main()
@@ -71,16 +74,50 @@ pip install -r requirements.txt
 
 # Install the package in development mode
 pip install -e .
+
+# Set PYTHONPATH for imports
+export PYTHONPATH=$PWD/src
 ```
 
 ## Key Features
 
-- **Component Registry**: Modular design with type-safe component registration
-- **Configuration Management**: Hierarchical configuration with Hydra
+- **Simplified Architecture**: Direct component instantiation with constructor parameters
+- **Hydra Configuration**: Clean configuration management with `_target_` specifications
 - **Self-Supervised Learning**: Multiple SSL methods for tabular data
-- **Flexible Architecture**: Mix and match components for custom models
-- **Experiment Management**: Easy experiment configuration and tracking
-- **Type Safety**: Pydantic-based configuration validation
+- **Flexible Components**: Mix and match components for custom models
+- **Experiment Management**: Pre-configured experiments for common architectures
+- **Modular Design**: Easy to extend and customize
+
+## Quick Examples
+
+### Running Pre-configured Experiments
+
+```bash
+# MLP-only baseline
+python train.py +experiment=simple_mlp
+
+# Small transformer model
+python train.py +experiment=transformer_small
+
+# Large S4 sequence model
+python train.py +experiment=s4_large
+
+# RNN baseline
+python train.py +experiment=rnn_baseline
+```
+
+### Custom Component Combinations
+
+```bash
+# Use specific components
+python train.py model/sequence_encoder=transformer model/event_encoder=mlp
+
+# MLP-only (no sequence processing)
+python train.py model/sequence_encoder=null
+
+# Custom parameters
+python train.py model.learning_rate=1e-4 data.batch_size=128
+```
 
 ## Contributing
 

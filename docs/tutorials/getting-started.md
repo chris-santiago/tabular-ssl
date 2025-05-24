@@ -4,103 +4,188 @@ This tutorial will guide you through the process of setting up and using the Tab
 
 ## Installation
 
-First, install the library using pip:
+First, clone and install the library:
 
 ```bash
-pip install tabular-ssl
+# Clone the repository
+git clone https://github.com/yourusername/tabular-ssl.git
+cd tabular-ssl
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Install in development mode
+pip install -e .
+
+# Set PYTHONPATH for imports
+export PYTHONPATH=$PWD/src
 ```
 
 ## Basic Usage
 
-Here's a simple example of how to use Tabular SSL:
+Here's a simple example using pre-configured experiments:
 
-```python
-import pandas as pd
-from tabular_ssl import TabularSSL
-from tabular_ssl.data import DataLoader
+```bash
+# Run MLP-only baseline
+python train.py +experiment=simple_mlp
 
-# Load your data
-data_loader = DataLoader()
-data = data_loader.load_data('your_data.csv')
+# Run transformer experiment
+python train.py +experiment=transformer_small
 
-# Initialize the model
-model = TabularSSL(
-    input_dim=data.shape[1],
-    hidden_dim=256,
-    num_layers=4,
-    num_heads=4
-)
+# Run with different data configuration
+python train.py +experiment=simple_mlp data=simple
 
-# Train the model
-history = model.train(
-    data=data,
-    batch_size=32,
-    epochs=100,
-    learning_rate=1e-4
-)
-
-# Make predictions
-predictions = model.predict(new_data)
+# Run with logging
+python train.py +experiment=simple_mlp logger=wandb
 ```
 
 ## Step-by-Step Guide
 
-### 1. Data Preparation
+### 1. Understanding the Configuration System
 
-First, prepare your data:
+Tabular SSL uses Hydra for configuration management. The main config structure is:
 
-```python
-# Load and preprocess your data
-data_loader = DataLoader()
-data = data_loader.load_data('your_data.csv')
+```yaml
+# configs/config.yaml
+defaults:
+  - data: default
+  - model: default  
+  - trainer: default
+  - logger: null
 
-# If you have categorical columns, specify them
-categorical_cols = ['category1', 'category2']
-data = data_loader.preprocess(data, categorical_cols=categorical_cols)
+# Training settings
+train: true
+test: false
+seed: 42
 ```
 
-### 2. Model Configuration
+### 2. Data Configuration
 
-Configure your model with appropriate parameters:
+Configure your data module:
 
-```python
-model = TabularSSL(
-    input_dim=data.shape[1],  # Number of features
-    hidden_dim=256,           # Hidden layer dimension
-    num_layers=4,             # Number of transformer layers
-    num_heads=4,              # Number of attention heads
-    dropout=0.1,              # Dropout rate
-    mask_ratio=0.15           # Feature masking ratio
-)
+```yaml
+# configs/data/default.yaml
+_target_: tabular_ssl.data.datamodule.TabularDataModule
+
+data_dir: ${paths.data_dir}
+dataset_name: sample_dataset
+batch_size: 64
+sequence_length: 32
+
+feature_config:
+  categorical_features:
+    - name: category_1
+      num_categories: 10
+  numerical_features:
+    - name: value_1
+      mean: 0.0
+      std: 1.0
 ```
 
-### 3. Training
+### 3. Model Configuration
 
-Train the model using self-supervised learning:
+The model is composed of modular components:
 
-```python
-history = model.train(
-    data=data,
-    batch_size=32,
-    epochs=100,
-    learning_rate=1e-4
-)
+```yaml
+# configs/model/default.yaml
+defaults:
+  - event_encoder: mlp
+  - sequence_encoder: transformer
+  - projection_head: mlp
+  - prediction_head: classification
+
+_target_: tabular_ssl.models.base.BaseModel
+
+learning_rate: 1.0e-4
+weight_decay: 0.01
+optimizer_type: adamw
 ```
 
-### 4. Evaluation
+### 4. Running Experiments
 
-Evaluate your model's performance:
+Use pre-configured experiments:
+
+```bash
+# Simple MLP baseline
+python train.py +experiment=simple_mlp
+
+# Transformer for sequence modeling
+python train.py +experiment=transformer_small
+
+# S4 for long sequences
+python train.py +experiment=s4_large
+
+# RNN baseline
+python train.py +experiment=rnn_baseline
+```
+
+### 5. Custom Configurations
+
+Override specific components:
+
+```bash
+# Use RNN instead of transformer
+python train.py model/sequence_encoder=rnn
+
+# No sequence encoder (MLP only)
+python train.py model/sequence_encoder=null
+
+# Custom learning rate
+python train.py model.learning_rate=1e-3
+
+# Different batch size
+python train.py data.batch_size=128
+```
+
+### 6. Creating Custom Training Script
 
 ```python
-from tabular_ssl.utils import evaluate_model, plot_training_history
+# train.py
+import hydra
+from omegaconf import DictConfig
+import pytorch_lightning as pl
 
-# Plot training history
-plot_training_history(history)
+@hydra.main(config_path="configs", config_name="config", version_base=None)
+def main(config: DictConfig):
+    # Set seed
+    pl.seed_everything(config.seed)
+    
+    # Create data module
+    datamodule = hydra.utils.instantiate(config.data)
+    
+    # Create model
+    model = hydra.utils.instantiate(config.model)
+    
+    # Create trainer
+    trainer = hydra.utils.instantiate(config.trainer)
+    
+    # Train
+    if config.train:
+        trainer.fit(model, datamodule=datamodule)
+    
+    # Test
+    if config.test:
+        trainer.test(model, datamodule=datamodule)
 
-# Evaluate model performance
-metrics = evaluate_model(model, test_data, metrics=['accuracy', 'f1'])
-print(metrics)
+if __name__ == "__main__":
+    main()
 ```
+
+## Available Components
+
+### Event Encoders
+- **MLP**: Multi-layer perceptron with configurable architecture
+
+### Sequence Encoders
+- **Transformer**: Self-attention based sequence modeling
+- **S4**: Structured state space model for long sequences
+- **RNN**: LSTM/GRU for sequential processing
+- **null**: No sequence processing (MLP-only)
+
+### Other Components
+- **Embedding**: Categorical feature embeddings with flexible dimensions
+- **Projection Head**: MLP for representation projection
+- **Prediction Head**: Classification/regression head
 
 ## Next Steps
 
@@ -110,33 +195,39 @@ print(metrics)
 
 ## Common Issues and Solutions
 
-### Memory Issues
+### Import Errors
 
-If you encounter memory issues with large datasets:
+Make sure PYTHONPATH is set correctly:
 
-```python
-# Use a smaller batch size
-model.train(data, batch_size=16)
-
-# Or reduce model complexity
-model = TabularSSL(
-    input_dim=data.shape[1],
-    hidden_dim=128,  # Reduced from 256
-    num_layers=2,    # Reduced from 4
-    num_heads=2      # Reduced from 4
-)
+```bash
+export PYTHONPATH=/path/to/tabular-ssl/src
 ```
 
-### Training Stability
+### Configuration Errors
 
-For better training stability:
+Validate your configuration:
 
-```python
-# Use a lower learning rate
-model.train(data, learning_rate=1e-5)
+```bash
+# Print configuration without running
+python train.py --print-config
 
-# Increase the number of epochs
-model.train(data, epochs=200)
+# Test specific experiment
+python train.py +experiment=simple_mlp --print-config
+```
+
+### Memory Issues
+
+Use smaller models or batch sizes:
+
+```bash
+# Smaller batch size
+python train.py data.batch_size=32
+
+# Simple MLP (no sequence processing)
+python train.py model/sequence_encoder=null
+
+# Use simple data configuration
+python train.py data=simple
 ```
 
 ## Additional Resources
